@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   SearchOutlined,
@@ -19,7 +19,7 @@ const columns = [
   {
     width: 100,
     title: "Select All",
-    dataIndex: "name",
+    dataIndex: "",
     key: "name",
     fixed: "center",
   },
@@ -51,14 +51,6 @@ const columns = [
     ),
   },
 ];
-const data = [];
-for (let i = 0; i < 100; i++) {
-  data.push({
-    key: i,
-    name: { data },
-    date: "06/12/2021",
-  });
-}
 
 const suffix = (
   <SearchOutlined
@@ -79,15 +71,16 @@ const suffix1 = (
 );
 
 function DatasourceTable() {
-  const url = "http://6d7c-223-196-162-107.ngrok.io/api/schemainfo";
-
+  const [tableData, setTableData] = useState();
+  const [selectedRowKeys, setSelectedRowKeys] = useState();
+  const url =
+    "http://191e-2401-4900-4fc5-7d37-57a5-991f-8365-1727.ngrok.io/api/schemainfo";
   const params = useParams();
-  console.log(params);
 
   let currentSource = dataSource.find(
     (eachSource) => eachSource.id === parseInt(params.id)
   );
-  console.log({ currentSource });
+
   useEffect(() => {
     Axios.get(
       url,
@@ -99,16 +92,32 @@ function DatasourceTable() {
         },
       }
     ).then((res) => {
-      console.log(res.data);
+      // console.log(res.data);
+      setTableData(res.data);
     });
   }, [params]);
-
-  //[currentSource.id]
+  // let data = [];
+  // for (let i = 0; i < 100; i++) {
+  //   data.push({
+  //     key: i,
+  //     name: data,
+  //     date: "06/12/2021",
+  //   });
+  // }
 
   function onChange(e) {
     console.log(`checked = ${e.target.checked}`);
   }
 
+  function onSelectChange(selectedRowKeys) {
+    console.log("selectedRowKeys changed: ", selectedRowKeys);
+    setSelectedRowKeys(selectedRowKeys);
+  }
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  // console.log({ selectedRowKeys });
   return (
     <Tableview>
       <CardComponent>
@@ -140,8 +149,9 @@ function DatasourceTable() {
         </Components>
 
         <Table
+          rowSelection={rowSelection}
           columns={columns}
-          dataSource={data}
+          dataSource={tableData}
           pagination={false}
           scroll={{ x: 800, y: 400 }}
           style={{ width: 900, marginTop: 30 }}
@@ -162,8 +172,13 @@ const Tableview = styled.div`
   flex-direction: row;
   width: 100%;
   gap: 40px;
-
   margin-left: 200px;
+  .ant-table-row-selected {
+    background-color: #1d1d1d;
+    "&:hover": {
+      background-color: #1a1a1c !important;
+    }
+  }
 `;
 const CardComponent = styled.div`
   display: flex;

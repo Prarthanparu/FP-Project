@@ -15,7 +15,7 @@ function ConfigTable(props) {
   const params = useParams();
   const navigate = useNavigate();
 
-  const url = "http://6d7c-223-196-162-107.ngrok.io/api/datasource";
+  const url = "http://191e-2401-4900-4fc5-7d37-57a5-991f-8365-1727.ngrok.io/api/datasource";
 
   const [data, setData] = useState({
     name: "",
@@ -50,19 +50,21 @@ function ConfigTable(props) {
           name: data.name,
         },
       }
-    ).then((res) => {
-      console.log({ res });
-      navigate(
-        "/configuration/" +
-          currentSource.id +
-          "/datasourcetable/" +
-          res.data.response_id
-      );
-    });
-  };
-
-  const info = (event) => {
-    message.info("Connection is established");
+    )
+      .then((res) => {
+        console.log({ res });
+        navigate(
+          "/configuration/" +
+            currentSource.id +
+            "/datasourcetable/" +
+            res.data.response_id
+        );
+        message.info("Connection is established");
+      })
+      .catch((err) => {
+        console.log({ err });
+        message.info("Something went wrong");
+      });
   };
 
   function handle(e) {
@@ -149,7 +151,6 @@ function ConfigTable(props) {
               <Button
                 onClick={(e) => {
                   submit(e);
-                  info();
                 }}
                 type="primary"
               >
