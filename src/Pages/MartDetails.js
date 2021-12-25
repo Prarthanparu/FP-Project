@@ -1,119 +1,64 @@
-import React from "react";
-import { Tabs, Empty, Button, Card } from "antd";
+import React, { useState, useEffect } from "react";
+import { Tabs, Button, Card } from "antd";
 import styled from "styled-components";
-// import DataSource from "../Pages/Datasources";
-// import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
-import {
-  SearchOutlined,
-  FilterOutlined,
-  TableOutlined,
-  CloseOutlined,
-  EditFilled,
-} from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
+import { TableOutlined, CloseOutlined } from "@ant-design/icons";
+import { Link, useParams } from "react-router-dom";
+import { dataSource } from "../Components/DatasourceCard";
 
 function MartDetails() {
-  const style = { width: 200 };
-
+  const [tableList, setTableList] = useState([]);
+  const params = useParams();
+  let currentSource = dataSource.find(
+    (eachSource) => eachSource.id === parseInt(params.id)
+  );
+  useEffect(() => {
+    const arr = params.tableVariables.split(",");
+    setTableList(arr);
+  }, [params]);
   const { TabPane } = Tabs;
+
   return (
     <MartBody>
       <MartContent>
-        <Tabs type="card">
+        <Tabs type="card" className="customTab">
           <TabPane tab="Data Sources" key="1"></TabPane>
           <TabPane tab="Reporting Mart" key="2"></TabPane>
         </Tabs>
       </MartContent>
-      <EmptyContent>
-        {/* <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          imageStyle={{
-            height: 100,
-            size: 100,
-          }}
-          description={<span>The Mart is Empty add new Connections.</span>}
-        ></Empty> */}
-        {/* <SelectedDatasourceCard /> */}
-        <SelectedTables>
-          <Card style={{ width: "80%", height: 60, marginTop: 40 }}>
-            <p style={{ alignItems: "center" }}>
-              <TableOutlined /> Table Name 1
-              <span style={{ marginLeft: 1000 }}>
-                <CloseOutlined />
-              </span>
-            </p>
-          </Card>
-          <Card style={{ width: "80%", height: 60, marginTop: 25 }}>
-            <p style={{ alignItems: "center" }}>
-              <TableOutlined /> Table Name 1
-              <CloseOutlined />
-            </p>
-          </Card>
-          <Card style={{ width: "80%", height: 60, marginTop: 25 }}>
-            <p style={{ alignItems: "center" }}>
-              <TableOutlined /> Table Name 1
-              <span style={{ marginLeft: 1000 }}>
-                <CloseOutlined />
-              </span>
-            </p>
-          </Card>
-          <Card style={{ width: "80%", height: 60, marginTop: 25 }}>
-            <p style={{ alignItems: "center" }}>
-              <TableOutlined /> Table Name 1
-              <span style={{ marginLeft: 1000 }}>
-                <CloseOutlined />
-              </span>
-            </p>
-          </Card>
-          <Card style={{ width: "80%", height: 60, marginTop: 25 }}>
-            <p style={{ alignItems: "center" }}>
-              <TableOutlined /> Table Name 1
-              <span style={{ marginLeft: 1000 }}>
-                <CloseOutlined />
-              </span>
-            </p>
-          </Card>
-          <Card style={{ width: "80%", height: 60, marginTop: 25 }}>
-            <p style={{ alignItems: "center" }}>
-              <TableOutlined /> Table Name 1
-              <span style={{ marginLeft: 1000 }}>
-                <CloseOutlined />
-              </span>
-            </p>
-          </Card>
-        </SelectedTables>
-      </EmptyContent>
-      <EmptyContent>
-        {/* <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          imageStyle={{
-            height: 100,
-            size: 100,
-          }}
-          description={<span>The Mart is Empty add new Connections.</span>}
-        ></Empty> */}
-        {/* <SelectedDatasourceCard /> */}
-        <SelectedTables>
-          <Card style={{ width: "80%", height: 60, marginTop: 40 }}>
-            <p style={{ alignItems: "center" }}>
-              <TableOutlined /> Table Name 1
-              <span style={{ marginLeft: 1000 }}>
-                <CloseOutlined />
-              </span>
-            </p>
-          </Card>
-        </SelectedTables>
-      </EmptyContent>
-      <ButtonContent>
-        <Link to="/">
-          {" "}
-          <Button type="primary">Add New Connections</Button>
-        </Link>
-        <Link to="/configuration/datasource/martdetails/qualitychecks">
-          {" "}
-          <Button>Define Checks</Button>
-        </Link>
-      </ButtonContent>
+      <CardView>
+        <CardComponent>
+          <SelectedDatasourceCard currentSource={currentSource} />
+        </CardComponent>
+        <CardContent>
+          <p style={{ marginBottom: 0, color: "rgb(205 207 210)", fontSize: "12px" }}>
+            {tableList && tableList.length} tables selected from MYSQL
+          </p>
+          <SelectedTables>
+            {tableList &&
+              tableList.map((item) => (
+                <Card className="customContent" style={{}}>
+                  <p>
+                    <span>
+                      <TableOutlined /> {item}
+                    </span>
+                    <CloseOutlined />
+                  </p>
+                </Card>
+              ))}
+          </SelectedTables>
+          <ButtonContent>
+            <Link to="/">
+              {" "}
+              <Button type="primary">Add New Connections</Button>
+            </Link>
+            <Link to="/configuration/datasource/martdetails/qualitychecks">
+              {" "}
+              <Button>Define Checks</Button>
+            </Link>
+          </ButtonContent>
+        </CardContent>
+      </CardView>
     </MartBody>
   );
 }
@@ -125,34 +70,71 @@ const MartBody = styled.div`
   width: 100%;
   height: 80vh;
   flex-direction: column;
+  gap: 40px;
 `;
 
 const MartContent = styled.div`
   display: flex;
   width: 100%;
+  .customTab {
+    margin-left: 100px;
+    .ant-tabs-tab {
+      margin-right: 10px;
+    }
+    .ant-tabs-nav::before {
+      display: none !important;
+    }
+  }
 `;
-
-const EmptyContent = styled.div`
-  /* border: 1px dashed #545454; */
-  /* justify-content: center;
-  align-items: center; */
+const CardView = styled.div`
   display: flex;
-  width: 100%;
-  height: 100%;
   flex-direction: row;
-  gap: 20px;
+  gap: 90px;
+  align-items: flex-start;
+  justify-content: center;
+`;
+const CardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: revert;
+`;
+const CardComponent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
 `;
 
 const ButtonContent = styled.div`
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  margin-top: 100px;
 `;
 
 const SelectedTables = styled.div`
   display: flex;
-  width: 100%;
-  height: 270px;
+  width: 800px;
+  height: 50vh;
   flex-direction: column;
   overflow: auto;
+  :first-child {
+    margin-top: 0px !important;
+  }
+  .customContent {
+    width: 80%;
+    height: 50px;
+    margin-top: 10px;
+    .ant-card-body {
+      padding: 14px !important;
+    }
+    p {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+  customContent:first-child {
+    margin-top: 0px !important;
+  }
 `;
