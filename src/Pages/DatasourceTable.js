@@ -10,8 +10,7 @@ import {
 import { Input, DatePicker, Checkbox, Table } from "antd";
 import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
 import { Button } from "antd";
-import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { dataSource } from "../Components/DatasourceCard";
 import Axios from "axios";
 
@@ -19,7 +18,7 @@ const columns = [
   {
     width: 100,
     title: "Select All",
-    dataIndex: "",
+    dataIndex: "name",
     key: "name",
     fixed: "center",
   },
@@ -73,9 +72,9 @@ const suffix1 = (
 function DatasourceTable() {
   const [tableData, setTableData] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState();
-  const url =
-    "http://191e-2401-4900-4fc5-7d37-57a5-991f-8365-1727.ngrok.io/api/schemainfo";
+  const url = " http://3d11-175-101-108-122.ngrok.io/api/schemainfo";
   const params = useParams();
+  const navigate = useNavigate();
 
   let currentSource = dataSource.find(
     (eachSource) => eachSource.id === parseInt(params.id)
@@ -92,32 +91,47 @@ function DatasourceTable() {
         },
       }
     ).then((res) => {
-      // console.log(res.data);
-      setTableData(res.data);
+      const data = [];
+      for (let i = 0; i < res.data.length; i++) {
+        data.push({
+          key: res.data[i],
+          name: res.data[i],
+        });
+      }
+      setTableData(data);
     });
   }, [params]);
-  // let data = [];
-  // for (let i = 0; i < 100; i++) {
-  //   data.push({
-  //     key: i,
-  //     name: data,
-  //     date: "06/12/2021",
-  //   });
-  // }
+  const data = [
+    "datasource",
+    "datasets",
+    "report_mart_dataset",
+    "report_mart_quality_checks",
+    "report_mart",
+    "quality_check_result",
+    "quality_checks",
+  ];
 
   function onChange(e) {
     console.log(`checked = ${e.target.checked}`);
   }
 
   function onSelectChange(selectedRowKeys) {
-    console.log("selectedRowKeys changed: ", selectedRowKeys);
     setSelectedRowKeys(selectedRowKeys);
   }
+
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
   };
-  // console.log({ selectedRowKeys });
+  const handleClick = () => {
+    navigate(
+      "/configuration/datasource/martdetails/" +
+        params.id +
+        "/" +
+        selectedRowKeys
+    );
+  };
+
   return (
     <Tableview>
       <CardComponent>
@@ -157,9 +171,9 @@ function DatasourceTable() {
           style={{ width: 900, marginTop: 30 }}
         />
         <ButtonPosition>
-          <Link to={"/configuration/datasource/martdetails"}>
-            <Button type="primary">Add Tables</Button>
-          </Link>
+          <Button type="primary" onClick={() => handleClick()}>
+            Add Tables
+          </Button>
         </ButtonPosition>
       </TableContent>
     </Tableview>
@@ -217,6 +231,6 @@ const CheckboxSelect = styled.div`
 const ButtonPosition = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 100px;
   width: 100%;
 `;

@@ -15,7 +15,7 @@ function ConfigTable(props) {
   const params = useParams();
   const navigate = useNavigate();
 
-  const url = "http://191e-2401-4900-4fc5-7d37-57a5-991f-8365-1727.ngrok.io/api/datasource";
+  const url = " http://3d11-175-101-108-122.ngrok.io/api/datasource";
 
   const [data, setData] = useState({
     name: "",
