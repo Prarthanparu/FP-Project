@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Tabs, Button, Card } from "antd";
 import styled from "styled-components";
 import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
-import { TableOutlined, CloseOutlined } from "@ant-design/icons";
+import { TableOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, useParams } from "react-router-dom";
 import { dataSource } from "../Components/DatasourceCard";
+import ReportingMart from "./ReportingMart";
+import ReportingMartList from "./ReportingMartList";
 
 function MartDetails() {
   const [tableList, setTableList] = useState([]);
+  const [martList, setMartList] = useState(false);
   const params = useParams();
   let currentSource = dataSource.find(
     (eachSource) => eachSource.id === parseInt(params.id)
@@ -18,47 +21,84 @@ function MartDetails() {
   }, [params]);
   const { TabPane } = Tabs;
 
+  function callback(key) {
+    console.log(key);
+    setMartList(false);
+  }
+
   return (
     <MartBody>
       <MartContent>
-        <Tabs type="card" className="customTab">
-          <TabPane tab="Data Sources" key="1"></TabPane>
-          <TabPane tab="Reporting Mart" key="2"></TabPane>
+        <Tabs
+          type="card"
+          className="customTab"
+          defaultActiveKey="1"
+          onChange={callback}
+        >
+          <TabPane tab="Data Sources" key="1">
+            <CardView>
+              <CardComponent>
+                <SelectedDatasourceCard currentSource={currentSource} />
+              </CardComponent>
+              <CardContent>
+                <p
+                  style={{
+                    marginBottom: 0,
+                    color: "rgb(205 207 210)",
+                    fontSize: "12px",
+                  }}
+                >
+                  {tableList && tableList.length} tables selected from MYSQL
+                </p>
+                <SelectedTables>
+                  {tableList &&
+                    tableList.map((item) => (
+                      <Card className="customContent" style={{}}>
+                        <p>
+                          <span>
+                            <TableOutlined /> {item}
+                          </span>
+                          <CloseOutlined />
+                        </p>
+                      </Card>
+                    ))}
+                </SelectedTables>
+              </CardContent>
+            </CardView>
+          </TabPane>
+          <TabPane tab="Reporting Mart" key="2">
+            {!martList ? (
+              <ReportingMart setMartList={setMartList} />
+            ) : (
+              <ReportingMartList />
+            )}
+          </TabPane>
         </Tabs>
+        {martList ? (
+          <AddView>
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<PlusOutlined />}
+              size="small"
+              className="customButton"
+            />
+            <p>Create New Reporting Mart</p>
+          </AddView>
+        ) : (
+          ""
+        )}
       </MartContent>
-      <CardView>
-        <CardComponent>
-          <SelectedDatasourceCard currentSource={currentSource} />
-        </CardComponent>
-        <CardContent>
-          <p style={{ marginBottom: 0, color: "rgb(205 207 210)", fontSize: "12px" }}>
-            {tableList && tableList.length} tables selected from MYSQL
-          </p>
-          <SelectedTables>
-            {tableList &&
-              tableList.map((item) => (
-                <Card className="customContent" style={{}}>
-                  <p>
-                    <span>
-                      <TableOutlined /> {item}
-                    </span>
-                    <CloseOutlined />
-                  </p>
-                </Card>
-              ))}
-          </SelectedTables>
-          <ButtonContent>
-            <Link to="/">
-              {" "}
-              <Button type="primary">Add New Connections</Button>
-            </Link>
-            <Link to="/configuration/datasource/martdetails/qualitychecks">
-              {" "}
-              <Button>Define Checks</Button>
-            </Link>
-          </ButtonContent>
-        </CardContent>
-      </CardView>
+      <ButtonContent>
+        <Link to="/">
+          {" "}
+          <Button type="primary">Add New Connections</Button>
+        </Link>
+        <Link to="/configuration/datasource/martdetails/qualitychecks">
+          {" "}
+          <Button>Define Checks</Button>
+        </Link>
+      </ButtonContent>
     </MartBody>
   );
 }
@@ -78,6 +118,7 @@ const MartContent = styled.div`
   width: 100%;
   .customTab {
     margin-left: 100px;
+    width: 100%;
     .ant-tabs-tab {
       margin-right: 10px;
     }
@@ -91,7 +132,7 @@ const CardView = styled.div`
   flex-direction: row;
   gap: 90px;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: start;
 `;
 const CardContent = styled.div`
   display: flex;
@@ -109,7 +150,6 @@ const ButtonContent = styled.div`
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-  margin-top: 100px;
 `;
 
 const SelectedTables = styled.div`
@@ -136,5 +176,13 @@ const SelectedTables = styled.div`
   }
   customContent:first-child {
     margin-top: 0px !important;
+  }
+`;
+const AddView = styled.div`
+  text-align: center;
+  display: flex;
+  .customButton {
+    background: linear-gradient(123.32deg, #db5e1d 45.17%, #ef3499 100%);
+    box-shadow: 3px 2px 6px #000000;
   }
 `;

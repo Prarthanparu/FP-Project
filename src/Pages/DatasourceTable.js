@@ -7,7 +7,7 @@ import {
   EyeInvisibleFilled,
   EditFilled,
 } from "@ant-design/icons";
-import { Input, DatePicker, Checkbox, Table } from "antd";
+import { Input, DatePicker, Checkbox, Table, message } from "antd";
 import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
 import { Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
@@ -72,7 +72,8 @@ const suffix1 = (
 function DatasourceTable() {
   const [tableData, setTableData] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState();
-  const url = " http://3d11-175-101-108-122.ngrok.io/api/schemainfo";
+  const url = "http://37ad-175-101-108-122.ngrok.io/api/schemainfo";
+  const datasetUrl = "http://37ad-175-101-108-122.ngrok.io/api/datasetdetails";
   const params = useParams();
   const navigate = useNavigate();
 
@@ -101,15 +102,6 @@ function DatasourceTable() {
       setTableData(data);
     });
   }, [params]);
-  const data = [
-    "datasource",
-    "datasets",
-    "report_mart_dataset",
-    "report_mart_quality_checks",
-    "report_mart",
-    "quality_check_result",
-    "quality_checks",
-  ];
 
   function onChange(e) {
     console.log(`checked = ${e.target.checked}`);
@@ -124,14 +116,41 @@ function DatasourceTable() {
     onChange: onSelectChange,
   };
   const handleClick = () => {
-    navigate(
-      "/configuration/datasource/martdetails/" +
-        params.id +
-        "/" +
-        selectedRowKeys
-    );
+    if (selectedRowKeys === undefined) {
+      message.info("please select at least one item");
+    } else {
+      Axios.post(
+        datasetUrl,
+        {
+          type: "tablessss",
+          description: "lets build",
+        },
+        {
+          headers: {
+            dataset_name: "default Value",
+            source_id: params.responseid,
+          },
+        }
+      )
+        .then((res) => {
+          console.log({ res });
+          navigate(
+            "/configuration/datasource/martdetails/" +
+              params.id +
+              "/datasourcetable/" +
+              params.responseid +
+              "/" +
+              selectedRowKeys
+          );
+          message.info("Connection is established");
+        })
+        .catch((err) => {
+          console.log({ err });
+          message.info("Something went wrong");
+        });
+    }
   };
-
+  console.log({ selectedRowKeys });
   return (
     <Tableview>
       <CardComponent>
