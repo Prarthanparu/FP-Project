@@ -13,6 +13,7 @@ import { Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import { dataSource } from "../Components/DatasourceCard";
 import Axios from "axios";
+import ExpertationData from "../Components/Expectations/ExpectationData";
 
 const columns = [
   {
@@ -74,13 +75,15 @@ function DatasourceTable() {
   const [selectedRowKeys, setSelectedRowKeys] = useState();
   const url = "http://37ad-175-101-108-122.ngrok.io/api/schemainfo";
   const datasetUrl = "http://37ad-175-101-108-122.ngrok.io/api/datasetdetails";
+  const expectationURL =
+    "http://37ad-175-101-108-122.ngrok.io/api/expectationsuite";
+
   const params = useParams();
   const navigate = useNavigate();
 
   let currentSource = dataSource.find(
     (eachSource) => eachSource.id === parseInt(params.id)
   );
-
   useEffect(() => {
     Axios.get(
       url,
@@ -133,14 +136,27 @@ function DatasourceTable() {
         }
       )
         .then((res) => {
-          console.log({ res });
+          Axios.post(expectationURL, null, {
+            headers: {
+              id: res.data.datasets_response_id,
+            },
+          })
+            .then((res) => {
+              console.log(res.data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
           navigate(
             "/configuration/datasource/martdetails/" +
               params.id +
               "/datasourcetable/" +
               params.responseid +
+              "/datasetresponse/" +
+              res.data.datasets_response_id +
               "/" +
-              selectedRowKeys
+              selectedRowKeys,
+            { state: ExpertationData }
           );
           message.info("Connection is established");
         })
@@ -150,7 +166,6 @@ function DatasourceTable() {
         });
     }
   };
-  console.log({ selectedRowKeys });
   return (
     <Tableview>
       <CardComponent>

@@ -3,7 +3,7 @@ import { Tabs, Button, Card } from "antd";
 import styled from "styled-components";
 import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
 import { TableOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { dataSource } from "../Components/DatasourceCard";
 import ReportingMart from "./ReportingMart";
 import ReportingMartList from "./ReportingMartList";
@@ -12,6 +12,9 @@ function MartDetails() {
   const [tableList, setTableList] = useState([]);
   const [martList, setMartList] = useState(false);
   const params = useParams();
+  const navigate = useNavigate();
+  const { state } = useLocation();
+
   let currentSource = dataSource.find(
     (eachSource) => eachSource.id === parseInt(params.id)
   );
@@ -25,7 +28,13 @@ function MartDetails() {
     console.log(key);
     setMartList(false);
   }
-
+  const handleClick = () => {
+    navigate(
+      "/configuration/datasource/martdetails/qualitychecks/tablechecks",
+      { state: state }
+    );
+  };
+// console.log(state)
   return (
     <MartBody>
       <MartContent>
@@ -94,10 +103,9 @@ function MartDetails() {
           {" "}
           <Button type="primary">Add New Connections</Button>
         </Link>
-        <Link to="/configuration/datasource/martdetails/qualitychecks">
-          {" "}
-          <Button>Define Checks</Button>
-        </Link>
+        {/* <Link to="/configuration/datasource/martdetails/qualitychecks"> */}{" "}
+        <Button onClick={() => handleClick()}>Define Checks</Button>
+        {/* </Link> */}
       </ButtonContent>
     </MartBody>
   );

@@ -19,7 +19,7 @@ function AppBody() {
           element={<DatasourceTable />}
         />
         <Route
-          path="/configuration/datasource/martdetails/:id/datasourcetable/:responseid/:tableVariables"
+          path="/configuration/datasource/martdetails/:id/datasourcetable/:responseid/datasetresponse/:datasets_response_id/:tableVariables"
           element={<MartDetails />}
         />
         <Route
