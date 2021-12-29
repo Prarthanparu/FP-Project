@@ -11,11 +11,24 @@ import {
 import { Input, DatePicker, Checkbox, Table } from "antd";
 import SelectedTableCard from "../SelectedTableCard";
 import { Button } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { List, Steps, Popover } from "antd";
 
 function DatasourceTable() {
   const { Step } = Steps;
+  const [rowData, setRowData] = useState([]);
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const filterItems = (arr, query) => {
+      return arr.filter(function (el) {
+        return (
+          el.expectation_type.toLowerCase().indexOf(query.toLowerCase()) !== -1
+        );
+      });
+    };
+    setRowData(filterItems(state, "expect_table"));
+  }, [state]);
   const expectation = [
     {
       title: "expect_table_row_count_to_equal",
@@ -66,6 +79,7 @@ function DatasourceTable() {
       title: "expect_table_columns_to_match_set",
     },
   ];
+
   const columns = [
     {
       width: 100,
@@ -130,6 +144,12 @@ function DatasourceTable() {
       }}
     />
   );
+  const handleNext = () => {
+    navigate(
+      "/configuration/datasource/martdetails/qualitychecks/columnchecks",
+      { state: state }
+    );
+  };
 
   return (
     <Tableview>
@@ -139,7 +159,7 @@ function DatasourceTable() {
         <DefaultExpectations>
           <List
             itemLayout="horizontal"
-            dataSource={expectation}
+            dataSource={rowData}
             renderItem={(item) => (
               <List.Item
                 actions={[
@@ -153,7 +173,7 @@ function DatasourceTable() {
               >
                 <List.Item.Meta
                   itemLayout="horizontal"
-                  title={<a>{item.title}</a>}
+                  title={<a>{item.expectation_type}</a>}
                 />
               </List.Item>
             )}
@@ -204,14 +224,7 @@ function DatasourceTable() {
         <ButtonContent>
           <Button type="primary">Apply</Button>
 
-          <Link
-            to={
-              "/configuration/datasource/martdetails/qualitychecks/columnchecks"
-            }
-          >
-            {" "}
-            <Button>Next</Button>
-          </Link>
+          <Button onClick={() => handleNext()}>Next</Button>
         </ButtonContent>
       </TableContent>
     </Tableview>

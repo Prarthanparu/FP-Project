@@ -1,28 +1,42 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { SearchOutlined, FilterOutlined } from "@ant-design/icons";
 import { Input, DatePicker, Table } from "antd";
 import SelectedTableCard from "../SelectedTableCard";
 import { Button } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Steps, Popover } from "antd";
 
 function DatasourceTable() {
   const { Step } = Steps;
+  const { state } = useLocation();
+  const [columnData, setColumnData] = useState([]);
+
+  useEffect(() => {
+    const filterItems = (arr, query) => {
+      return arr.filter(function (el) {
+        return (
+          el.expectation_type.toLowerCase().indexOf(query.toLowerCase()) !== -1
+        );
+      });
+    };
+    setColumnData(filterItems(state, "expect_column"));
+  }, [state]);
 
   const columns = [
     {
       title: "Column Name",
       width: 50,
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "kwargs",
+      key: "kwargs",
+      render: (kwargs) => kwargs.column,
       fixed: "center",
     },
     {
       title: "Expectations",
       width: 60,
-      dataIndex: "description",
-      key: "discription",
+      dataIndex: "expectation_type",
+      key: "expectation_type",
       fixed: "center",
     },
     {
@@ -108,7 +122,7 @@ function DatasourceTable() {
         <ExpectationsTable>
           <Table
             columns={columns}
-            dataSource={data}
+            dataSource={columnData}
             pagination={false}
             scroll={{ x: 800, y: 400 }}
             style={{ width: "100%" }}
