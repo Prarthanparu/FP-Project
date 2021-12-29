@@ -134,8 +134,8 @@ function DatasourceTable() {
       Axios.post(
         datasetUrl,
         {
-          type: "tablessss",
-          description: "lets build",
+          type: "table",
+          description: "sample",
         },
         {
           headers: {
@@ -151,28 +151,28 @@ function DatasourceTable() {
             },
           })
             .then((res) => {
-              console.log(res.data);
               setBtnLoading(!btnloading);
+              console.log(res.data);
+              navigate(
+                "/configuration/datasource/martdetails/" +
+                  params.id +
+                  "/datasourcetable/" +
+                  params.responseid +
+                  "/datasetresponse/" +
+                  res.data.datasets_response_id +
+                  "/" +
+                  selectedRowKeys,
+                { state: res.data.expectations }
+              );
+              message.info("Profiling Done Successfully!");
             })
             .catch((err) => {
               setBtnLoading(!btnloading);
               console.log(err);
             });
-          navigate(
-            "/configuration/datasource/martdetails/" +
-              params.id +
-              "/datasourcetable/" +
-              params.responseid +
-              "/datasetresponse/" +
-              res.data.datasets_response_id +
-              "/" +
-              selectedRowKeys,
-            { state: ExpertationData }
-          );
-          message.info("Connection is established");
         })
         .catch((err) => {
-          console.log({ err });
+          console.log(err);
           message.info("Something went wrong");
         });
     }
