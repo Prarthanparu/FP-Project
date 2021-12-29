@@ -7,7 +7,7 @@ import {
   EyeInvisibleFilled,
   EditFilled,
 } from "@ant-design/icons";
-import { Input, DatePicker, Checkbox, Table, message } from "antd";
+import { Input, DatePicker, Checkbox, Table, message, Spin } from "antd";
 import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
 import { Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
@@ -73,6 +73,8 @@ const suffix1 = (
 function DatasourceTable() {
   const [tableData, setTableData] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState();
+  const [loading, setLoading] = useState(false);
+  const [btnloading, setBtnLoading] = useState(false);
   const url = "http://37ad-175-101-108-122.ngrok.io/api/schemainfo";
   const datasetUrl = "http://37ad-175-101-108-122.ngrok.io/api/datasetdetails";
   const expectationURL =
@@ -85,6 +87,7 @@ function DatasourceTable() {
     (eachSource) => eachSource.id === parseInt(params.id)
   );
   useEffect(() => {
+    setLoading(true);
     Axios.get(
       url,
 
@@ -94,18 +97,23 @@ function DatasourceTable() {
           source_type: currentSource.source_type,
         },
       }
-    ).then((res) => {
-      const data = [];
-      for (let i = 0; i < res.data.length; i++) {
-        data.push({
-          key: res.data[i],
-          name: res.data[i],
-        });
-      }
-      setTableData(data);
-    });
+    )
+      .then((res) => {
+        setLoading(false);
+        const data = [];
+        for (let i = 0; i < res.data.length; i++) {
+          data.push({
+            key: res.data[i],
+            name: res.data[i],
+          });
+        }
+        setTableData(data);
+      })
+      .catch((err) => {
+        setLoading(false);
+      });
   }, [params]);
-
+  console.log({ loading });
   function onChange(e) {
     console.log(`checked = ${e.target.checked}`);
   }
@@ -122,6 +130,7 @@ function DatasourceTable() {
     if (selectedRowKeys === undefined) {
       message.info("please select at least one item");
     } else {
+      setBtnLoading(!btnloading);
       Axios.post(
         datasetUrl,
         {
@@ -143,8 +152,10 @@ function DatasourceTable() {
           })
             .then((res) => {
               console.log(res.data);
+              setBtnLoading(!btnloading);
             })
             .catch((err) => {
+              setBtnLoading(!btnloading);
               console.log(err);
             });
           navigate(
@@ -167,49 +178,59 @@ function DatasourceTable() {
     }
   };
   return (
-    <Tableview>
-      <CardComponent>
-        <SelectedDatasourceCard currentSource={currentSource} />
-        <Button>
-          <TableOutlined /> Create Custom Table
-        </Button>
-      </CardComponent>
-      <TableContent>
-        <Header>
-          <h1>Select The Table From the DataSource</h1>
-        </Header>
-        <Components>
-          <Input
-            placeholder="Search Your Source"
-            style={{ width: 283, height: 41 }}
-            suffix={suffix}
-          />
-          <Input
-            placeholder="Search Your Source"
-            style={{ width: 147, height: 41 }}
-            suffix={suffix1}
-          />
+    <Tableview style={{ marginLeft: loading ? "0" : "200px" }}>
+      {!loading ? (
+        <React.Fragment>
+          <CardComponent>
+            <SelectedDatasourceCard currentSource={currentSource} />
+            <Button>
+              <TableOutlined /> Create Custom Table
+            </Button>
+          </CardComponent>
+          <TableContent>
+            <Header>
+              <h1>Select The Table From the DataSource</h1>
+            </Header>
+            <Components>
+              <Input
+                placeholder="Search Your Source"
+                style={{ width: 283, height: 41 }}
+                suffix={suffix}
+              />
+              <Input
+                placeholder="Search Your Source"
+                style={{ width: 147, height: 41 }}
+                suffix={suffix1}
+              />
 
-          <DatePicker size={"large"} />
-          <CheckboxSelect>
-            <Checkbox onChange={onChange}>Select All</Checkbox>
-          </CheckboxSelect>
-        </Components>
+              <DatePicker size={"large"} />
+              <CheckboxSelect>
+                <Checkbox onChange={onChange}>Select All</Checkbox>
+              </CheckboxSelect>
+            </Components>
 
-        <Table
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={tableData}
-          pagination={false}
-          scroll={{ x: 800, y: 400 }}
-          style={{ width: 900, marginTop: 30 }}
-        />
-        <ButtonPosition>
-          <Button type="primary" onClick={() => handleClick()}>
-            Add Tables
-          </Button>
-        </ButtonPosition>
-      </TableContent>
+            <Table
+              rowSelection={rowSelection}
+              columns={columns}
+              dataSource={tableData}
+              pagination={false}
+              scroll={{ x: 800, y: 400 }}
+              style={{ width: 900, marginTop: 30 }}
+            />
+            <ButtonPosition>
+              <Button
+                type="primary"
+                loading={btnloading}
+                onClick={() => handleClick()}
+              >
+                Add Tables
+              </Button>
+            </ButtonPosition>
+          </TableContent>
+        </React.Fragment>
+      ) : (
+        <Spin className="loading" />
+      )}
     </Tableview>
   );
 }
@@ -220,7 +241,13 @@ const Tableview = styled.div`
   flex-direction: row;
   width: 100%;
   gap: 40px;
-  margin-left: 200px;
+  .loading {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
   .ant-table-row-selected {
     background-color: #1d1d1d;
     "&:hover": {

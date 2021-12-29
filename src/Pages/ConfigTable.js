@@ -25,6 +25,7 @@ function ConfigTable(props) {
     database: "",
     port: "",
   });
+  const [loading, setLoading] = useState(false);
 
   let currentSource = dataSource.find(
     (eachSource) => eachSource.id === parseInt(params.id)
@@ -32,7 +33,7 @@ function ConfigTable(props) {
 
   const submit = (e) => {
     e.preventDefault();
-
+    setLoading(true);
     Axios.post(
       url,
       {
@@ -53,6 +54,7 @@ function ConfigTable(props) {
     )
       .then((res) => {
         console.log({ res });
+        setLoading(false);
         navigate(
           "/configuration/" +
             currentSource.id +
@@ -63,6 +65,7 @@ function ConfigTable(props) {
       })
       .catch((err) => {
         console.log({ err });
+        setLoading(false);
         message.info("Something went wrong");
       });
   };
@@ -149,6 +152,7 @@ function ConfigTable(props) {
             </Form.Item>
             <Form.Item>
               <Button
+                loading={loading}
                 onClick={(e) => {
                   submit(e);
                 }}
