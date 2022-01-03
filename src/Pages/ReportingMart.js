@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Card, Button, Form, Input, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import ModalComponent from "../Components/Modal";
 import axios from "axios";
 
@@ -10,6 +10,8 @@ const ReportingMart = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [name, setName] = useState("");
   const params = useParams();
+  const { state } = useLocation();
+  console.log({ state });
   const [form] = Form.useForm();
   const url = "http://37ad-175-101-108-122.ngrok.io/api/report_mart";
   const handleOk = () => {
@@ -42,7 +44,6 @@ const ReportingMart = (props) => {
   const handleChange = (e) => {
     setName(e.target.value);
   };
-  console.log({ name });
   return (
     <CardContent>
       <Card className="customCard">

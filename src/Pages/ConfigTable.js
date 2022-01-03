@@ -57,9 +57,10 @@ function ConfigTable(props) {
         setLoading(false);
         navigate(
           "/configuration/" +
-            currentSource.id +
+            res.data.response_id +
             "/datasourcetable/" +
-            res.data.response_id
+            res.data.response_id,
+          { state: res.data }
         );
         message.info("Connection is established");
       })

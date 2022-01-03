@@ -10,10 +10,9 @@ import {
 import { Input, DatePicker, Checkbox, Table, message, Spin } from "antd";
 import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
 import { Button } from "antd";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { dataSource } from "../Components/DatasourceCard";
 import Axios from "axios";
-import ExpertationData from "../Components/Expectations/ExpectationData";
 
 const columns = [
   {
@@ -72,8 +71,10 @@ const suffix1 = (
 
 function DatasourceTable() {
   const [tableData, setTableData] = useState();
-  const [selectedRowKeys, setSelectedRowKeys] = useState();
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [payload, setPayloadData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [screenLoading, setScreenLoading] = useState(false);
   const [btnloading, setBtnLoading] = useState(false);
   const url = "http://37ad-175-101-108-122.ngrok.io/api/schemainfo";
   const datasetUrl = "http://37ad-175-101-108-122.ngrok.io/api/datasetdetails";
@@ -82,24 +83,24 @@ function DatasourceTable() {
 
   const params = useParams();
   const navigate = useNavigate();
-
+  const location = useLocation();
   let currentSource = dataSource.find(
     (eachSource) => eachSource.id === parseInt(params.id)
   );
+
   useEffect(() => {
     setLoading(true);
-    Axios.get(
-      url,
+    const pay = {
+      1: {
+        datasource_id: JSON.stringify(location.state.response_id),
+        source_type: location.state.source_type,
+      },
+    };
 
-      {
-        headers: {
-          datasource_id: params.responseid,
-          source_type: currentSource.source_type,
-        },
-      }
-    )
+    Axios.post(url, pay)
       .then((res) => {
         setLoading(false);
+        console.log(res, "response");
         const data = [];
         for (let i = 0; i < res.data.length; i++) {
           data.push({
@@ -109,11 +110,22 @@ function DatasourceTable() {
         }
         setTableData(data);
       })
-      .catch((err) => {
+      .catch(() => {
         setLoading(false);
       });
-  }, [params]);
-  console.log({ loading });
+  }, [params, currentSource]);
+  console.log({ tableData });
+  useEffect(() => {
+    const newArr = [];
+    for (let i = 0; i < selectedRowKeys.length; i++) {
+      newArr.push({
+        type: "table",
+        discription: selectedRowKeys[i],
+      });
+    }
+    setPayloadData(newArr);
+  }, [selectedRowKeys]);
+
   function onChange(e) {
     console.log(`checked = ${e.target.checked}`);
   }
@@ -127,16 +139,15 @@ function DatasourceTable() {
     onChange: onSelectChange,
   };
   const handleClick = () => {
-    if (selectedRowKeys === undefined) {
+    setScreenLoading(true);
+    if (!payload.length) {
       message.info("please select at least one item");
     } else {
       setBtnLoading(!btnloading);
       Axios.post(
         datasetUrl,
-        {
-          type: "table",
-          description: "sample",
-        },
+        payload,
+
         {
           headers: {
             dataset_name: "default Value",
@@ -151,20 +162,18 @@ function DatasourceTable() {
             },
           })
             .then((res) => {
+              setScreenLoading(false);
               setBtnLoading(!btnloading);
-              console.log(res.data);
               navigate(
                 "/configuration/datasource/martdetails/" +
                   params.id +
                   "/datasourcetable/" +
                   params.responseid +
-                  "/datasetresponse/" +
-                  res.data.datasets_response_id +
                   "/" +
                   selectedRowKeys,
                 { state: res.data.expectations }
               );
-              message.info("Profiling Done Successfully!");
+              message.success("Profiling Done Successfully!");
             })
             .catch((err) => {
               setBtnLoading(!btnloading);
@@ -182,7 +191,7 @@ function DatasourceTable() {
       {!loading ? (
         <React.Fragment>
           <CardComponent>
-            <SelectedDatasourceCard currentSource={currentSource} />
+            <SelectedDatasourceCard currentSource={location.state} />
             <Button>
               <TableOutlined /> Create Custom Table
             </Button>
@@ -208,15 +217,17 @@ function DatasourceTable() {
                 <Checkbox onChange={onChange}>Select All</Checkbox>
               </CheckboxSelect>
             </Components>
+            <Spin tip="Profiling in Progress..." spinning={screenLoading}>
+              <Table
+                rowSelection={rowSelection}
+                columns={columns}
+                dataSource={tableData}
+                pagination={false}
+                scroll={{ x: 800, y: 400 }}
+                style={{ width: 900, marginTop: 30 }}
+              />
+            </Spin>
 
-            <Table
-              rowSelection={rowSelection}
-              columns={columns}
-              dataSource={tableData}
-              pagination={false}
-              scroll={{ x: 800, y: 400 }}
-              style={{ width: 900, marginTop: 30 }}
-            />
             <ButtonPosition>
               <Button
                 type="primary"
