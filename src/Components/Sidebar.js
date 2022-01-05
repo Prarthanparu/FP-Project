@@ -21,8 +21,10 @@ function Sidebar() {
             </Link>
           </li>
           <li>
-            <RadarChartOutlined style={{ fontSize: 30 }} />
-            <h5>Data Source</h5>
+            <Link to="/configuration/datasource/marttable">
+              <RadarChartOutlined style={{ fontSize: 30 }} />
+              <h5>Data Source</h5>
+            </Link>
           </li>
           <li key="/configuration/datasource/martdetails">
             <Link to="/configuration/datasource/martdetails">

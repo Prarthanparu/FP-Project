@@ -13,7 +13,7 @@ import Image from "../images/empty.png";
 const ReportingMartList = () => {
   const params = useParams();
   const [dataSet, setDataSet] = useState();
-  const url = "http://37ad-175-101-108-122.ngrok.io/api/report_mart";
+  const url = "http://0a78-223-196-162-114.ngrok.io/api/report_mart";
  
   useEffect(() => {
     axios

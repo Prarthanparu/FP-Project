@@ -7,7 +7,8 @@ import MartDetails from "./Pages/MartDetails";
 import QualityChecksView from "./Pages/QualityChecksView";
 import TableExpectation from "./Components/Expectations/TableExpectation";
 import ColumnExpectation from "./Components/Expectations/ColumnExpectation";
-import ReportingMart from "./Pages/ReportingMart";
+import ReportingMart from "./Pages/ReportingMart"
+import DatasourceMartDetails from "./Pages/DatasourceMartTable";
 
 function AppBody() {
   return (
@@ -25,6 +26,10 @@ function AppBody() {
       <Route
         path="/configuration/datasource/martdetails"
         element={<ReportingMart />}
+      />
+      <Route
+        path="/configuration/datasource/marttable"
+        element={<DatasourceMartDetails />}
       />
       <Route
         path="/configuration/datasource/martdetails/qualitychecks"

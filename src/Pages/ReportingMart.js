@@ -13,7 +13,7 @@ const ReportingMart = (props) => {
   const { state } = useLocation();
   console.log({ state });
   const [form] = Form.useForm();
-  const url = "http://37ad-175-101-108-122.ngrok.io/api/report_mart";
+  const url = "http://0a78-223-196-162-114.ngrok.io/api/report_mart";
   const handleOk = () => {
     axios
       .post(

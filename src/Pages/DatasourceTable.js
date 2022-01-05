@@ -76,45 +76,45 @@ function DatasourceTable() {
   const [loading, setLoading] = useState(false);
   const [screenLoading, setScreenLoading] = useState(false);
   const [btnloading, setBtnLoading] = useState(false);
-  const url = "http://37ad-175-101-108-122.ngrok.io/api/schemainfo";
-  const datasetUrl = "http://37ad-175-101-108-122.ngrok.io/api/datasetdetails";
+  const url = "http://0a78-223-196-162-114.ngrok.io/api/schemainfo";
+  const datasetUrl = "http://0a78-223-196-162-114.ngrok.io/api/datasetdetails";
   const expectationURL =
-    "http://37ad-175-101-108-122.ngrok.io/api/expectationsuite";
+    "http://0a78-223-196-162-114.ngrok.io/api/expectationsuite";
 
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   let currentSource = dataSource.find(
-    (eachSource) => eachSource.id === parseInt(params.id)
+    (eachSource) => eachSource.source_type === location.state.source_type
   );
-
   useEffect(() => {
+    console.log({ currentSource }, params);
     setLoading(true);
     const pay = {
       1: {
         datasource_id: JSON.stringify(location.state.response_id),
         source_type: location.state.source_type,
-      },
+      },      
     };
 
     Axios.post(url, pay)
       .then((res) => {
         setLoading(false);
-        console.log(res, "response");
         const data = [];
-        for (let i = 0; i < res.data.length; i++) {
-          data.push({
-            key: res.data[i],
-            name: res.data[i],
+        res.data &&
+          res.data[params.responseid].forEach((e) => {
+            console.log(e);
+            data.push({
+              key: e,
+              name: e,
+            });
           });
-        }
         setTableData(data);
       })
       .catch(() => {
         setLoading(false);
       });
   }, [params, currentSource]);
-  console.log({ tableData });
   useEffect(() => {
     const newArr = [];
     for (let i = 0; i < selectedRowKeys.length; i++) {
@@ -141,6 +141,7 @@ function DatasourceTable() {
   const handleClick = () => {
     setScreenLoading(true);
     if (!payload.length) {
+      setScreenLoading(false);
       message.info("please select at least one item");
     } else {
       setBtnLoading(!btnloading);
@@ -191,7 +192,7 @@ function DatasourceTable() {
       {!loading ? (
         <React.Fragment>
           <CardComponent>
-            <SelectedDatasourceCard currentSource={location.state} />
+            <SelectedDatasourceCard currentSource={currentSource} />
             <Button>
               <TableOutlined /> Create Custom Table
             </Button>
