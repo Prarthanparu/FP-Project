@@ -1,31 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Tabs, Button, Card } from "antd";
+import { Tabs, Button, Table } from "antd";
 import styled from "styled-components";
-import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
-import { TableOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import { dataSource } from "../Components/DatasourceCard";
 import ReportingMart from "./ReportingMart";
 import ReportingMartList from "./ReportingMartList";
+import Axios from "axios";
+import moment from "moment";
 
-function MartDetails() {
+function DatasourceMartDetails() {
   const [tableList, setTableList] = useState([]);
   const [martList, setMartList] = useState(false);
   const params = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
-
-  let currentSource = dataSource.find(
-    (eachSource) => eachSource.id === parseInt(params.id)
-  );
+  const datasourceUrl = "http://0a78-223-196-162-114.ngrok.io/api/datasource";
   useEffect(() => {
-    const arr = params.tableVariables.split(",");
-    setTableList(arr);
+    Axios.get(datasourceUrl)
+      .then((res) => {
+        setTableList(res.data);
+      })
+      .catch(() => {});
   }, [params]);
   const { TabPane } = Tabs;
 
   function callback(key) {
-    console.log(key);
     setMartList(false);
   }
   const handleClick = () => {
@@ -34,45 +33,83 @@ function MartDetails() {
       { state: state }
     );
   };
-// console.log(state)
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Created Date",
+      dataIndex: "created_on",
+      key: "created_on",
+      render: (record) => moment(record).format("YYYY-DD-MMMM"),
+    },
+    {
+      title: "Total Datasets",
+      dataIndex: "datasets_count",
+      key: "datasets_count",
+      render: (record) =>
+        `${
+          record === 0
+            ? record + " DataSets"
+            : record === 1
+            ? record + " DataSet Selected"
+            : record + " DataSets Selected"
+        } `,
+    },
+    {
+      title: "Source Type",
+      dataIndex: "source_type",
+      key: "source_type",
+    },
+    {
+      title: "Actions",
+      key: "",
+      dataIndex: "",
+      render: (record) => (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 60,
+            justifyContent: "flex-start",
+          }}
+        >
+          <a onClick={() => handleEdit(record)}>
+            <EditOutlined />
+          </a>
+          <a>
+            <DeleteOutlined />
+          </a>
+        </div>
+      ),
+    },
+  ];
+  const handleEdit = (e) => {
+    navigate("/configuration/" + e.id + "/datasourcetable/" + e.id, {
+      state: e,
+    });
+  };
   return (
     <MartBody>
       <MartContent>
         <Tabs
           type="card"
           className="customTab"
-          defaultActiveKey="1"
+          defaultActiveKey={state.from === "reoportmark" ? "2" : "1"}
           onChange={callback}
         >
           <TabPane tab="Data Sources" key="1">
             <CardView>
-              <CardComponent>
-                <SelectedDatasourceCard currentSource={currentSource} />
-              </CardComponent>
-              <CardContent>
-                <p
-                  style={{
-                    marginBottom: 0,
-                    color: "rgb(205 207 210)",
-                    fontSize: "12px",
-                  }}
-                >
-                  {tableList && tableList.length} tables selected from MYSQL
-                </p>
-                <SelectedTables>
-                  {tableList &&
-                    tableList.map((item) => (
-                      <Card className="customContent" style={{}}>
-                        <p>
-                          <span>
-                            <TableOutlined /> {item}
-                          </span>
-                          <CloseOutlined />
-                        </p>
-                      </Card>
-                    ))}
-                </SelectedTables>
-              </CardContent>
+              <Table
+                style={{ width: "100%", height: "100%" }}
+                scroll={{ x: 1500, y: 400 }}
+                columns={columns}
+                dataSource={tableList}
+                pagination={false}
+              />
             </CardView>
           </TabPane>
           <TabPane tab="Reporting Mart" key="2">
@@ -103,15 +140,13 @@ function MartDetails() {
           {" "}
           <Button type="primary">Add New Connections</Button>
         </Link>
-        {/* <Link to="/configuration/datasource/martdetails/qualitychecks"> */}{" "}
         <Button onClick={() => handleClick()}>Define Checks</Button>
-        {/* </Link> */}
       </ButtonContent>
     </MartBody>
   );
 }
 
-export default MartDetails;
+export default DatasourceMartDetails;
 
 const MartBody = styled.div`
   display: flex;

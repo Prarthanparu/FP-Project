@@ -20,14 +20,17 @@ function Sidebar() {
               <h5>Data Flow</h5>
             </Link>
           </li>
-          <li>
-            <Link to="/configuration/datasource/marttable">
+          <li key="/configuration/datasource/martdetails">
+            <Link to="/configuration/datasource/martdetails">
               <RadarChartOutlined style={{ fontSize: 30 }} />
               <h5>Data Source</h5>
             </Link>
           </li>
-          <li key="/configuration/datasource/martdetails">
-            <Link to="/configuration/datasource/martdetails">
+          <li key="/configuration/reportmart">
+            <Link
+              to="/configuration/datasource/martdetails"
+              state={{ from: "reoportmark" }}
+            >
               <DatabaseOutlined style={{ fontSize: 30 }} />
               <h5>Reporting Mart</h5>
             </Link>

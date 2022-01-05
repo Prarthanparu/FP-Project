@@ -72,7 +72,7 @@ const suffix1 = (
 function DatasourceTable() {
   const [tableData, setTableData] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [payload, setPayloadData] = useState([]);
+  const [payload, setPayloadData] = useState({});
   const [loading, setLoading] = useState(false);
   const [screenLoading, setScreenLoading] = useState(false);
   const [btnloading, setBtnLoading] = useState(false);
@@ -88,13 +88,14 @@ function DatasourceTable() {
     (eachSource) => eachSource.source_type === location.state.source_type
   );
   useEffect(() => {
-    console.log({ currentSource }, params);
     setLoading(true);
     const pay = {
       1: {
-        datasource_id: JSON.stringify(location.state.response_id),
+        datasource_id: JSON.stringify(
+          location.state.id ? location.state.id : location.state.response_id
+        ),
         source_type: location.state.source_type,
-      },      
+      },
     };
 
     Axios.post(url, pay)
@@ -103,7 +104,6 @@ function DatasourceTable() {
         const data = [];
         res.data &&
           res.data[params.responseid].forEach((e) => {
-            console.log(e);
             data.push({
               key: e,
               name: e,
@@ -115,12 +115,13 @@ function DatasourceTable() {
         setLoading(false);
       });
   }, [params, currentSource]);
+
   useEffect(() => {
     const newArr = [];
     for (let i = 0; i < selectedRowKeys.length; i++) {
       newArr.push({
         type: "table",
-        discription: selectedRowKeys[i],
+        description: selectedRowKeys[i],
       });
     }
     setPayloadData(newArr);
@@ -145,35 +146,37 @@ function DatasourceTable() {
       message.info("please select at least one item");
     } else {
       setBtnLoading(!btnloading);
+
       Axios.post(
         datasetUrl,
         payload,
 
         {
           headers: {
-            dataset_name: "default Value",
+            dataset_name: "Dummy Data",
+            type: "dataset",
             source_id: params.responseid,
           },
         }
       )
         .then((res) => {
-          Axios.post(expectationURL, null, {
-            headers: {
-              id: res.data.datasets_response_id,
+          Axios.post(
+            expectationURL,
+            {
+              ids: res.data.datasets_response_id,
             },
-          })
+            {
+              headers: {
+                type: res.data.type,
+              },
+            }
+          )
             .then((res) => {
               setScreenLoading(false);
               setBtnLoading(!btnloading);
-              navigate(
-                "/configuration/datasource/martdetails/" +
-                  params.id +
-                  "/datasourcetable/" +
-                  params.responseid +
-                  "/" +
-                  selectedRowKeys,
-                { state: res.data.expectations }
-              );
+              navigate("/configuration/datasource/martdetails", {
+                state: res.data.expectations,
+              });
               message.success("Profiling Done Successfully!");
             })
             .catch((err) => {

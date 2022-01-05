@@ -7,8 +7,7 @@ import MartDetails from "./Pages/MartDetails";
 import QualityChecksView from "./Pages/QualityChecksView";
 import TableExpectation from "./Components/Expectations/TableExpectation";
 import ColumnExpectation from "./Components/Expectations/ColumnExpectation";
-import ReportingMart from "./Pages/ReportingMart"
-import DatasourceMartDetails from "./Pages/DatasourceMartTable";
+import ReportingMart from "./Pages/ReportingMart";
 
 function AppBody() {
   return (
@@ -20,17 +19,11 @@ function AppBody() {
         element={<DatasourceTable />}
       />
       <Route
-        path="/configuration/datasource/martdetails/:id/datasourcetable/:responseid/:tableVariables"
+        path="/configuration/datasource/martdetails"
         element={<MartDetails />}
       />
-      <Route
-        path="/configuration/datasource/martdetails"
-        element={<ReportingMart />}
-      />
-      <Route
-        path="/configuration/datasource/marttable"
-        element={<DatasourceMartDetails />}
-      />
+      <Route path="/configuration/reportmart" element={<ReportingMart />} />
+
       <Route
         path="/configuration/datasource/martdetails/qualitychecks"
         element={<QualityChecksView />}
