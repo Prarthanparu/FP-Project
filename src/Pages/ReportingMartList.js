@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Card, Checkbox, Upload } from "antd";
+import { Card, Checkbox, Upload, Table, Button } from "antd";
 import { useParams } from "react-router-dom";
 import {
   EditOutlined,
@@ -9,12 +9,19 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import Image from "../images/empty.png";
+import moment from "moment";
 
 const ReportingMartList = () => {
   const params = useParams();
   const [dataSet, setDataSet] = useState();
+  const [tableData, setTableData] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
   const url = "http://0a78-223-196-162-114.ngrok.io/api/report_mart";
- 
+  const datasourceUrl = "http://0a78-223-196-162-114.ngrok.io/api/datasource";
+  const postDatasourceUrl =
+    "http://0a78-223-196-162-114.ngrok.io/api/report_mart";
+
   useEffect(() => {
     axios
       .get(url, {
@@ -26,14 +33,86 @@ const ReportingMartList = () => {
         setDataSet(res.data);
       });
   }, [params]);
-  const data = ["datasource", "datasets"];
+  useEffect(() => {
+    axios
+      .get(datasourceUrl)
+      .then((res) => {
+        const data = [];
+        res.data &&
+          res.data.forEach((e) => {
+            data.push({
+              key: JSON.stringify(e.id),
+              name: e.name,
+              created_on: e.created_on,
+              created_user: e.created_user,
+              dataset_details: e.dataset_details,
+              source_type: e.source_type,
+            });
+          });
+        setTableData(data);
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
+  }, []);
   const onChange = (e) => {
     console.log(`checked = ${e.target.checked}`);
   };
+
+  const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Created Date",
+      dataIndex: "created_on",
+      key: "created_on",
+      render: (record) => moment(record).format("YYYY-DD-MMMM"),
+    },
+    {
+      title: "Total Datasets",
+      dataIndex: "datasets_count",
+      key: "datasets_count",
+      render: (record) =>
+        `${
+          record === 0
+            ? record + " DataSets"
+            : record === 1
+            ? record + " DataSet Selected"
+            : record + " DataSets Selected"
+        } `,
+    },
+    {
+      title: "Source Type",
+      dataIndex: "source_type",
+      key: "source_type",
+    },
+  ];
+  function onSelectChange(selectedRowKeys) {
+    setSelectedRowKeys(selectedRowKeys);
+  }
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const AddDatasource = () => {
+    axios
+      .post(postDatasourceUrl, {
+        id: selectedRowKeys,
+        reportmart_name: "tablessss",
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
   return (
     <CardContent>
-      {/* {data &&
-        data.map((item) => ( */}
       <ListContent>
         <Checkbox onChange={onChange} />
         <Card className="customContent" style={{}}>
@@ -54,12 +133,33 @@ const ReportingMartList = () => {
           </p>
         </Card>
       </ListContent>
-      {/* ))} */}
+
       <Card className="customCard">
         <ListView>
-          <img src={Image} />
-          <p>The Mart is Empty add new Connections.</p>
+          {tableData && tableData.length ? (
+            <Table
+              style={{ width: "100%", height: "100%" }}
+              scroll={{ x: 1500, y: 400 }}
+              rowSelection={rowSelection}
+              columns={columns}
+              dataSource={tableData}
+              pagination={false}
+            />
+          ) : (
+            <>
+              <img src={Image} />
+              <p>The Mart is Empty add new Connections.</p>
+            </>
+          )}
         </ListView>
+        <p style={{ float: "right" }}>
+          <Button
+            style={{ marginTop: "10px", border: 0, padding: 0 }}
+            onClick={() => AddDatasource()}
+          >
+            + Add Custom Datasources
+          </Button>
+        </p>
       </Card>
     </CardContent>
   );
@@ -100,6 +200,9 @@ const CardContent = styled.section`
     display: flex;
     justify-content: center;
     align-items: center;
+    .ant-card-body {
+      width: 100%;
+    }
   }
 `;
 const ListView = styled.div`

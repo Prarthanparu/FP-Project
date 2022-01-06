@@ -2,42 +2,32 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Card, Button, Form, Input, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useParams, useLocation } from "react-router-dom";
 import ModalComponent from "../Components/Modal";
 import axios from "axios";
 
 const ReportingMart = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [name, setName] = useState("");
-  const params = useParams();
-  const { state } = useLocation();
-  console.log({ state });
-  const [form] = Form.useForm();
-  const url = "http://0a78-223-196-162-114.ngrok.io/api/report_mart";
-  const handleOk = () => {
-    axios
-      .post(
-        url,
-        {
-          reportmart_name: name,
-        },
-        {
-          headers: {
-            datasource_id: params.responseid,
-          },
-        }
-      )
-      .then((res) => {
-        console.log({ res });
-        setIsModalVisible(false);
-        props.setMartList(true);
-      })
-      .catch((err) => {
-        console.log({ err });
-        message.info("Something went wrong");
-      });
-  };
 
+  const [form] = Form.useForm();
+  const url = "http://0a78-223-196-162-114.ngrok.io/api/datasource";
+  const handleOk = () => {
+    setIsModalVisible(false);
+    props.setMartList(true);
+    // axios
+    //   .get(url, {
+    //     // reportmart_name: name,
+    //   })
+    //   .then((res) => {
+    //     setTableData(res.data);
+    //     setIsModalVisible(false);
+    //     props.setMartList(true);
+    //   })
+    //   .catch((err) => {
+    //     console.log({ err });
+    //     message.info("Something went wrong");
+    //   });
+  };
   const handleCancel = () => {
     setIsModalVisible(false);
   };
