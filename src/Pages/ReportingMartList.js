@@ -113,12 +113,14 @@ const ReportingMartList = () => {
   };
   return (
     <CardContent>
+      {/* {dataSet &&
+        dataSet.map((item) => ( */}
       <ListContent>
         <Checkbox onChange={onChange} />
         <Card className="customContent" style={{}}>
           <p>
             <span>
-              {dataSet} <EditOutlined className="icon" />
+              {dataSet && dataSet[0].name} <EditOutlined className="icon" />
             </span>
             <p>
               <span style={{ marginRight: "30px" }}>
@@ -133,7 +135,7 @@ const ReportingMartList = () => {
           </p>
         </Card>
       </ListContent>
-
+      {/* ))} */}
       <Card className="customCard">
         <ListView>
           {tableData && tableData.length ? (

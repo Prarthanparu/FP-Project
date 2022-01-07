@@ -25,7 +25,7 @@ function DatasourceMartDetails() {
   const params = useParams();
   const navigate = useNavigate();
   const datasourceUrl = "http://0a78-223-196-162-114.ngrok.io/api/datasource";
-
+  const reportmartUrl = "http://0a78-223-196-162-114.ngrok.io/api/report_mart";
   useEffect(() => {
     setLoading(true);
     state && state.datasource === null && state.reportmark === "reportmark"
@@ -44,6 +44,17 @@ function DatasourceMartDetails() {
         setLoading(false);
       });
   }, [params]);
+  useEffect(() => {
+    Axios.get(reportmartUrl)
+      .then((res) => {
+        res.data && res.data.length > 0
+          ? setMartList(true)
+          : setMartList(false);
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
+  }, []);
   const { TabPane } = Tabs;
 
   function callback(key) {
