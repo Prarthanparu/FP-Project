@@ -3,57 +3,7 @@ import { Card } from "antd";
 import styled from "styled-components";
 import { Col } from "antd";
 import { useNavigate } from "react-router-dom";
-
-export const dataSource = [
-  {
-    id: 1,
-    img: "/images/Postgre.png",
-    title: "PostGreSQL",
-    source_type: "POSTGRESSQL",
-  },
-  {
-    id: 2,
-    img: "/images/Snowflake.png",
-    title: "SnowFlake",
-    source_type: "SNOWFLAKE",
-  },
-  {
-    id: 3,
-    img: "images/Amazon.png",
-    title: "Amazon S3 CSV",
-    source_type: "AMAZON",
-  },
-  {
-    id: 4,
-    img: "images/Dynamo.png",
-    title: "Dynamo DB",
-    source_type: "DYNAMO",
-  },
-  {
-    id: 5,
-    img: "../images/Ibm.png",
-    title: "SnowFlake",
-    source_type: "SNOWFLAKE",
-  },
-  {
-    id: 6,
-    img: "images/MySql.png",
-    title: "MySQL",
-    source_type: "MYSQL",
-  },
-  {
-    id: 7,
-    img: "../images/Mango.png",
-    title: "Mamgo DB",
-    source_type: "MANGO",
-  },
-  {
-    id: 8,
-    img: "images/Addnew.png",
-    title: "Add Datasource",
-    source_type: "ADD",
-  },
-];
+import { dataSourceTypes } from "./dataSourceTypes";
 
 function Datasources(props) {
   const { currentSource } = props;
@@ -62,13 +12,15 @@ function Datasources(props) {
   function handleClick(id) {
     navigate("/configuration/" + id);
   }
-  // console.log(currentSource && currentSource.img, "img");
   return (
     <>
       {currentSource && currentSource ? (
         <Col span={8}>
           <ImageContainer>
-            <img src={currentSource && currentSource.img} />
+            <img
+              src={currentSource && currentSource.img}
+              alt={currentSource && currentSource.title}
+            />
           </ImageContainer>
           <ImageTitle>
             <p>{currentSource.title}</p>
@@ -76,16 +28,19 @@ function Datasources(props) {
         </Col>
       ) : (
         <>
-          {dataSource.map((data) => {
+          {dataSourceTypes.map((data) => {
             return (
-              <Col span={8}>
+              <Col span={8} key={data.id}>
                 <Card
                   id={data.id}
                   onClick={(e) => handleClick(data.id)}
                   hoverable
                 >
                   <ImageContainer>
-                    <img src={data.img}></img>
+                    <img
+                      src={data.img}
+                      alt={currentSource && currentSource.title}
+                    ></img>
                   </ImageContainer>
                   <ImageTitle>
                     <p>{data.title}</p>

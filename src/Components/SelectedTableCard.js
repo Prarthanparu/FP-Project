@@ -2,15 +2,17 @@ import React from "react";
 import styled from "styled-components";
 import { Card } from "antd";
 import { CheckCircleFilled } from "@ant-design/icons";
-// import Image from "/images/Frame 2.png";
+import Image from "../images/Frame 2.png";
 
 function SelectedDatasourceCard() {
   return (
     <CardContent>
       <Card hoverable style={{ width: 177, height: 247 }}>
-        <ImageContainer>{/* <img src={Image} /> */}</ImageContainer>
+        <ImageContainer>
+          <img src={Image} />
+        </ImageContainer>
         <ImageDetails>
-          <h1>Table Name</h1>
+          <h1>Sample</h1>
 
           <p>
             Selected <br />

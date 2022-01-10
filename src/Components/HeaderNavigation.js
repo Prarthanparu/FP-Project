@@ -68,7 +68,7 @@ function HeaderNavigation() {
 export default HeaderNavigation;
 
 const LandingPage = styled.div`
-  margin-left: 156px;
+  margin-left: 100px;
   display: flex;
   padding: 10px;
   align-items: center;

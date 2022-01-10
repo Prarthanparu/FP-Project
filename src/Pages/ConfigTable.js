@@ -6,16 +6,16 @@ import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
 import Axios from "axios";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
-import { dataSource } from "../Components/DatasourceCard";
+import { dataSourceTypes } from "../Components/dataSourceTypes";
 
 function ConfigTable(props) {
   const [form] = Form.useForm();
 
   const params = useParams();
   const navigate = useNavigate();
+  const proxy = process.env.REACT_APP_PROXY;
 
-  const url = "http://37ad-175-101-108-122.ngrok.io/api/datasource";
+  const url = proxy + "/api/datasource";
 
   const [data, setData] = useState({
     name: "",
@@ -25,14 +25,16 @@ function ConfigTable(props) {
     database: "",
     port: "",
   });
+  const [loading, setLoading] = useState(false);
 
-  let currentSource = dataSource.find(
+  let currentSource = dataSourceTypes.find(
     (eachSource) => eachSource.id === parseInt(params.id)
   );
+  console.log(currentSource);
 
   const submit = (e) => {
     e.preventDefault();
-
+    setLoading(true);
     Axios.post(
       url,
       {
@@ -52,17 +54,19 @@ function ConfigTable(props) {
       }
     )
       .then((res) => {
-        console.log({ res });
+        console.log(res.data.response_id);
+        setLoading(false);
         navigate(
           "/configuration/" +
-            currentSource.id +
+            res.data.response_id +
             "/datasourcetable/" +
-            res.data.response_id
+            res.data.response_id,
+          { state: res.data }
         );
         message.info("Connection is established");
       })
       .catch((err) => {
-        console.log({ err });
+        setLoading(false);
         message.info("Something went wrong");
       });
   };
@@ -149,6 +153,7 @@ function ConfigTable(props) {
             </Form.Item>
             <Form.Item>
               <Button
+                loading={loading}
                 onClick={(e) => {
                   submit(e);
                 }}
@@ -168,9 +173,7 @@ export default ConfigTable;
 
 const ConfigBody = styled.div`
   display: flex;
-
   width: 100%;
-
   flex-direction: row;
   gap: 50px;
   justify-content: center;
@@ -179,7 +182,6 @@ const ConfigBody = styled.div`
 const TableContent = styled.div`
   display: flex;
   flex-direction: column;
-
   > h1 {
     font-weight: bold;
     font-size: 30px;

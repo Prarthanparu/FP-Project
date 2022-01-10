@@ -1,66 +1,123 @@
 import React from "react";
-import { Menu } from "antd";
 import styled from "styled-components";
 import {
   NodeIndexOutlined,
   RadarChartOutlined,
   DatabaseOutlined,
   HddOutlined,
+  PhoneOutlined,
+  ReadOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 function Sidebar() {
   return (
     <SidebarBody>
       <SidebarComponents>
-        <Menu
-          style={{ width: 156, height: "100vh" }}
-          defaultSelectedKeys={["1"]}
-        >
-          <Menu.Item
-            key="1"
-            icon={<NodeIndexOutlined />}
-            style={{ marginTop: 35 }}
-          >
-            Data Flow
-          </Menu.Item>
-
-          <Menu.Item
-            key="2"
-            icon={<DatabaseOutlined />}
-            style={{ marginTop: 35 }}
-          >
-            Data Source
-          </Menu.Item>
-
-          <Menu.Item key="3" icon={<HddOutlined />} style={{ marginTop: 35 }}>
-            Reporting Mart
-          </Menu.Item>
-
-          <Menu.Item
-            key="4"
-            icon={<RadarChartOutlined />}
-            style={{ marginTop: 35 }}
-          >
-            Analytics
-          </Menu.Item>
-        </Menu>
+        <ul>
+          <li key="/">
+            <Link to="/">
+              <NodeIndexOutlined style={{ fontSize: 30 }} />
+              <h5>Data Flow</h5>
+            </Link>
+          </li>
+          <li key="1">
+            <Link
+              to="/configuration/martdetails"
+              state={{ from: "datasource" }}
+            >
+              <RadarChartOutlined style={{ fontSize: 30 }} />
+              <h5>Data Source</h5>
+            </Link>
+          </li>
+          <li>
+            <Link to="/configuration/reportmart">
+              <DatabaseOutlined style={{ fontSize: 30 }} />
+              <h5>Reporting Mart</h5>
+            </Link>
+          </li>
+          <li>
+            <HddOutlined style={{ fontSize: 30 }} />
+            <h5>Analytics</h5>
+          </li>
+        </ul>
       </SidebarComponents>
+      <SidebarFooterComponents>
+        <ul>
+          <li key="1">
+            <PhoneOutlined style={{ fontSize: 20 }} />
+            <h5>Support</h5>
+          </li>
+          <li>
+            <ReadOutlined style={{ fontSize: 20 }} />
+            <h5>Docs</h5>
+          </li>
+          <li>
+            <h6>V 1.00</h6>
+          </li>
+        </ul>
+      </SidebarFooterComponents>
     </SidebarBody>
   );
 }
 
 export default Sidebar;
 const SidebarBody = styled.div`
+  display: flex;
+  flex-direction: column;
   position: absolute;
   height: 100%;
-`;
-const SidebarComponents = styled.div`
+  width: 100px;
   background-color: black;
-  height: 100%;
-  width: 156px;
-  gap: 60px;
-
   border-right-width: 2px;
   border-right-style: solid;
   border-image: linear-gradient(to top, #ef7434, rgba(0, 0, 0, 0)) 1 100%;
+`;
+const SidebarComponents = styled.div`
+  margin-top: 30px;
+  flex: 0.75;
+  > ul {
+    list-style-type: none;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 0px;
+    > li {
+      text-align: center;
+      flex-wrap: wrap;
+      padding: 5px;
+      flex-direction: column;
+      color: #545454;
+    }
+    > li:hover {
+      color: white;
+    }
+    > li:active {
+      color: #ef7434;
+    }
+    > li > h5 {
+      color: #545454;
+    }
+  }
+`;
+
+const SidebarFooterComponents = styled.div`
+  display: flex;
+  flex: 0.25;
+  justify-content: center;
+  > ul {
+    list-style-type: none;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    > li {
+      text-align: center;
+      flex-wrap: wrap;
+      flex-direction: column;
+      color: #545454;
+    }
+    > li > h5 {
+      color: #545454;
+    }
+  }
 `;

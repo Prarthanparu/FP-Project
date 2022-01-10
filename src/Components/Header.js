@@ -6,11 +6,9 @@ import { Menu, Dropdown, Button, message } from "antd";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import { InfoCircleOutlined, BellOutlined } from "@ant-design/icons";
 import "../App.less";
-import { Link } from "react-router-dom";
 
 function handleMenuClick(e) {
   message.info("Selected.");
-  console.log("click", e);
 }
 
 function Header() {
@@ -98,7 +96,7 @@ const FirstDiv = styled.div`
 const LogoContainer = styled.div`
   background: #000000;
   padding: 10px;
-  width: 156px;
+  width: 100px;
   border-bottom: 1px solid rgba(84, 84, 84, 0.6);
 
   > a img {

@@ -3,7 +3,6 @@ import styled from "styled-components";
 import {
   SearchOutlined,
   FilterOutlined,
-  TableOutlined,
   EyeInvisibleFilled,
   EditFilled,
 } from "@ant-design/icons";
@@ -132,7 +131,6 @@ const Tableview = styled.div`
   flex-direction: row;
   width: 100%;
   gap: 40px;
-
   margin-left: 200px;
 `;
 const CardComponent = styled.div`
