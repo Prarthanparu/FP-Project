@@ -290,9 +290,13 @@ function DatasourceTable() {
                 setScreenLoading(false);
                 setBtnLoading(false);
                 navigate("/configuration/datasource/martdetails/tablechecks", {
-                  state:
-                    res.data &&
-                    res.data.result[response.data.datasets_response_id].expectations,
+                  state: {
+                    expectations:
+                      res.data &&
+                      res.data.result[response.data.datasets_response_id]
+                        .expectations,
+                    reportmart_id: res.data && res.data.report_mart_id,
+                  },
                 });
                 message.success("Profiling Done Successfully!");
               })

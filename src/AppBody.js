@@ -36,7 +36,7 @@ function AppBody() {
       />
       <Route
         path="/configuration/datasource/martdetails/columnchecks/datadocs"
-        element={<ColumnExpectation />}
+        element={<Datadocs />}
       />
     </Routes>
   );

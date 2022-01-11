@@ -27,8 +27,8 @@ function DatasourceTable() {
         );
       });
     };
-    setRowData(filterItems(state, "expect_table"));
-  }, [state]);
+    setRowData(filterItems(state && state.expectations, "expect_table"));
+  }, [state.expectations]);
   const expectation = [
     {
       title: "expect_table_row_count_to_equal",
@@ -145,10 +145,9 @@ function DatasourceTable() {
     />
   );
   const handleNext = () => {
-    navigate(
-      "/configuration/datasource/martdetails/columnchecks",
-      { state: state }
-    );
+    navigate("/configuration/datasource/martdetails/columnchecks", {
+      state: state,
+    });
   };
 
   return (

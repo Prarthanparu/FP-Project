@@ -20,18 +20,19 @@ function DatasourceTable() {
         );
       });
     };
-    setColumnData(filterItems(state, "expect_column"));
-  }, [state]);
-  console.log({ state });
-  let exp_arr = columnData
-    .map((item) => {
-      return item.expectation_type;
-    })
-    .join(",");
+    setColumnData(filterItems(state && state.expectations, "expect_column"));
+  }, [state && state.expectations]);
 
-  const newObj = {};
+  useEffect(() => {
+    let exp_arr = columnData
+      .map((item) => {
+        return item.expectation_type;
+      })
+      .join(",");
 
-  newObj["expectation_type"] = exp_arr;
+    const newObj = {};
+    newObj["expectation_type"] = exp_arr;
+  }, [columnData.length]);
 
   const columns = [
     {
@@ -95,7 +96,9 @@ function DatasourceTable() {
   );
 
   const handleNext = () => {
-    navigate("/configuration/datasource/martdetails/columnchecks/datadocs");
+    navigate("/configuration/datasource/martdetails/columnchecks/datadocs", {
+      state: state.reportmart_id,
+    });
   };
 
   return (
@@ -141,7 +144,7 @@ function DatasourceTable() {
             <Button type="primary">Apply</Button>
           </Link>
 
-          <Button onClick={handleNext}>Next</Button>
+          <Button onClick={() => handleNext()}>Next</Button>
         </ButtonContent>
       </TableContent>
     </Tableview>
