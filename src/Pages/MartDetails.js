@@ -16,14 +16,16 @@ function DatasourceMartDetails() {
   const proxy = process.env.REACT_APP_PROXY;
   const datasourceUrl = proxy + "/api/datasource";
 
-  Axios.get(datasourceUrl)
-    .then((res) => {
-      setLoading(false);
-      setTableList(res.data);
-    })
-    .catch(() => {
-      setLoading(false);
-    });
+  useEffect(() => {
+    Axios.get(datasourceUrl)
+      .then((res) => {
+        setLoading(false);
+        setTableList(res.data);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const handleClick = () => {
     navigate(

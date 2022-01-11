@@ -4,14 +4,14 @@ import { SearchOutlined, FilterOutlined } from "@ant-design/icons";
 import { Input, DatePicker, Table } from "antd";
 import SelectedTableCard from "../SelectedTableCard";
 import { Button } from "antd";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Steps, Popover } from "antd";
 
 function DatasourceTable() {
   const { Step } = Steps;
   const { state } = useLocation();
   const [columnData, setColumnData] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const filterItems = (arr, query) => {
       return arr.filter(function (el) {
@@ -22,7 +22,7 @@ function DatasourceTable() {
     };
     setColumnData(filterItems(state, "expect_column"));
   }, [state]);
-
+  console.log({ state });
   let exp_arr = columnData
     .map((item) => {
       return item.expectation_type;
@@ -94,6 +94,10 @@ function DatasourceTable() {
     />
   );
 
+  const handleNext = () => {
+    navigate("/configuration/datasource/martdetails/columnchecks/datadocs");
+  };
+
   return (
     <Tableview>
       <CardComponent>
@@ -136,10 +140,8 @@ function DatasourceTable() {
             {" "}
             <Button type="primary">Apply</Button>
           </Link>
-          <Link to="">
-            {" "}
-            <Button>Next</Button>
-          </Link>
+
+          <Button onClick={handleNext}>Next</Button>
         </ButtonContent>
       </TableContent>
     </Tableview>

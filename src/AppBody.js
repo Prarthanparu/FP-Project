@@ -8,6 +8,7 @@ import QualityChecksView from "./Pages/QualityChecksView";
 import TableExpectation from "./Components/Expectations/TableExpectation";
 import ColumnExpectation from "./Components/Expectations/ColumnExpectation";
 import ReportingMartBody from "./Pages/ReportingMart";
+import Datadocs from "./Pages/Datadocs";
 
 function AppBody() {
   return (
@@ -31,6 +32,10 @@ function AppBody() {
       />
       <Route
         path="/configuration/datasource/martdetails/columnchecks"
+        element={<ColumnExpectation />}
+      />
+      <Route
+        path="/configuration/datasource/martdetails/columnchecks/datadocs"
         element={<ColumnExpectation />}
       />
     </Routes>

@@ -1,6 +1,7 @@
 import React from "react";
-import { Table, Badge, Menu, Dropdown, Space } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import { Table, Menu, Space } from "antd";
+import { FolderViewOutlined, EditOutlined } from "@ant-design/icons";
+import styled from "styled-components";
 
 const menu = (
   <Menu>
@@ -12,36 +13,50 @@ const menu = (
 function ReportingMartBody() {
   const expandedRowRender = () => {
     const columns = [
-      { title: "Date", dataIndex: "date", key: "date" },
-      { title: "Name", dataIndex: "name", key: "name" },
+      {
+        title: "Processed Data",
+        dataIndex: "processeddata",
+        key: "processedData",
+      },
+      {
+        title: "Execution Start Time",
+        dataIndex: "executionStartTime",
+        key: "executionStartTime",
+      },
+      {
+        title: "Execution End Time",
+        dataIndex: "executionEndTime",
+        key: "executionEndTime",
+      },
+      { title: "Pass", dataIndex: "pass", key: "pass" },
+      { title: "Fail", dataIndex: "fail", key: "fail" },
       {
         title: "Status",
-        key: "state",
-        render: () => (
-          <span>
-            <Badge status="success" />
-            Finished
-          </span>
+        dataIndex: "status",
+        key: "status",
+        render: (record) => (
+          <p
+            style={{
+              color:
+                record === "review"
+                  ? "red"
+                  : record === "Approved"
+                  ? "green"
+                  : "yellow",
+            }}
+          >
+            {record}
+          </p>
         ),
       },
-      {
-        title: "Upgrade Status",
-        dataIndex: "upgradeNum",
-        key: "upgradeNum",
-      },
+
       {
         title: "Action",
-        dataIndex: "operation",
-        key: "operation",
+        dataIndex: "",
+        key: "",
         render: () => (
           <Space size="middle">
-            <a>Pause</a>
-            <a>Stop</a>
-            <Dropdown overlay={menu}>
-              <a>
-                More <DownOutlined />
-              </a>
-            </Dropdown>
+            <FolderViewOutlined />
           </Space>
         ),
       },
@@ -51,22 +66,44 @@ function ReportingMartBody() {
     for (let i = 0; i < 3; ++i) {
       data.push({
         key: i,
-        date: "2014-12-24 23:12:00",
-        name: "This is production name",
-        upgradeNum: "Upgraded: 56",
+        processeddata: "2014-12-24 23:12:00",
+        executionStartTime: "2014-12-24 23:12:00",
+        executionEndTime: "This is production name",
+        pass: "4",
+        fail: "12",
+        status: i === 1 ? "Approved" : i === 2 ? "review" : "pending",
+        action: "Upgraded: 56",
       });
     }
-    return <Table columns={columns} dataSource={data} pagination={false} />;
+    return (
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        className="innerTable"
+      />
+    );
   };
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Platform", dataIndex: "platform", key: "platform" },
-    { title: "Version", dataIndex: "version", key: "version" },
-    { title: "Upgraded", dataIndex: "upgradeNum", key: "upgradeNum" },
-    { title: "Creator", dataIndex: "creator", key: "creator" },
-    { title: "Date", dataIndex: "createdAt", key: "createdAt" },
-    { title: "Action", key: "operation", render: () => <a>Publish</a> },
+    {
+      title: "Number of Data Sources",
+      dataIndex: "numDatasource",
+      key: "numDatasource",
+    },
+    { title: "Number of Tables", dataIndex: "numTables", key: "numTables" },
+    {
+      title: "Table Expectations",
+      dataIndex: "numTableExpetations",
+      key: "numTableExpetations",
+    },
+    {
+      title: "Column Expectations",
+      dataIndex: "numColumnExpetations",
+      key: "numColumnExpetations",
+    },
+    { title: "Actions", key: "action", render: () => <EditOutlined /> },
   ];
 
   const data = [];
@@ -74,23 +111,36 @@ function ReportingMartBody() {
     data.push({
       key: i,
       name: "Screem",
-      platform: "iOS",
-      version: "10.3.4.5654",
-      upgradeNum: 500,
-      creator: "Jack",
-      createdAt: "2014-12-24 23:12:00",
+      numDatasource: "1",
+      numTables: "3",
+      numTableExpetations: "2",
+      numColumnExpetations: "6",
     });
   }
   return (
-    <div>
+    <Wrapper>
       <Table
         className="components-table-demo-nested"
         columns={columns}
         expandable={{ expandedRowRender }}
         dataSource={data}
       />
-    </div>
+    </Wrapper>
   );
 }
 
 export default ReportingMartBody;
+
+const Wrapper = styled.div`
+  .innerTable {
+    .ant-table-thead {
+      .ant-table-cell {
+        color: #ef7434;
+      }
+    }
+    .ant-table-thead > tr > th {
+      border-top: 4px solid #111010;
+      border-bottom: 4px solid #111010;
+    }
+  }
+`;

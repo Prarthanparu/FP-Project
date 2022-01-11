@@ -1,32 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Card, Button, Form, Input, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import ModalComponent from "../Components/Modal";
-import axios from "axios";
+import ReportMartBody from "./ReportingMartBody";
+import Axios from "axios";
 
 const ReportingMart = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [reportmartBody, setReportmartBody] = useState(false);
   const [name, setName] = useState("");
 
   const [form] = Form.useForm();
-  // const url = "http://f026-175-101-108-122.ngrok.io/api/datasource";
+  const proxy = process.env.REACT_APP_PROXY;
+  const reportMart = proxy + "/api/report_mart";
+
   const handleOk = () => {
+    Axios.post(reportMart, null, {
+      headers: {
+        // datasource_id: location.state.response_id,
+        reportmart_name: name,
+      },
+    }).then((res) => {
+      //reportmart_name
+      console.log(res);
+      // setDropDown(!dropDown);
+    });
+
     setIsModalVisible(false);
-    props.setMartList(true);
-    // axios
-    //   .get(url, {
-    //     // reportmart_name: name,
-    //   })
-    //   .then((res) => {
-    //     setTableData(res.data);
-    //     setIsModalVisible(false);
-    //     props.setMartList(true);
-    //   })
-    //   .catch((err) => {
-    //     console.log({ err });
-    //     message.info("Something went wrong");
-    //   });
+    setReportmartBody(true);
   };
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -36,19 +38,23 @@ const ReportingMart = (props) => {
   };
   return (
     <CardContent>
-      <Card className="customCard">
-        <AddView>
-          <Button
-            type="primary"
-            shape="circle"
-            icon={<PlusOutlined />}
-            size="large"
-            className="customButton"
-            onClick={() => setIsModalVisible(true)}
-          />
-          <p>There is No Reporting Mart Data, Create One Here</p>
-        </AddView>
-      </Card>
+      {reportmartBody ? (
+        <ReportMartBody />
+      ) : (
+        <Card className="customCard">
+          <AddView>
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<PlusOutlined />}
+              size="large"
+              className="customButton"
+              onClick={() => setIsModalVisible(true)}
+            />
+            <p>There is No Reporting Mart Data, Create One Here</p>
+          </AddView>
+        </Card>
+      )}
       {isModalVisible && (
         <ModalComponent
           isModalVisible={isModalVisible}

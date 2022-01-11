@@ -146,7 +146,7 @@ function DatasourceTable() {
   );
   const handleNext = () => {
     navigate(
-      "/configuration/datasource/martdetails/qualitychecks/columnchecks",
+      "/configuration/datasource/martdetails/columnchecks",
       { state: state }
     );
   };

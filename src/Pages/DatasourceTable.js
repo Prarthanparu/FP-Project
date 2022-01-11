@@ -81,13 +81,15 @@ function DatasourceTable() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [name, setName] = useState("");
   const [menuItems, setMenuItems] = useState([]);
+  const [itemReportMartId, setItemReportMartId] = useState();
+  const [datasourceId, setDataSetId] = useState();
   const [dropDown, setDropDown] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
 
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/schemainfo";
-  const datasetUrl = proxy + "/api/datasetdetails";
   const expectationURL = proxy + "/api/expectationsuite";
+  const datasetUrl = proxy + "/api/datasetdetails";
   const reportMart = proxy + "/api/report_mart";
   const reportmartDetailsUrl = proxy + "/api/report_mart_dataset";
 
@@ -217,6 +219,7 @@ function DatasourceTable() {
             onClick={(e) => {
               setSelectedDropdown(item.name);
               dropdown(item.id);
+              setItemReportMartId(item.id);
             }}
             key={item.id}
           >
@@ -265,16 +268,16 @@ function DatasourceTable() {
           },
           {
             headers: {
-              reportmart_id: 84,
+              reportmart_id: itemReportMartId,
             },
           }
         )
           .then((res) => {
-            // TODO replace hard coded value with dynamic value
+            setDataSetId(response.data.datasets_response_id);
             Axios.post(
               expectationURL,
               {
-                ids: [84],
+                ids: [itemReportMartId],
               },
               {
                 headers: {
@@ -284,11 +287,12 @@ function DatasourceTable() {
               }
             )
               .then((res) => {
-                Axios.post();
                 setScreenLoading(false);
-                setBtnLoading(!btnloading);
+                setBtnLoading(false);
                 navigate("/configuration/datasource/martdetails/tablechecks", {
-                  state: res.data.expectations,
+                  state:
+                    res.data &&
+                    res.data.result[response.data.datasets_response_id].expectations,
                 });
                 message.success("Profiling Done Successfully!");
               })
