@@ -102,17 +102,6 @@ function DatasourceTable() {
   );
 
   useEffect(() => {
-    Axios.get(reportMart, {
-      id: location.state.response_id,
-      reportmart_name: "testing",
-    })
-      .then((res) => {
-        setMenuItems(res.data);
-      })
-      .catch(() => {});
-  }, [dropDown]);
-
-  useEffect(() => {
     setLoading(true);
     const pay = {
       1: {
@@ -153,7 +142,7 @@ function DatasourceTable() {
   }, [selectedRowKeys]);
 
   function handleMenuClick(e) {
-    message.info("Click on menu item.");
+    message.success("Report Mart Selected Successfully!");
   }
   const handleOk = () => {
     Axios.post(
@@ -175,7 +164,6 @@ function DatasourceTable() {
             reportmart_name: name,
           },
         }).then((res) => {
-          //reportmart_name
           setDropDown(!dropDown);
         });
       })
@@ -185,12 +173,29 @@ function DatasourceTable() {
 
     setIsModalVisible(false);
   };
+
   const handleCancel = () => {
     setIsModalVisible(false);
   };
   const handleChange = (e) => {
     setName(e.target.value);
   };
+
+  useEffect(() => {
+    Axios.get(reportMart, {
+      id: location.state.response_id,
+      reportmart_name: "testing",
+    })
+      .then((res) => {
+        console.log(res.data);
+        if (Array.isArray(res.data)) {
+          setMenuItems(res.data);
+        } else {
+          setMenuItems([]);
+        }
+      })
+      .catch(() => {});
+  }, [dropDown]);
 
   const dropdown = (e) => {
     Axios.put(reportMart, null, {
@@ -207,13 +212,16 @@ function DatasourceTable() {
       });
   };
 
+  console.log(menuItems);
+  console.log(menuItems && menuItems.length);
   const menu = (
     <Menu onClick={handleMenuClick}>
-      <Menu.Item key="1" onClick={() => setIsModalVisible(true)}>
+      <Menu.Item onClick={() => setIsModalVisible(true)}>
         {" "}
         + Create Reporting Mart
       </Menu.Item>
       {menuItems &&
+        menuItems.length > 0 &&
         menuItems.map((item) => (
           <Menu.Item
             onClick={(e) => {
@@ -287,6 +295,7 @@ function DatasourceTable() {
               }
             )
               .then((res) => {
+                console.log(res);
                 setScreenLoading(false);
                 setBtnLoading(false);
                 navigate("/configuration/datasource/martdetails/tablechecks", {

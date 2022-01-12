@@ -14,7 +14,6 @@ function ConfigTable(props) {
   const params = useParams();
   const navigate = useNavigate();
   const proxy = process.env.REACT_APP_PROXY;
-
   const url = proxy + "/api/datasource";
 
   const [data, setData] = useState({
@@ -39,7 +38,6 @@ function ConfigTable(props) {
       url,
       {
         id: currentSource.id,
-        // sourceName: data.sourceName,
         host: data.host,
         username: data.username,
         port: data.port,

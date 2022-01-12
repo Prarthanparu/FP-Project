@@ -16,16 +16,14 @@ function DatasourceMartDetails() {
   const proxy = process.env.REACT_APP_PROXY;
   const datasourceUrl = proxy + "/api/datasource";
 
-  useEffect(() => {
-    Axios.get(datasourceUrl)
-      .then((res) => {
-        setLoading(false);
-        setTableList(res.data);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
+  Axios.get(datasourceUrl)
+    .then((res) => {
+      setLoading(false);
+      setTableList(res.data);
+    })
+    .catch(() => {
+      setLoading(false);
+    });
 
   const handleClick = () => {
     navigate(
@@ -88,6 +86,7 @@ function DatasourceMartDetails() {
     },
   ];
   const handleEdit = (e) => {
+    console.log(e);
     navigate("/configuration/" + e.id + "/datasourcetable/" + e.id, {
       state: e,
     });
@@ -168,12 +167,6 @@ const CardContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: revert;
-`;
-const CardComponent = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
 `;
 
 const ButtonContent = styled.div`

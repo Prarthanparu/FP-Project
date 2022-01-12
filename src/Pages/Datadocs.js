@@ -6,32 +6,37 @@ import Axios from "axios";
 
 function Datadocs() {
   const { state } = useLocation();
-  const [fileUrl, setFileUrl] = useState();
+  const [fileUrls, setFileUrls] = useState([]);
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/visualization";
 
   useEffect(() => {
     Axios.get(url, {
       headers: {
-        reportmart_id: state,
+        report_mart_id: state,
       },
     })
       .then((res) => {
         console.log(res);
-        setFileUrl(res.data[0]);
+        setFileUrls(res.data.result);
       })
       .catch(() => {});
   }, []);
+
   return (
     <DocsDetails>
-      <Iframe
-        url={fileUrl}
-        width="100%"
-        height="100%"
-        id="myId"
-        display="flex"
-        position="relative"
-      />
+      {fileUrls.map((fileUrl) => {
+        return (
+          <Iframe
+            url={fileUrl}
+            width="1700px"
+            height="1000px"
+            id="myId"
+            display="initial"
+            position="relative"
+          />
+        );
+      })}
     </DocsDetails>
   );
 }
@@ -39,8 +44,8 @@ function Datadocs() {
 export default Datadocs;
 
 const DocsDetails = styled.div`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
+  display: block;
+  margin-left: -30px;
+  overflow-y: scroll;
+  max-height: 800px;
 `;

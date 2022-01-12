@@ -13,20 +13,37 @@ const ReportingMart = (props) => {
 
   const [form] = Form.useForm();
   const proxy = process.env.REACT_APP_PROXY;
+  const datasetUrl = proxy + "/api/datasetdetails";
   const reportMart = proxy + "/api/report_mart";
 
   const handleOk = () => {
-    Axios.post(reportMart, null, {
-      headers: {
-        // datasource_id: location.state.response_id,
-        reportmart_name: name,
-      },
-    }).then((res) => {
-      //reportmart_name
-      console.log(res);
-      // setDropDown(!dropDown);
-    });
+    // Axios.post(
+    //   datasetUrl,
+    //   payload,
 
+    //   {
+    //     headers: {
+    //       dataset_name: "Dummy Data",
+    //       type: "dataset",
+    //       // source_id: params.responseid,
+    //     },
+    //   }
+    // )
+    //   .then((res) => {
+    // Axios.post(reportMart, null, {
+    //   headers: {
+    //     // datasource_id: location.state.response_id,
+    //     reportmart_name: name,
+    //   },
+    // }).then((res) => {
+    //   //reportmart_name
+    //   console.log(res);
+    //   // setDropDown(!dropDown);
+    // });
+    // })
+    // .catch((err) => {
+    //   message.info("Something went wrong");
+    // });
     setIsModalVisible(false);
     setReportmartBody(true);
   };

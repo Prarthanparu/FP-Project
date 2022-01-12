@@ -4,7 +4,6 @@ import "./App.less";
 import AppBody from "./AppBody";
 import Sidebar from "./Components/Sidebar";
 import Header from "./Components/Header";
-import HeaderNavigation from "./Components/HeaderNavigation";
 
 function App() {
   return (
@@ -13,7 +12,6 @@ function App() {
       <MainBody>
         <Sidebar />
         <InnerBody>
-          <HeaderNavigation />
           <Collections>
             <AppBody />
           </Collections>

@@ -119,6 +119,10 @@ function ReportingMartBody() {
   }
   return (
     <Wrapper>
+      <WrapperHeader>
+        <a href="">Quality Checks</a>
+      </WrapperHeader>
+
       <Table
         className="components-table-demo-nested"
         columns={columns}
@@ -142,5 +146,15 @@ const Wrapper = styled.div`
       border-top: 4px solid #111010;
       border-bottom: 4px solid #111010;
     }
+  }
+`;
+
+const WrapperHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  > a {
+    font-size: 25px;
+    font-weight: bold;
   }
 `;
