@@ -1,29 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Tabs, Button, Table, Spin } from "antd";
+import { Button, Table, Spin } from "antd";
 import styled from "styled-components";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Axios from "axios";
 import moment from "moment";
 
 function DatasourceMartDetails() {
   const { state } = useLocation();
   const [tableList, setTableList] = useState([]);
-  const [martList, setMartList] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const proxy = process.env.REACT_APP_PROXY;
   const datasourceUrl = proxy + "/api/datasource";
 
-  Axios.get(datasourceUrl)
-    .then((res) => {
-      setLoading(false);
-      setTableList(res.data);
-    })
-    .catch(() => {
-      setLoading(false);
-    });
+  useEffect(() => {
+    Axios.get(datasourceUrl)
+      .then((res) => {
+        setLoading(false);
+        setTableList(res.data);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const handleClick = () => {
     navigate(
@@ -86,7 +87,6 @@ function DatasourceMartDetails() {
     },
   ];
   const handleEdit = (e) => {
-    console.log(e);
     navigate("/configuration/" + e.id + "/datasourcetable/" + e.id, {
       state: e,
     });
@@ -163,11 +163,6 @@ const CardView = styled.div`
   align-items: flex-start;
   justify-content: start;
 `;
-const CardContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: revert;
-`;
 
 const ButtonContent = styled.div`
   display: flex;
@@ -175,37 +170,4 @@ const ButtonContent = styled.div`
   justify-content: flex-end;
 `;
 
-const SelectedTables = styled.div`
-  display: flex;
-  width: 800px;
-  height: 50vh;
-  flex-direction: column;
-  overflow: auto;
-  :first-child {
-    margin-top: 0px !important;
-  }
-  .customContent {
-    width: 80%;
-    height: 50px;
-    margin-top: 10px;
-    .ant-card-body {
-      padding: 14px !important;
-    }
-    p {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-  }
-  customContent:first-child {
-    margin-top: 0px !important;
-  }
-`;
-const AddView = styled.div`
-  text-align: center;
-  display: flex;
-  .customButton {
-    background: linear-gradient(123.32deg, #db5e1d 45.17%, #ef3499 100%);
-    box-shadow: 3px 2px 6px #000000;
-  }
-`;
+;
