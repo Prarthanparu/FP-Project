@@ -13,13 +13,13 @@ const dataSourceTypes = [
   },
   {
     id: 3,
-    img: "images/Amazon.png",
+    img: "/images/Amazon.png",
     title: "Amazon S3 CSV",
     source_type: "AMAZON",
   },
   {
     id: 4,
-    img: "images/Dynamo.png",
+    img: "/images/Dynamo.png",
     title: "Dynamo DB",
     source_type: "DYNAMO",
   },
@@ -31,7 +31,7 @@ const dataSourceTypes = [
   },
   {
     id: 6,
-    img: "images/MySql.png",
+    img: "/images/MySql.png",
     title: "MySQL",
     source_type: "MYSQL",
   },

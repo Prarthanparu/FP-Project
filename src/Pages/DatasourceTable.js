@@ -85,7 +85,7 @@ function DatasourceTable() {
   const [itemReportMartId, setItemReportMartId] = useState();
   const [dropDown, setDropDown] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
-  const [testArea, setTextArea] = useState(false);
+  const [textArea, setTextArea] = useState(false);
   const [inputQuery, setInputQuery] = useState();
 
   const proxy = process.env.REACT_APP_PROXY;
@@ -143,9 +143,6 @@ function DatasourceTable() {
     setPayloadData(newArr);
   }, [selectedRowKeys]);
 
-  function handleMenuClick(e) {
-    message.success("Report Mart Selected Successfully!");
-  }
   const handleOk = () => {
     Axios.post(datasetUrl, payload, {
       headers: {
@@ -155,6 +152,7 @@ function DatasourceTable() {
       },
     })
       .then((res) => {
+        console.log(res);
         Axios.post(reportMart, null, {
           headers: {
             datasource_id: location.state.response_id,
@@ -194,23 +192,6 @@ function DatasourceTable() {
       .catch(() => {});
   }, [dropDown]);
 
-  const dropdown = (e) => {
-    Axios.put(reportMart, null, {
-      headers: {
-        datasource_id: location.state.response_id
-          ? location.state.response_id
-          : location.state.id,
-        reportmart_id: e,
-      },
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   function onChange(e) {
     console.log(`checked = ${e.target.checked}`);
   }
@@ -230,7 +211,7 @@ function DatasourceTable() {
       type: "query",
       description: inputQuery ? inputQuery : "",
     });
-    if (!payload.length && !testArea) {
+    if (!payload.length && !textArea) {
       setScreenLoading(false);
       message.info("please select at least one item");
     } else if (!itemReportMartId) {
@@ -241,12 +222,12 @@ function DatasourceTable() {
 
       Axios.post(
         datasetUrl,
-        testArea ? newArr : payload,
+        textArea ? newArr : payload,
 
         {
           headers: {
             dataset_name: "Dummy Data",
-            type: testArea ? "query" : "dataset",
+            type: textArea ? "query" : "dataset",
             source_id: params.responseid,
           },
         }
@@ -263,15 +244,16 @@ function DatasourceTable() {
           }
         )
           .then((res) => {
+            console.log(res);
             Axios.post(
               expectationURL,
               {
-                ids: [itemReportMartId],
+                dataset_ids: response.data.datasets_response_id,
+                report_mart_id: itemReportMartId,
               },
               {
                 headers: {
                   type: "reportmart",
-                  // type: response.data.type,
                 },
               }
             )
@@ -343,7 +325,7 @@ function DatasourceTable() {
               />
 
               <DatePicker size={"large"} />
-              {testArea ? null : (
+              {textArea ? null : (
                 <CheckboxSelect>
                   <Checkbox onChange={onChange}>Select All</Checkbox>
                 </CheckboxSelect>
@@ -354,7 +336,7 @@ function DatasourceTable() {
               tip="Profiling in Progress..."
               spinning={screenLoading}
             >
-              {testArea ? (
+              {textArea ? (
                 <QueryTable
                   inputQuery={inputQuery}
                   setInputQuery={setInputQuery}
@@ -370,7 +352,6 @@ function DatasourceTable() {
                 />
               )}
             </Spin>
-
             <DropdownElement>
               <Select
                 style={{ width: 250 }}
@@ -395,7 +376,7 @@ function DatasourceTable() {
                 loading={btnloading}
                 onClick={() => handleClick()}
               >
-                {testArea ? "Add Custom Data" : "Add Tables"}
+                {textArea ? "Add Custom Data" : "Add Tables"}
               </Button>
             </ButtonPosition>
           </TableContent>
