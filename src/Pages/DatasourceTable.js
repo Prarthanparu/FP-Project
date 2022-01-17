@@ -270,7 +270,6 @@ function DatasourceTable() {
               }
             )
               .then((res) => {
-                console.log(res);
                 setScreenLoading(false);
                 setBtnLoading(false);
                 // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]

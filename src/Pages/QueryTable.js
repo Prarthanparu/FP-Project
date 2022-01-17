@@ -31,7 +31,10 @@ export default QueryTable;
 const QueryBody = styled.div`
   display: flex;
   width: 100%;
+<<<<<<< HEAD
   height: 400px;
+=======
+>>>>>>> db01bb4f120e89ec1aed3f2b8079b629e14970dd
   flex-direction: column;
   padding-top: 40px;
 `;
