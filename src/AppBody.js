@@ -26,6 +26,7 @@ function AppBody() {
         path="/configuration/datasource/martdetails/qualitychecks"
         element={<QualityChecksView />}
       />
+
       <Route
         path="/configuration/datasource/martdetails/tablechecks"
         element={<TableExpectation />}

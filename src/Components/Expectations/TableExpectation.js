@@ -14,7 +14,7 @@ import { Button } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { List, Steps, Popover } from "antd";
 
-function DatasourceTable() {
+function TableExpectation() {
   const { Step } = Steps;
   const [rowData, setRowData] = useState([]);
   const { state } = useLocation();
@@ -28,7 +28,8 @@ function DatasourceTable() {
       });
     };
     setRowData(filterItems(state && state.expectations, "expect_table"));
-  }, [state.expectations]);
+  }, [state]);
+
   const expectation = [
     {
       title: "expect_table_row_count_to_equal",
@@ -230,7 +231,7 @@ function DatasourceTable() {
   );
 }
 
-export default DatasourceTable;
+export default TableExpectation;
 
 const Tableview = styled.div`
   display: flex;

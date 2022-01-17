@@ -4,8 +4,6 @@ import { CheckCircleFilled } from "@ant-design/icons";
 import DatasourceCard from "./DatasourceCard";
 import { Card } from "antd";
 
-// import Image from "../images/Amazon.png";
-
 function SelectedDatasourceCard(props) {
   const { currentSource } = props;
   return (

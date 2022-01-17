@@ -6,15 +6,24 @@ import {
   TableOutlined,
   EyeInvisibleFilled,
   EditFilled,
-  DownOutlined,
 } from "@ant-design/icons";
-import { Input, DatePicker, Checkbox, Table, message, Spin, Form } from "antd";
+import {
+  Input,
+  DatePicker,
+  Checkbox,
+  Table,
+  message,
+  Spin,
+  Form,
+  notification,
+} from "antd";
 import SelectedDatasourceCard from "../Components/SelectedDatasourceCard";
-import { Button, Menu, Dropdown } from "antd";
+import { Button, Select } from "antd";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { dataSourceTypes } from "../Components/dataSourceTypes";
 import Axios from "axios";
 import ModalComponent from "../Components/Modal";
+import QueryTable from "./QueryTable";
 
 const columns = [
   {
@@ -70,11 +79,12 @@ const suffix1 = (
     }}
   />
 );
+const { Option } = Select;
 
 function DatasourceTable() {
   const [tableData, setTableData] = useState();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [payload, setPayloadData] = useState({});
+  const [payload, setPayloadData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [screenLoading, setScreenLoading] = useState(false);
   const [btnloading, setBtnLoading] = useState(false);
@@ -82,9 +92,10 @@ function DatasourceTable() {
   const [name, setName] = useState("");
   const [menuItems, setMenuItems] = useState([]);
   const [itemReportMartId, setItemReportMartId] = useState();
-  const [datasourceId, setDataSetId] = useState();
   const [dropDown, setDropDown] = useState(false);
   const [selectedDropdown, setSelectedDropdown] = useState("");
+  const [textArea, setTextArea] = useState(false);
+  const [inputQuery, setInputQuery] = useState();
 
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/schemainfo";
@@ -116,6 +127,7 @@ function DatasourceTable() {
       .then((res) => {
         setLoading(false);
         const data = [];
+        location.state.source_id = params.responseid;
         res.data &&
           res.data[params.responseid].forEach((e) => {
             data.push({
@@ -141,53 +153,47 @@ function DatasourceTable() {
     setPayloadData(newArr);
   }, [selectedRowKeys]);
 
-  function handleMenuClick(e) {
-    message.success("Report Mart Selected Successfully!");
-  }
   const handleOk = () => {
-    Axios.post(
-      datasetUrl,
-      payload,
-
-      {
-        headers: {
-          dataset_name: "Dummy Data",
-          type: "dataset",
-          source_id: params.responseid,
-        },
-      }
-    )
+    Axios.post(datasetUrl, payload, {
+      headers: {
+        dataset_name: "Dummy Data",
+        type: "dataset",
+        source_id: params.responseid,
+      },
+    })
       .then((res) => {
+        console.log(res);
         Axios.post(reportMart, null, {
           headers: {
-            datasource_id: location.state.response_id,
+            datasource_id: location.state.response_id
+              ? location.state.response_id
+              : location.state.id,
             reportmart_name: name,
           },
         }).then((res) => {
           setDropDown(!dropDown);
+          setIsModalVisible(false);
         });
       })
       .catch((err) => {
         message.info("Something went wrong");
       });
-
     setIsModalVisible(false);
   };
-
   const handleCancel = () => {
     setIsModalVisible(false);
   };
   const handleChange = (e) => {
     setName(e.target.value);
   };
-
   useEffect(() => {
     Axios.get(reportMart, {
-      id: location.state.response_id,
+      id: location.state.response_id
+        ? location.state.response_id
+        : location.state.id,
       reportmart_name: "testing",
     })
       .then((res) => {
-        console.log(res.data);
         if (Array.isArray(res.data)) {
           setMenuItems(res.data);
         } else {
@@ -196,46 +202,6 @@ function DatasourceTable() {
       })
       .catch(() => {});
   }, [dropDown]);
-
-  const dropdown = (e) => {
-    Axios.put(reportMart, null, {
-      headers: {
-        datasource_id: location.state.response_id,
-        reportmart_id: e,
-      },
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  console.log(menuItems);
-  console.log(menuItems && menuItems.length);
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      <Menu.Item onClick={() => setIsModalVisible(true)}>
-        {" "}
-        + Create Reporting Mart
-      </Menu.Item>
-      {menuItems &&
-        menuItems.length > 0 &&
-        menuItems.map((item) => (
-          <Menu.Item
-            onClick={(e) => {
-              setSelectedDropdown(item.name);
-              dropdown(item.id);
-              setItemReportMartId(item.id);
-            }}
-            key={item.id}
-          >
-            {item.name}
-          </Menu.Item>
-        ))}
-    </Menu>
-  );
 
   function onChange(e) {
     console.log(`checked = ${e.target.checked}`);
@@ -251,24 +217,33 @@ function DatasourceTable() {
   };
   const handleClick = () => {
     setScreenLoading(true);
-    if (!payload.length) {
+    const newArr = [];
+    newArr.push({
+      type: "query",
+      description: inputQuery ? inputQuery : "",
+    });
+    if (!payload.length && !textArea) {
       setScreenLoading(false);
       message.info("please select at least one item");
+    } else if (!itemReportMartId) {
+      setScreenLoading(false);
+      message.info("please choose reporting mart");
     } else {
       setBtnLoading(!btnloading);
 
       Axios.post(
         datasetUrl,
-        payload,
+        textArea ? newArr : payload,
 
         {
           headers: {
             dataset_name: "Dummy Data",
-            type: "dataset",
+            type: textArea ? "query" : "dataset",
             source_id: params.responseid,
           },
         }
       ).then((response) => {
+        console.log(response);
         Axios.post(
           reportmartDetailsUrl,
           {
@@ -281,16 +256,16 @@ function DatasourceTable() {
           }
         )
           .then((res) => {
-            setDataSetId(response.data.datasets_response_id);
+            console.log(res);
             Axios.post(
               expectationURL,
               {
-                ids: [itemReportMartId],
+                dataset_ids: response.data.datasets_response_id,
+                report_mart_id: itemReportMartId,
               },
               {
                 headers: {
                   type: "reportmart",
-                  // type: response.data.type,
                 },
               }
             )
@@ -298,20 +273,34 @@ function DatasourceTable() {
                 console.log(res);
                 setScreenLoading(false);
                 setBtnLoading(false);
+                // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
                 navigate("/configuration/datasource/martdetails/tablechecks", {
                   state: {
+                    expectationsData: res.data,
                     expectations:
                       res.data &&
-                      res.data.result[response.data.datasets_response_id]
+                      res.data.result[response.data.datasets_response_id[0]]
                         .expectations,
                     reportmart_id: res.data && res.data.report_mart_id,
+                    dataset_ids: response.data.datasets_response_id,
+                    data_source_id: params.responseid,
                   },
                 });
                 message.success("Profiling Done Successfully!");
               })
               .catch((err) => {
-                setBtnLoading(!btnloading);
-                console.log(err);
+                setBtnLoading(false);
+                setScreenLoading(false);
+                notification.error({
+                  message:
+                    err.message === "Request failed with status code 500"
+                      ? "500"
+                      : "Error",
+                  description:
+                    err.message === "Request failed with status code 500"
+                      ? "Internal Server Error"
+                      : err.message,
+                });
               });
           })
           .catch((err) => {
@@ -321,6 +310,14 @@ function DatasourceTable() {
       });
     }
   };
+  function handleSelectChange(value, option) {
+    if (value === "+ Create Reporting Mart") {
+      setIsModalVisible(true);
+    } else {
+      setSelectedDropdown(value);
+      setItemReportMartId(option.key);
+    }
+  }
 
   return (
     <Tableview style={{ marginLeft: loading ? "0" : "200px" }}>
@@ -328,7 +325,7 @@ function DatasourceTable() {
         <React.Fragment>
           <CardComponent>
             <SelectedDatasourceCard currentSource={currentSource} />
-            <Button>
+            <Button onClick={() => setTextArea(true)}>
               <TableOutlined /> Create Custom Table
             </Button>
           </CardComponent>
@@ -355,35 +352,58 @@ function DatasourceTable() {
               />
 
               <DatePicker size={"large"} />
-              <CheckboxSelect>
-                <Checkbox onChange={onChange}>Select All</Checkbox>
-              </CheckboxSelect>
+              {textArea ? null : (
+                <CheckboxSelect>
+                  <Checkbox onChange={onChange}>Select All</Checkbox>
+                </CheckboxSelect>
+              )}
             </Components>
-            <Spin tip="Profiling in Progress..." spinning={screenLoading}>
-              <Table
-                rowSelection={rowSelection}
-                columns={columns}
-                dataSource={tableData}
-                pagination={false}
-                scroll={{ x: 800, y: 400 }}
-                style={{ width: 900, marginTop: 30 }}
-              />
+            <Spin
+              className="spin"
+              tip="Profiling in Progress..."
+              spinning={screenLoading}
+            >
+              {textArea ? (
+                <QueryTable
+                  inputQuery={inputQuery}
+                  setInputQuery={setInputQuery}
+                />
+              ) : (
+                <Table
+                  rowSelection={rowSelection}
+                  columns={columns}
+                  dataSource={tableData}
+                  pagination={false}
+                  scroll={{ x: 800, y: 400 }}
+                  style={{ width: 900, marginTop: 30 }}
+                />
+              )}
             </Spin>
             <DropdownElement>
-              <Dropdown overlay={menu}>
-                <Button>
-                  Choose Reporting Mart <DownOutlined />
-                </Button>
-              </Dropdown>
+              <Select
+                style={{ width: 250 }}
+                onChange={handleSelectChange}
+                placeholder="Choose Reporting Mart"
+              >
+                <Option value="+ Create Reporting Mart">
+                  + Create Reporting Mart
+                </Option>
+                {menuItems &&
+                  menuItems.length > 0 &&
+                  menuItems.map((item) => (
+                    <Option key={item.id} value={item.name}>
+                      {item.name}
+                    </Option>
+                  ))}
+              </Select>
             </DropdownElement>
-
             <ButtonPosition>
               <Button
                 type="primary"
                 loading={btnloading}
                 onClick={() => handleClick()}
               >
-                Add Tables
+                {textArea ? "Add Custom Data" : "Add Tables"}
               </Button>
             </ButtonPosition>
           </TableContent>
@@ -452,6 +472,9 @@ const TableContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  .ant-spin-nested-loading {
+    width: 100%;
+  }
 `;
 
 const Header = styled.div`

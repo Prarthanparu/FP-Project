@@ -7,7 +7,7 @@ import { Button } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Steps, Popover } from "antd";
 
-function DatasourceTable() {
+function ColumnExpectation() {
   const { Step } = Steps;
   const { state } = useLocation();
   const [columnData, setColumnData] = useState([]);
@@ -97,7 +97,7 @@ function DatasourceTable() {
 
   const handleNext = () => {
     navigate("/configuration/datasource/martdetails/columnchecks/datadocs", {
-      state: state.reportmart_id,
+      state: state,
     });
   };
 
@@ -151,7 +151,7 @@ function DatasourceTable() {
   );
 }
 
-export default DatasourceTable;
+export default ColumnExpectation;
 
 const Tableview = styled.div`
   display: flex;

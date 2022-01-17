@@ -29,7 +29,6 @@ function ConfigTable(props) {
   let currentSource = dataSourceTypes.find(
     (eachSource) => eachSource.id === parseInt(params.id)
   );
-  console.log(currentSource);
 
   const submit = (e) => {
     e.preventDefault();
@@ -52,7 +51,6 @@ function ConfigTable(props) {
       }
     )
       .then((res) => {
-        console.log(res.data.response_id);
         setLoading(false);
         navigate(
           "/configuration/" +

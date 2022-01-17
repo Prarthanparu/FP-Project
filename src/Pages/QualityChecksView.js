@@ -11,7 +11,7 @@ import SelectedTableCard from "../Components/SelectedTableCard";
 import { Button } from "antd";
 import { Link } from "react-router-dom";
 
-function DatasourceTable() {
+function QualityChecksView() {
   const columns = [
     {
       width: 100,
@@ -125,7 +125,7 @@ function DatasourceTable() {
   );
 }
 
-export default DatasourceTable;
+export default QualityChecksView;
 const Tableview = styled.div`
   display: flex;
   flex-direction: row;
