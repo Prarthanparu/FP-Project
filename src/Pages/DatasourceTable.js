@@ -186,6 +186,7 @@ function DatasourceTable() {
   const handleChange = (e) => {
     setName(e.target.value);
   };
+
   useEffect(() => {
     Axios.get(reportMart, {
       id: location.state.response_id
@@ -270,6 +271,7 @@ function DatasourceTable() {
               }
             )
               .then((res) => {
+                console.log(res);
                 setScreenLoading(false);
                 setBtnLoading(false);
                 // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
@@ -402,7 +404,7 @@ function DatasourceTable() {
                 loading={btnloading}
                 onClick={() => handleClick()}
               >
-                {textArea ? "Add Custom Data" : "Add Tables"}
+                {textArea ? "Create Custom Dataset" : "Add Tables"}
               </Button>
             </ButtonPosition>
           </TableContent>

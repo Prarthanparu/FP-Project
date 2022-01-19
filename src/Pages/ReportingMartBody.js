@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Menu, Space } from "antd";
 import { FolderViewOutlined, EditOutlined } from "@ant-design/icons";
 import styled from "styled-components";
+import Axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const menu = (
   <Menu>
@@ -10,7 +12,39 @@ const menu = (
   </Menu>
 );
 
-function ReportingMartBody() {
+function ReportingMartBody({ reportMarts }) {
+  const proxy = process.env.REACT_APP_PROXY;
+  const expectationsuiteUrl = proxy + "/api/expectationsuite";
+  const [expectationsuites, setExpectationsuites] = useState([]);
+
+  useEffect(() => {
+    let data = [];
+    if (reportMarts?.length > 0) {
+      reportMarts.forEach(async (reportMart, index) => {
+        await Axios.get(expectationsuiteUrl, {
+          headers: {
+            report_mart_id: reportMart.id,
+          },
+        })
+          .then((res) => {
+            let details = res.data.output;
+            data.push({
+              key: index,
+              name: reportMart.name,
+              numDatasource: details.no_of_datasources,
+              numTables: details.no_of_datasets,
+              numTableExpetations: details.no_of_table_expectations,
+              numColumnExpetations: details.no_of_column_expectations || 0,
+            });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      });
+      setExpectationsuites(data);
+    }
+  }, []);
+
   const expandedRowRender = () => {
     const columns = [
       {
@@ -103,20 +137,49 @@ function ReportingMartBody() {
       dataIndex: "numColumnExpetations",
       key: "numColumnExpetations",
     },
-    { title: "Actions", key: "action", render: () => <EditOutlined /> },
+    {
+      title: "Actions",
+      key: "action",
+      render: () => (
+        <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
+          <section>
+            <EditOutlined />
+          </section>
+          <section>
+            <a href="">Execute</a>
+          </section>
+        </div>
+      ),
+    },
   ];
+  useEffect(() => {
+    let data = [];
+    if (reportMarts?.length > 0) {
+      reportMarts.forEach(async (reportMart, index) => {
+        await Axios.get(expectationsuiteUrl, {
+          headers: {
+            report_mart_id: reportMart.id,
+          },
+        })
+          .then((res) => {
+            let details = res.data.output;
+            data.push({
+              key: index,
+              name: reportMart.name,
+              numDatasource: details.no_of_datasources,
+              numTables: details.no_of_datasets,
+              numTableExpetations: details.no_of_table_expectations,
+              numColumnExpetations: details.no_of_column_expectations || 0,
+            });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      });
+      setExpectationsuites(data);
+    }
+  }, []);
 
-  const data = [];
-  for (let i = 0; i < 3; ++i) {
-    data.push({
-      key: i,
-      name: "Screem",
-      numDatasource: "1",
-      numTables: "3",
-      numTableExpetations: "2",
-      numColumnExpetations: "6",
-    });
-  }
   return (
     <Wrapper>
       <WrapperHeader>
@@ -127,7 +190,7 @@ function ReportingMartBody() {
         className="components-table-demo-nested"
         columns={columns}
         expandable={{ expandedRowRender }}
-        dataSource={data}
+        dataSource={expectationsuites}
       />
     </Wrapper>
   );

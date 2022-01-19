@@ -5,16 +5,31 @@ import { PlusOutlined } from "@ant-design/icons";
 import ModalComponent from "../Components/Modal";
 import ReportMartBody from "./ReportingMartBody";
 import Axios from "axios";
+import { useLocation } from "react-router-dom";
+
 
 const ReportingMart = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [reportmartBody, setReportmartBody] = useState(false);
   const [name, setName] = useState("");
 
   const [form] = Form.useForm();
   const proxy = process.env.REACT_APP_PROXY;
   const datasetUrl = proxy + "/api/datasetdetails";
-  const reportMart = proxy + "/api/report_mart";
+  const reportMartUrl = proxy + "/api/report_mart";
+
+  const [reportMarts, setReportMarts] = useState([]);
+  const { state } = useLocation();
+
+  useEffect(() => {
+
+    Axios.get(reportMartUrl)
+      .then((res) => {
+        console.log(res);
+        setReportMarts(res.data);
+      })
+      .catch(() => { });
+    // Always keep empty array in the end of useEffect
+  }, []);
 
   const handleOk = () => {
     // Axios.post(
@@ -45,18 +60,20 @@ const ReportingMart = (props) => {
     //   message.info("Something went wrong");
     // });
     setIsModalVisible(false);
-    setReportmartBody(true);
   };
+
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+
   const handleChange = (e) => {
     setName(e.target.value);
   };
+
   return (
     <CardContent>
-      {reportmartBody ? (
-        <ReportMartBody />
+      {reportMarts && reportMarts.length>0 ? (
+        <ReportMartBody reportMarts= {reportMarts}/>
       ) : (
         <Card className="customCard">
           <AddView>

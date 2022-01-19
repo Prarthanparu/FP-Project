@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Input } from "antd";
 
@@ -11,6 +11,14 @@ function QueryTable(props) {
 
   return (
     <QueryBody>
+      <QueryInput>
+        <Input
+          id="name"
+          type="text"
+          style={{ width: 450, height: 41 }}
+          placeholder="Enter Dataset Name"
+        />
+      </QueryInput>
       <TextArea
         showCount
         maxLength={100}
@@ -31,10 +39,10 @@ export default QueryTable;
 const QueryBody = styled.div`
   display: flex;
   width: 100%;
-<<<<<<< HEAD
+  gap: 20px;
   height: 400px;
-=======
->>>>>>> db01bb4f120e89ec1aed3f2b8079b629e14970dd
   flex-direction: column;
   padding-top: 40px;
 `;
+
+const QueryInput = styled.div``;
