@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, Spin } from "antd";
+import { Button, Table, Spin, Popconfirm, notification } from "antd";
 import styled from "styled-components";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -79,9 +79,12 @@ function DatasourceMartDetails() {
           <a onClick={() => handleEdit(record)}>
             <EditOutlined />
           </a>
-          <a>
+          <Popconfirm
+            title="Are you Sure you want to delete the Record?"
+            onConfirm={() => handleDelete(record)}
+          >
             <DeleteOutlined />
-          </a>
+          </Popconfirm>
         </div>
       ),
     },
@@ -90,6 +93,26 @@ function DatasourceMartDetails() {
     navigate("/configuration/" + e.id + "/datasourcetable/" + e.id, {
       state: e,
     });
+  };
+  const handleDelete = (e) => {
+    console.log(e);
+    Axios.delete(datasourceUrl, {
+      headers: {
+        datasource_id: e.id,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+        notification.success({
+          description: "Datasource deleted sucessfully",
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+        notification.error({
+          description: "Something went worng",
+        });
+      });
   };
   return (
     <MartBody>

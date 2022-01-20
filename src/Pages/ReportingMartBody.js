@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Table, Menu, Space } from "antd";
-import { FolderViewOutlined, EditOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 import Axios from "axios";
-import { useLocation } from "react-router-dom";
+import ExpandedRowRender from "./ExpandedRowRender";
 
 const menu = (
   <Menu>
@@ -12,45 +12,85 @@ const menu = (
   </Menu>
 );
 
-function ReportingMartBody({ reportMarts }) {
+const ReportingMartBody = ({ suiteData }) => {
+
   const proxy = process.env.REACT_APP_PROXY;
-  const expectationsuiteUrl = proxy + "/api/expectationsuite";
-  const [expectationsuites, setExpectationsuites] = useState([]);
+  const visualizationUrl = proxy + "/api/visualization";
+  const [visualizations, setVisualizations] = useState([]);
 
   useEffect(() => {
-    let data = [];
-    if (reportMarts?.length > 0) {
-      reportMarts.forEach(async (reportMart, index) => {
-        await Axios.get(expectationsuiteUrl, {
-          headers: {
-            report_mart_id: reportMart.id,
-          },
-        })
-          .then((res) => {
-            let details = res.data.output;
-            data.push({
-              key: index,
-              name: reportMart.name,
-              numDatasource: details.no_of_datasources,
-              numTables: details.no_of_datasets,
-              numTableExpetations: details.no_of_table_expectations,
-              numColumnExpetations: details.no_of_column_expectations || 0,
-            });
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      });
-      setExpectationsuites(data);
-    }
+    Axios.get(visualizationUrl, {
+      headers: {
+        report_mart_id: 3
+      }
+    })
+      .then((res) => {
+        setVisualizations(res.data);
+      })
+      .catch(() => { });
+    // Always keep empty array in the end of useEffect for initializing
   }, []);
 
-  const expandedRowRender = () => {
+  const columns = [
+    { title: "Name", dataIndex: "report_mart_name", key: "report_mart_name" },
+    {
+      title: "Number of Data Sources",
+      dataIndex: "no_of_datasources",
+      key: "no_of_datasources",
+    },
+    { title: "Number of Tables", dataIndex: "no_of_datasets", key: "no_of_datasets" },
+    {
+      title: "Table Expectations",
+      dataIndex: "no_of_table_expectations",
+      key: "no_of_table_expectations",
+    },
+    {
+      title: "Column Expectations",
+      dataIndex: "no_of_column_expectations",
+      key: "no_of_column_expectations",
+    },
+    { title: "Actions", key: "action", render: () => <EditOutlined /> },
+  ];
+
+  const expandedRowRender = (props) => {
+    const proxy = process.env.REACT_APP_PROXY;
+    const visualizationUrl = proxy + "/api/visualization";
+    const data = [];
+
+    const test = async () => {
+      await Axios.get(visualizationUrl, {
+        headers: {
+          report_mart_id: props.report_mart_id
+        }
+      })
+        .then((res) => {
+          console.log(res);
+          res.data.output.forEach((element) => {
+            data.push({
+              key: element.id,
+              processeddata: element.processed_date,
+              executionStartTime: element.start_time,
+              executionEndTime: element.end_time,
+              pass: element.no_of_passed,
+              fail: element.no_of_failed,
+              status: element.status,
+            });
+          });
+        }).catch((e) => {console.log(e); });
+    }
+
+    async function x(x)
+    {
+      await test();
+    }
+
+    x();
+
     const columns = [
       {
         title: "Processed Data",
-        dataIndex: "processeddata",
-        key: "processedData",
+        dataIndex: "processedDate",
+        key: "processedDate",
       },
       {
         title: "Execution Start Time",
@@ -62,8 +102,8 @@ function ReportingMartBody({ reportMarts }) {
         dataIndex: "executionEndTime",
         key: "executionEndTime",
       },
-      { title: "Pass", dataIndex: "pass", key: "pass" },
-      { title: "Fail", dataIndex: "fail", key: "fail" },
+      { title: "Pass", dataIndex: "noOfPassed", key: "noOfPassed" },
+      { title: "Fail", dataIndex: "noOfFailed", key: "noOfFailed" },
       {
         title: "Status",
         dataIndex: "status",
@@ -90,25 +130,13 @@ function ReportingMartBody({ reportMarts }) {
         key: "",
         render: () => (
           <Space size="middle">
-            <FolderViewOutlined />
+            <EyeOutlined />
           </Space>
         ),
       },
     ];
 
-    const data = [];
-    for (let i = 0; i < 3; ++i) {
-      data.push({
-        key: i,
-        processeddata: "2014-12-24 23:12:00",
-        executionStartTime: "2014-12-24 23:12:00",
-        executionEndTime: "This is production name",
-        pass: "4",
-        fail: "12",
-        status: i === 1 ? "Approved" : i === 2 ? "review" : "pending",
-        action: "Upgraded: 56",
-      });
-    }
+console.log(data);
     return (
       <Table
         columns={columns}
@@ -119,67 +147,6 @@ function ReportingMartBody({ reportMarts }) {
     );
   };
 
-  const columns = [
-    { title: "Name", dataIndex: "name", key: "name" },
-    {
-      title: "Number of Data Sources",
-      dataIndex: "numDatasource",
-      key: "numDatasource",
-    },
-    { title: "Number of Tables", dataIndex: "numTables", key: "numTables" },
-    {
-      title: "Table Expectations",
-      dataIndex: "numTableExpetations",
-      key: "numTableExpetations",
-    },
-    {
-      title: "Column Expectations",
-      dataIndex: "numColumnExpetations",
-      key: "numColumnExpetations",
-    },
-    {
-      title: "Actions",
-      key: "action",
-      render: () => (
-        <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
-          <section>
-            <EditOutlined />
-          </section>
-          <section>
-            <a href="">Execute</a>
-          </section>
-        </div>
-      ),
-    },
-  ];
-  useEffect(() => {
-    let data = [];
-    if (reportMarts?.length > 0) {
-      reportMarts.forEach(async (reportMart, index) => {
-        await Axios.get(expectationsuiteUrl, {
-          headers: {
-            report_mart_id: reportMart.id,
-          },
-        })
-          .then((res) => {
-            let details = res.data.output;
-            data.push({
-              key: index,
-              name: reportMart.name,
-              numDatasource: details.no_of_datasources,
-              numTables: details.no_of_datasets,
-              numTableExpetations: details.no_of_table_expectations,
-              numColumnExpetations: details.no_of_column_expectations || 0,
-            });
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      });
-      setExpectationsuites(data);
-    }
-  }, []);
-
   return (
     <Wrapper>
       <WrapperHeader>
@@ -189,8 +156,10 @@ function ReportingMartBody({ reportMarts }) {
       <Table
         className="components-table-demo-nested"
         columns={columns}
-        expandable={{ expandedRowRender }}
-        dataSource={expectationsuites}
+
+        expandable={{expandedRowRender}}
+        rowKey={(record) => record.report_mart_id}
+        dataSource={suiteData}
       />
     </Wrapper>
   );

@@ -96,6 +96,7 @@ function DatasourceTable() {
   const [selectedDropdown, setSelectedDropdown] = useState("");
   const [textArea, setTextArea] = useState(false);
   const [inputQuery, setInputQuery] = useState();
+  const [inputName, setInputName] = useState();
 
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/schemainfo";
@@ -238,7 +239,7 @@ function DatasourceTable() {
 
         {
           headers: {
-            dataset_name: "Dummy Data",
+            dataset_name: textArea ? inputName : "Dummy Data",
             type: textArea ? "query" : "dataset",
             source_id: params.responseid,
           },
@@ -368,6 +369,7 @@ function DatasourceTable() {
                 <QueryTable
                   inputQuery={inputQuery}
                   setInputQuery={setInputQuery}
+                  setInputName={setInputName}
                 />
               ) : (
                 <Table

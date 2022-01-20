@@ -7,7 +7,7 @@ import MartDetails from "./Pages/MartDetails";
 import QualityChecksView from "./Pages/QualityChecksView";
 import TableExpectation from "./Components/Expectations/TableExpectation";
 import ColumnExpectation from "./Components/Expectations/ColumnExpectation";
-import ReportingMartBody from "./Pages/ReportingMart";
+import ReportingMart from "./Pages/ReportingMart";
 import Datadocs from "./Pages/Datadocs";
 
 function AppBody() {
@@ -20,7 +20,7 @@ function AppBody() {
         element={<DatasourceTable />}
       />
       <Route path="/configuration/martdetails" element={<MartDetails />} />
-      <Route path="/configuration/reportmart" element={<ReportingMartBody />} />
+      <Route path="/configuration/reportmart" element={<ReportingMart />} />
 
       <Route
         path="/configuration/datasource/martdetails/qualitychecks"

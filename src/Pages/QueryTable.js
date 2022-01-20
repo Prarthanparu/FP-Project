@@ -8,6 +8,9 @@ function QueryTable(props) {
   const onChange = (e) => {
     props.setInputQuery(e.target.value);
   };
+  const onChangeName = (e) => {
+    props.setInputName(e.target.value);
+  };
 
   return (
     <QueryBody>
@@ -17,6 +20,7 @@ function QueryTable(props) {
           type="text"
           style={{ width: 450, height: 41 }}
           placeholder="Enter Dataset Name"
+          onChange={onChangeName}
         />
       </QueryInput>
       <TextArea

@@ -5,7 +5,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import ModalComponent from "../Components/Modal";
 import ReportMartBody from "./ReportingMartBody";
 import Axios from "axios";
-import { useLocation } from "react-router-dom";
 
 
 const ReportingMart = (props) => {
@@ -14,21 +13,16 @@ const ReportingMart = (props) => {
 
   const [form] = Form.useForm();
   const proxy = process.env.REACT_APP_PROXY;
-  const datasetUrl = proxy + "/api/datasetdetails";
-  const reportMartUrl = proxy + "/api/report_mart";
-
-  const [reportMarts, setReportMarts] = useState([]);
-  const { state } = useLocation();
+  const expectationsuiteUrl = proxy + "/api/expectationsuite";
+  const [expectationsuites, setExpectationsuites] = useState([]);
 
   useEffect(() => {
-
-    Axios.get(reportMartUrl)
+    Axios.get(expectationsuiteUrl)
       .then((res) => {
-        console.log(res);
-        setReportMarts(res.data);
+        setExpectationsuites(res.data.output);
       })
       .catch(() => { });
-    // Always keep empty array in the end of useEffect
+    // Always keep empty array in the end of useEffect for initializing
   }, []);
 
   const handleOk = () => {
@@ -72,8 +66,8 @@ const ReportingMart = (props) => {
 
   return (
     <CardContent>
-      {reportMarts && reportMarts.length>0 ? (
-        <ReportMartBody reportMarts= {reportMarts}/>
+      {expectationsuites && expectationsuites.length>0 ? (
+        <ReportMartBody suiteData= {expectationsuites}/>
       ) : (
         <Card className="customCard">
           <AddView>
