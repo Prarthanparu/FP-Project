@@ -19,7 +19,7 @@ function Datadocs() {
       },
     })
       .then((res) => {
-        setFileUrls(res.data.result);
+        setFileUrls(res.data.output.map((item) => item.datadoc_location));
       })
       .catch(() => {});
   }, []);

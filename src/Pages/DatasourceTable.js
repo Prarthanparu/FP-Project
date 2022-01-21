@@ -116,12 +116,10 @@ function DatasourceTable() {
   useEffect(() => {
     setLoading(true);
     const pay = {
-      1: {
-        datasource_id: JSON.stringify(
-          location.state.id ? location.state.id : location.state.response_id
-        ),
-        source_type: location.state.source_type,
-      },
+      datasource_id: JSON.stringify(
+        location.state.id ? location.state.id : location.state.response_id
+      ),
+      source_type: location.state.source_type,
     };
 
     Axios.post(url, pay)
@@ -148,6 +146,7 @@ function DatasourceTable() {
     for (let i = 0; i < selectedRowKeys.length; i++) {
       newArr.push({
         type: "table",
+        dataset_name: selectedRowKeys[i],
         description: selectedRowKeys[i],
       });
     }
@@ -157,7 +156,6 @@ function DatasourceTable() {
   const handleOk = () => {
     Axios.post(datasetUrl, payload, {
       headers: {
-        dataset_name: "Dummy Data",
         type: "dataset",
         source_id: params.responseid,
       },
@@ -220,10 +218,6 @@ function DatasourceTable() {
   const handleClick = () => {
     setScreenLoading(true);
     const newArr = [];
-    newArr.push({
-      type: "query",
-      description: inputQuery ? inputQuery : "",
-    });
     if (!payload.length && !textArea) {
       setScreenLoading(false);
       message.info("please select at least one item");
@@ -232,14 +226,17 @@ function DatasourceTable() {
       message.info("please choose reporting mart");
     } else {
       setBtnLoading(!btnloading);
-
+      newArr.push({
+        type: "query",
+        dataset_name: inputName,
+        description: inputQuery ? inputQuery : "",
+      });
       Axios.post(
         datasetUrl,
         textArea ? newArr : payload,
 
         {
           headers: {
-            dataset_name: textArea ? inputName : "Dummy Data",
             type: textArea ? "query" : "dataset",
             source_id: params.responseid,
           },
