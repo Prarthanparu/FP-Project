@@ -6,10 +6,14 @@
 - [ ] Updates on Analytics SideBar Screen
 - [ ] Search filters functionality needs to be added
 - [ ] Edit and Remove options for the Default Table and Column expectation
-- [ ] Execute Action must be functional ( needs inputs from the back-end Team)
-- [ ] Data-docs View Icon for the Profiled Data sets
-- [ ] Select All functionality in all screens
+- [x] Execute Action must be functional ( needs inputs from the back-end Team)
+- [x] Data-docs View Icon for the Profiled Data sets
+- [x] Select All functionality in all screens
 - [ ] Login and Logout needs to be added
+- [ ] Query, Table, Checks in Header need to be implemented
+- [ ] Search in Header need to be implemented
+- [ ] Provide Search filter for datasources in create data source screen
+- [ ] Apply button on expectations selection screens
 
 ## 23/01/2022 - Rajendra
 

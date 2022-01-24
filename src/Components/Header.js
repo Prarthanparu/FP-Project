@@ -38,16 +38,16 @@ function Header() {
         </LogoContainer>
         <HeaderSearch>
           <Space direction="vertical">
-            <Search
+            {/* <Search
               placeholder="Search Anything (⌘)"
               onSearch={onSearch}
               enterButton
               style={{ marginLeft: 20, width: 284 }}
-            />
+            /> */}
           </Space>
         </HeaderSearch>
         <HeaderContent>
-          <Dropdown overlay={menu}>
+          {/* <Dropdown overlay={menu}>
             <Button>
               Query <DownOutlined />
             </Button>
@@ -61,7 +61,7 @@ function Header() {
             <Button>
               Checks <DownOutlined />
             </Button>
-          </Dropdown>
+          </Dropdown> */}
           <InfoCircleOutlined style={{ fontSize: 24 }} />
           <BellOutlined style={{ fontSize: 24 }} />
         </HeaderContent>

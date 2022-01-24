@@ -115,7 +115,7 @@ function ColumnExpectation() {
           </Steps>
         </Header>
 
-        <Components>
+        {/* <Components>
           <Input
             placeholder="Search Your Source"
             style={{ width: 283, height: 41 }}
@@ -128,7 +128,7 @@ function ColumnExpectation() {
           />
 
           <DatePicker size={"large"} />
-        </Components>
+        </Components> */}
         <ExpectationsTable>
           <Table
             columns={columns}

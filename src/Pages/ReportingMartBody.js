@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { EyeOutlined, EditOutlined, PlayCircleOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  EditOutlined,
+  PlayCircleOutlined,
+} from "@ant-design/icons";
 import styled from "styled-components";
 import Axios from "axios";
 import moment from "moment";
@@ -15,11 +19,10 @@ import {
   Form,
   notification,
   Space,
-  Modal
+  Modal,
 } from "antd";
 
 const ReportingMartBody = ({ suiteData }) => {
-
   const proxy = process.env.REACT_APP_PROXY;
   const visualizationUrl = proxy + "/api/visualization";
   const expectationURL = proxy + "/api/expectationsuite";
@@ -61,39 +64,43 @@ const ReportingMartBody = ({ suiteData }) => {
       render: (reportMartId) => (
         <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
           <section>
-            <PlayCircleOutlined  title='Execute' style={{ fontSize: "20px" }} onClick={(e) => {
-              Axios.post(
-                expectationURL,
-                {
-                  report_mart_id: reportMartId,
-                },
-                {
-                  headers: {
-                    type: "fullmart",
+            <PlayCircleOutlined
+              title="Execute"
+              style={{ fontSize: "20px" }}
+              onClick={(e) => {
+                Axios.post(
+                  expectationURL,
+                  {
+                    report_mart_id: reportMartId,
                   },
-                }
-              )
-                .then((res) => {
-                  console.log(res);
-                  setLoading(false);
-                  // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-                  navigate("/configuration/reportmart");
-                  message.success("Profiling Done Successfully!");
-                })
-                .catch((err) => {
-                  setLoading(false);
-                  notification.error({
-                    message:
-                      err.message === "Request failed with status code 500"
-                        ? "500"
-                        : "Error",
-                    description:
-                      err.message === "Request failed with status code 500"
-                        ? "Internal Server Error"
-                        : err.message,
+                  {
+                    headers: {
+                      type: "fullmart",
+                    },
+                  }
+                )
+                  .then((res) => {
+                    console.log(res);
+                    setLoading(false);
+                    // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
+                    navigate("/configuration/reportmart");
+                    message.success("Profiling Done Successfully!");
+                  })
+                  .catch((err) => {
+                    setLoading(false);
+                    notification.error({
+                      message:
+                        err.message === "Request failed with status code 500"
+                          ? "500"
+                          : "Error",
+                      description:
+                        err.message === "Request failed with status code 500"
+                          ? "Internal Server Error"
+                          : err.message,
+                    });
                   });
-                });
-            }}/>
+              }}
+            />
           </section>
         </div>
       ),
@@ -130,16 +137,18 @@ const ReportingMartBody = ({ suiteData }) => {
         title: "Execution Start Time",
         dataIndex: "start_time",
         key: "start_time",
-        render: (record) => moment(record).local().format("YYYY-DD-MMMM HH:mm:ss"),
+        render: (record) =>
+          moment(record).local().format("YYYY-DD-MMMM HH:mm:ss"),
       },
       {
         title: "Execution End Time",
         dataIndex: "end_time",
         key: "end_time",
-        render: (record) => moment(record).local().format("YYYY-DD-MMMM HH:mm:ss"),
+        render: (record) =>
+          moment(record).local().format("YYYY-DD-MMMM HH:mm:ss"),
       },
-      { title: "Pass", dataIndex: "no_of_failed", key: "no_of_failed" },
-      { title: "Fail", dataIndex: "no_of_passed", key: "no_of_passed" },
+      { title: "Pass", dataIndex: "no_of_passed", key: "no_of_passed" },
+      { title: "Fail", dataIndex: "no_of_failed", key: "no_of_failed" },
       {
         title: "Status",
         dataIndex: "status",
@@ -148,11 +157,11 @@ const ReportingMartBody = ({ suiteData }) => {
           <p
             style={{
               color:
-                record === "Review"
+                record === "Failed"
                   ? "red"
-                  : record === "Approved"
-                    ? "green"
-                    : "yellow",
+                  : record === "Passed"
+                  ? "green"
+                  : "yellow",
             }}
           >
             {record}
@@ -165,10 +174,14 @@ const ReportingMartBody = ({ suiteData }) => {
         dataIndex: "datadoc_location",
         key: "datadoc_location",
         render: (record) => (
-          <Space size="middle" id={{ record }} onClick={(e) => {
-            setDataDocLocation(record);
-            setShowReport(true)
-          }}>
+          <Space
+            size="middle"
+            id={{ record }}
+            onClick={(e) => {
+              setDataDocLocation(record);
+              setShowReport(true);
+            }}
+          >
             <EyeOutlined style={{ fontSize: "20px" }} />
           </Space>
         ),
@@ -186,7 +199,7 @@ const ReportingMartBody = ({ suiteData }) => {
     );
   };
 
-  console.log('showReport', showReport)
+  console.log("showReport", showReport);
 
   return (
     <Wrapper>
@@ -202,6 +215,7 @@ const ReportingMartBody = ({ suiteData }) => {
         rowKey={(record) => record.report_mart_id}
         dataSource={suiteData}
         expandedRowKeys={expandedRowKeys}
+        style={{ width: "99%" }}
       />
       <Modal
         title="Modal 1000px width"

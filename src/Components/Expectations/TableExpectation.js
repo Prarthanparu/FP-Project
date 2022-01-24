@@ -30,7 +30,7 @@ function TableExpectation() {
     setRowData(filterItems(state && state.expectations, "expect_table"));
   }, [state]);
 
-  const expectation = [
+  const Tableexpectation = [
     {
       title: "expect_table_row_count_to_equal",
     },
@@ -209,7 +209,7 @@ function TableExpectation() {
         <ExpectationsList>
           <List
             itemLayout="horizontal"
-            dataSource={expectation}
+            dataSource={Tableexpectation}
             renderItem={(item) => (
               <List.Item>
                 <List.Item.Meta

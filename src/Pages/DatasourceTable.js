@@ -146,11 +146,11 @@ function DatasourceTable() {
     // send all datasets for perstitence and mark selected ones
     tableData.forEach((e) => {
       newArr.push({
-            type: "table",
-            dataset_name: e.key,
-            description: e.key,
-            selected: selectedRowKeys.includes(e.key),
-          });
+        type: "table",
+        dataset_name: e.key,
+        description: e.key,
+        selected: selectedRowKeys.includes(e.key),
+      });
     });
     setPayloadData(newArr);
   }, [selectedRowKeys, tableData]);
@@ -204,10 +204,6 @@ function DatasourceTable() {
       })
       .catch(() => {});
   }, [dropDown]);
-
-  function onChange(e) {
-    console.log(`checked = ${e.target.checked}`);
-  }
 
   function onSelectChange(selectedRowKeys) {
     setSelectedRowKeys(selectedRowKeys);
@@ -263,7 +259,7 @@ function DatasourceTable() {
               {
                 dataset_ids: response.data.datasets_response_id,
                 report_mart_id: itemReportMartId,
-                datasource_id: location.state.source_id
+                datasource_id: location.state.source_id,
               },
               {
                 headers: {
@@ -341,7 +337,7 @@ function DatasourceTable() {
                 </h3>
               )}
             </Header>
-            <Components>
+            {/* <Components>
               <Input
                 placeholder="Search Your Source"
                 style={{ width: 283, height: 41 }}
@@ -354,12 +350,7 @@ function DatasourceTable() {
               />
 
               <DatePicker size={"large"} />
-              {textArea ? null : (
-                <CheckboxSelect>
-                  <Checkbox onChange={onChange}>Select All</Checkbox>
-                </CheckboxSelect>
-              )}
-            </Components>
+            </Components> */}
             <Spin
               className="spin"
               tip="Profiling in Progress..."
@@ -495,11 +486,6 @@ const Components = styled.div`
   margin-top: 25px;
   justify-content: center;
   gap: 20px;
-`;
-const CheckboxSelect = styled.div`
-  display: flex;
-  margin-left: 160px;
-  align-items: center;
 `;
 const ButtonPosition = styled.div`
   display: flex;

@@ -95,7 +95,7 @@ function QualityChecksView() {
             <span style={{ color: "white", fontSize: 18 }}>Loan Reporting</span>
           </p>
         </Header>
-        <Components>
+        {/* <Components>
           <Input
             placeholder="Search Your Source"
             style={{ width: 283, height: 41 }}
@@ -111,7 +111,7 @@ function QualityChecksView() {
           <CheckboxSelect>
             <Checkbox onChange={onChange}>Select All</Checkbox>
           </CheckboxSelect>
-        </Components>
+        </Components> */}
 
         <Table
           columns={columns}

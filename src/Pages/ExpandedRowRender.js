@@ -65,9 +65,9 @@ const ExpandedRowRender = (props) => {
         <p
           style={{
             color:
-              record === "review"
+              record === "Failed"
                 ? "red"
-                : record === "Approved"
+                : record === "Passed"
                   ? "green"
                   : "yellow",
           }}
