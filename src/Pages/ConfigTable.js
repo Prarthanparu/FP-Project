@@ -100,7 +100,11 @@ function ConfigTable(props) {
           </span>
         </p>
         <SearchBarContent>
-          <Form form={form} layout="vertical">
+          <Form
+            form={form}
+            layout="vertical"
+            className={params.id === "2" ? "scroll" : ""}
+          >
             <Form.Item label="Name" required>
               <Input
                 onChange={(e) => handle(e)}
@@ -250,4 +254,34 @@ const SearchBarContent = styled.div`
   text-align: right;
   width: 100%;
   justify-content: center;
+  .scroll {
+    height: 40rem;
+    overflow-y: scroll;
+  }
+
+  .scroll::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #f5f5f5;
+    border-radius: 10px;
+  }
+
+  .scroll::-webkit-scrollbar {
+    width: 10px;
+    background-color: #f5f5f5;
+  }
+
+  .scroll::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 10px;
+    background-image: -webkit-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.2) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.2) 50%,
+      rgba(0, 0, 0, 0.2) 75%,
+      transparent 75%,
+      transparent
+    );
+  }
 `;
