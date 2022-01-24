@@ -51,11 +51,12 @@ function DatasourceMartDetails() {
       key: "datasets_count",
       render: (record) =>
         `${
-          record === 0
-            ? record + " DataSets"
-            : record === 1
-            ? record + " DataSet Selected"
-            : record + " DataSets Selected"
+          record
+          //  === 0
+          //   ? record + " DataSets"
+          //   : record === 1
+          //   ? record + " DataSet Selected"
+          //   : record + " DataSets Selected"
         } `,
     },
     {

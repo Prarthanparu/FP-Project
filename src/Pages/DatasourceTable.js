@@ -82,7 +82,7 @@ const suffix1 = (
 const { Option } = Select;
 
 function DatasourceTable() {
-  const [tableData, setTableData] = useState();
+  const [tableData, setTableData] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [payload, setPayloadData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -139,19 +139,21 @@ function DatasourceTable() {
       .catch(() => {
         setLoading(false);
       });
-  }, [params, currentSource]);
+  }, [location.state, url, params, currentSource]);
 
   useEffect(() => {
     const newArr = [];
-    for (let i = 0; i < selectedRowKeys.length; i++) {
+    // send all datasets for perstitence and mark selected ones
+    tableData.forEach((e) => {
       newArr.push({
-        type: "table",
-        dataset_name: selectedRowKeys[i],
-        description: selectedRowKeys[i],
-      });
-    }
+            type: "table",
+            dataset_name: e.key,
+            description: e.key,
+            selected: selectedRowKeys.includes(e.key),
+          });
+    });
     setPayloadData(newArr);
-  }, [selectedRowKeys]);
+  }, [selectedRowKeys, tableData]);
 
   const handleOk = () => {
     Axios.post(datasetUrl, payload, {
@@ -261,6 +263,7 @@ function DatasourceTable() {
               {
                 dataset_ids: response.data.datasets_response_id,
                 report_mart_id: itemReportMartId,
+                datasource_id: location.state.source_id
               },
               {
                 headers: {

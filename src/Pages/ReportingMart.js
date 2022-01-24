@@ -5,15 +5,17 @@ import { PlusOutlined } from "@ant-design/icons";
 import ModalComponent from "../Components/Modal";
 import ReportMartBody from "./ReportingMartBody";
 import Axios from "axios";
-
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 const ReportingMart = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [name, setName] = useState("");
-
+  const params = useParams();
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const proxy = process.env.REACT_APP_PROXY;
   const expectationsuiteUrl = proxy + "/api/expectationsuite";
+  const reportMartUrl = proxy + "/api/report_mart";
   const [expectationsuites, setExpectationsuites] = useState([]);
 
   useEffect(() => {
@@ -26,34 +28,16 @@ const ReportingMart = (props) => {
   }, []);
 
   const handleOk = () => {
-    // Axios.post(
-    //   datasetUrl,
-    //   payload,
-
-    //   {
-    //     headers: {
-    //       dataset_name: "Dummy Data",
-    //       type: "dataset",
-    //       // source_id: params.responseid,
-    //     },
-    //   }
-    // )
-    //   .then((res) => {
-    // Axios.post(reportMart, null, {
-    //   headers: {
-    //     // datasource_id: location.state.response_id,
-    //     reportmart_name: name,
-    //   },
-    // }).then((res) => {
-    //   //reportmart_name
-    //   console.log(res);
-    //   // setDropDown(!dropDown);
-    // });
-    // })
-    // .catch((err) => {
-    //   message.info("Something went wrong");
-    // });
-    setIsModalVisible(false);
+    Axios.post(reportMartUrl, null, {
+      headers: {
+        reportmart_name: name,
+      },
+    }).then((res) => {
+      setIsModalVisible(false);
+      navigate("/configuration/reportmart");
+    }).catch((err) => {
+      message.info("Something went wrong");
+    });
   };
 
   const handleCancel = () => {
@@ -66,23 +50,19 @@ const ReportingMart = (props) => {
 
   return (
     <CardContent>
-      {expectationsuites && expectationsuites.length>0 ? (
-        <ReportMartBody suiteData= {expectationsuites}/>
-      ) : (
-        <Card className="customCard">
-          <AddView>
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<PlusOutlined />}
-              size="large"
-              className="customButton"
-              onClick={() => setIsModalVisible(true)}
-            />
-            <p>There is No Reporting Mart Data, Create One Here</p>
-          </AddView>
-        </Card>
+      <AddView>
+
+      </AddView>
+      {expectationsuites && expectationsuites.length > 0 && (
+        <ReportMartBody suiteData={expectationsuites} />
       )}
+      <ButtonContent>
+      <Button
+        type="primary"
+        onClick={() => setIsModalVisible(true)}
+        title={'Add Report Mart'}
+      >Add Report Mart</Button>
+      </ButtonContent>
       {isModalVisible && (
         <ModalComponent
           isModalVisible={isModalVisible}
@@ -126,11 +106,15 @@ const CardContent = styled.section`
   }
 `;
 const AddView = styled.div`
-  text-align: center;
-  width: 274px;
+  text-align: right;
   .customButton {
     background: linear-gradient(123.32deg, #db5e1d 45.17%, #ef3499 100%);
     box-shadow: 3px 2px 6px #000000;
     margin-bottom: 24px;
   }
+`;
+const ButtonContent = styled.div`
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 `;
