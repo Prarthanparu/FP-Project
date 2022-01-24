@@ -114,6 +114,16 @@ function DatasourceMartDetails() {
           description: "Something went worng",
         });
       });
+    setTimeout(() => {
+      Axios.get(datasourceUrl)
+        .then((res) => {
+          setLoading(false);
+          setTableList(res.data);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    }, 1500);
   };
   return (
     <MartBody>

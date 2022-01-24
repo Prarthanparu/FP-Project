@@ -23,26 +23,40 @@ function ConfigTable(props) {
     password: "",
     database: "",
     port: "",
+    schema: "",
+    warehouse: "",
+    role: "",
   });
   const [loading, setLoading] = useState(false);
 
   let currentSource = dataSourceTypes.find(
     (eachSource) => eachSource.id === parseInt(params.id)
   );
-
   const submit = (e) => {
     e.preventDefault();
     setLoading(true);
     Axios.post(
       url,
-      {
-        id: currentSource.id,
-        host: data.host,
-        username: data.username,
-        port: data.port,
-        password: data.password,
-        database: data.database,
-      },
+      params.id === "2"
+        ? {
+            id: currentSource.id,
+            host: data.host,
+            username: data.username,
+            port: data.port,
+            password: data.password,
+            database: data.database,
+            schema: data.schema,
+            warehouse: data.warehouse,
+            role: data.role,
+          }
+        : {
+            id: currentSource.id,
+            host: data.host,
+            username: data.username,
+            port: data.port,
+            password: data.password,
+            database: data.database,
+          },
       {
         headers: {
           source_type: currentSource.source_type,
@@ -147,6 +161,40 @@ function ConfigTable(props) {
                 placeholder="input placeholder"
               />
             </Form.Item>
+            {params.id === "2" ? (
+              <>
+                <Form.Item label="Schema">
+                  <Input
+                    onChange={(e) => handle(e)}
+                    id="schema"
+                    value={data.schema}
+                    type="text"
+                    style={{ width: 450, height: 41 }}
+                    placeholder="input placeholder"
+                  />
+                </Form.Item>
+                <Form.Item label="Warehouse">
+                  <Input
+                    onChange={(e) => handle(e)}
+                    id="warehouse"
+                    value={data.warehouse}
+                    type="text"
+                    style={{ width: 450, height: 41 }}
+                    placeholder="input placeholder"
+                  />
+                </Form.Item>
+                <Form.Item label="Role">
+                  <Input
+                    onChange={(e) => handle(e)}
+                    id="role"
+                    value={data.role}
+                    type="text"
+                    style={{ width: 450, height: 41 }}
+                    placeholder="input placeholder"
+                  />
+                </Form.Item>
+              </>
+            ) : null}
             <Form.Item>
               <Button
                 loading={loading}
