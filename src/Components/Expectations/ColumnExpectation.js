@@ -20,7 +20,12 @@ function ColumnExpectation() {
         );
       });
     };
-    setColumnData(filterItems(state && state.expectations, "expect_column"));
+    setColumnData(
+      filterItems(
+        state && state.expectations[state.dataset_ids[0]].expectations,
+        "expect_column"
+      )
+    );
   }, [state && state.expectations]);
 
   useEffect(() => {

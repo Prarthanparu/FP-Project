@@ -277,8 +277,7 @@ function DatasourceTable() {
                     expectationsData: res.data,
                     expectations:
                       res.data &&
-                      res.data.result[response.data.datasets_response_id[0]]
-                        .expectations,
+                      res.data.result,
                     reportmart_id: res.data && res.data.report_mart_id,
                     dataset_ids: response.data.datasets_response_id,
                     data_source_id: params.responseid,

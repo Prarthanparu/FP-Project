@@ -27,9 +27,14 @@ function TableExpectation() {
         );
       });
     };
-    setRowData(filterItems(state && state.expectations, "expect_table"));
+    setRowData(
+      filterItems(
+        state && state.expectations[state.dataset_ids[0]].expectations,
+        "expect_table"
+      )
+    );
   }, [state]);
-
+  console.log(state.dataset_ids);
   const Tableexpectation = [
     {
       title: "expect_table_row_count_to_equal",
@@ -81,38 +86,6 @@ function TableExpectation() {
     },
   ];
 
-  const columns = [
-    {
-      width: 100,
-      dataIndex: "name",
-      key: "name",
-      fixed: "center",
-    },
-    {
-      width: 40,
-      dataIndex: "date",
-      key: "date",
-      fixed: "center",
-    },
-    {
-      key: "operation",
-      width: 40,
-      render: () => (
-        <div style={{ display: "flex", flexDirection: "row", gap: 30 }}>
-          <p>
-            <EditFilled />
-          </p>
-          <p>
-            <EyeInvisibleFilled />
-          </p>
-          <p>
-            <Checkbox />
-          </p>
-        </div>
-      ),
-    },
-  ];
-
   const customDot = (dot, { status, index }) => (
     <Popover
       content={
@@ -146,9 +119,16 @@ function TableExpectation() {
     />
   );
   const handleNext = () => {
-    navigate("/configuration/datasource/martdetails/columnchecks", {
-      state: state,
-    });
+    console.log(state.dataset_ids);
+    if (state.dataset_ids.length > 1) {
+      for (let i = 0; i <= state.dataset_ids.length; ++i) {
+        console.log({ i });
+      }
+    } else {
+      navigate("/configuration/datasource/martdetails/columnchecks", {
+        state: { state },
+      });
+    }
   };
 
   return (
