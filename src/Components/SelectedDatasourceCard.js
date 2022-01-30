@@ -9,7 +9,7 @@ function SelectedDatasourceCard(props) {
   return (
     <>
       <CardContent>
-        <Card hoverable>
+        <Card hoverable style={ { width: 300 }}>
           <ImageContainer>
             <DatasourceCard currentSource={currentSource} />
           </ImageContainer>

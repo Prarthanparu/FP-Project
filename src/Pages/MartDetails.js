@@ -133,7 +133,7 @@ function DatasourceMartDetails() {
           <MartContent>
             <CardView>
               <Table
-                style={{ width: "100%", height: "100%" }}
+                style={{ width: "99%", height: "100%" }}
                 scroll={{ x: 1500, y: 400 }}
                 columns={columns}
                 dataSource={tableList}

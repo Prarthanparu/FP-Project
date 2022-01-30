@@ -25,7 +25,7 @@ const dataSourceTypes = [
   },
   {
     id: 5,
-    img: "../images/Ibm.png",
+    img: "/images/Ibm.png",
     title: "IBM DB2",
     source_type: "IBM",
   },
@@ -37,13 +37,13 @@ const dataSourceTypes = [
   },
   {
     id: 7,
-    img: "../images/Mango.png",
+    img: "/images/Mango.png",
     title: "Mongo DB",
     source_type: "MONGO",
   },
   {
     id: 8,
-    img: "../images/Addnew.png",
+    img: "/images/Addnew.png",
     title: "Add Datasource",
     source_type: "ADD",
   },

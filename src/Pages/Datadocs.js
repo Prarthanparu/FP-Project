@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Iframe from "react-iframe";
 import { useLocation } from "react-router-dom";
 import Axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
 
 function Datadocs() {
   const { state } = useLocation();
@@ -28,7 +29,7 @@ function Datadocs() {
     <DocsDetails>
       {fileUrls.map((fileUrl) => {
         return (
-          <IframeDetails>
+          <IframeDetails key={uuidv4()}>
             <Iframe
               src={fileUrl}
               width="100%"

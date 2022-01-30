@@ -4,15 +4,15 @@ import { Card } from "antd";
 import { CheckCircleFilled } from "@ant-design/icons";
 import Image from "../images/Frame 2.png";
 
-function SelectedDatasourceCard() {
+function SelectedTableCard({ tableName }) {
   return (
     <CardContent>
-      <Card hoverable style={{ width: 177, height: 247 }}>
+      <Card hoverable style={{ width: 300, height: 247 }}>
         <ImageContainer>
           <img src={Image} />
         </ImageContainer>
         <ImageDetails>
-          <h1>Sample</h1>
+          <h1>{tableName}</h1>
 
           <p>
             Selected <br />
@@ -28,7 +28,7 @@ function SelectedDatasourceCard() {
   );
 }
 
-export default SelectedDatasourceCard;
+export default SelectedTableCard;
 
 const CardContent = styled.section`
   display: flex;

@@ -33,7 +33,8 @@ const ReportingMartBody = ({ suiteData }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [showReport, setShowReport] = useState(false);
   const [dataDocLocation, setDataDocLocation] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const [screenLoading, setScreenLoading] = useState(false);
 
   const columns = [
     { title: "Name", dataIndex: "report_mart_name", key: "report_mart_name" },
@@ -68,6 +69,7 @@ const ReportingMartBody = ({ suiteData }) => {
               title="Execute"
               style={{ fontSize: "20px" }}
               onClick={(e) => {
+                setScreenLoading(true);
                 Axios.post(
                   expectationURL,
                   {
@@ -81,13 +83,13 @@ const ReportingMartBody = ({ suiteData }) => {
                 )
                   .then((res) => {
                     console.log(res);
-                    setLoading(false);
+                    setScreenLoading(false);
                     // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-                    navigate("/configuration/reportmart");
                     message.success("Profiling Done Successfully!");
+                    navigate("/configuration/reportmart/refresh");
                   })
                   .catch((err) => {
-                    setLoading(false);
+                    setScreenLoading(false);
                     notification.error({
                       message:
                         err.message === "Request failed with status code 500"
@@ -102,6 +104,12 @@ const ReportingMartBody = ({ suiteData }) => {
               }}
             />
           </section>
+          <span>
+            <EditOutlined style={{ fontSize: "20px" }} />
+          </span>
+          <span>
+            <EyeOutlined style={{ fontSize: "20px" }} />
+          </span>
         </div>
       ),
     },
@@ -206,24 +214,29 @@ const ReportingMartBody = ({ suiteData }) => {
       <WrapperHeader>
         <a href="">Report mart Checks</a>
       </WrapperHeader>
-
-      <Table
-        className="components-table-demo-nested"
-        columns={columns}
-        expandable={{ expandedRowRender }}
-        onExpand={(expanded, record) => handleExpend(expanded, record)}
-        rowKey={(record) => record.report_mart_id}
-        dataSource={suiteData}
-        expandedRowKeys={expandedRowKeys}
-        style={{ width: "99%" }}
-      />
+      <Spin
+        className="spin"
+        tip="Profiling in progress..."
+        spinning={screenLoading}
+      >
+        <Table
+          className="components-table-demo-nested"
+          columns={columns}
+          expandable={{ expandedRowRender }}
+          onExpand={(expanded, record) => handleExpend(expanded, record)}
+          rowKey={(record) => record.report_mart_id}
+          dataSource={suiteData}
+          expandedRowKeys={expandedRowKeys}
+          style={{ width: "99%" }}
+        />
+      </Spin>
       <Modal
-        title="Modal 1000px width"
+        title="Data Docs"
         centered
         visible={showReport}
         onOk={() => setShowReport(false)}
         onCancel={() => setShowReport(false)}
-        width={1000}
+        width={1400}
       >
         <Iframe
           src={dataDocLocation}

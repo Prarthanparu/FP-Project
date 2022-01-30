@@ -21,6 +21,7 @@ function AppBody() {
       />
       <Route path="/configuration/martdetails" element={<MartDetails />} />
       <Route path="/configuration/reportmart" element={<ReportingMart />} />
+      <Route path="/configuration/reportmart/refresh" element={<ReportingMart />} />
 
       <Route
         path="/configuration/datasource/martdetails/qualitychecks"

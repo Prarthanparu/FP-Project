@@ -100,7 +100,8 @@ function DatasourceTable() {
 
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/schemainfo";
-  const expectationURL = proxy + "/api/expectationsuite";
+  
+  const expectationURL = proxy + "/api/expectations";
   const datasetUrl = proxy + "/api/datasetdetails";
   const reportMart = proxy + "/api/report_mart";
   const reportmartDetailsUrl = proxy + "/api/report_mart_dataset";
@@ -274,16 +275,17 @@ function DatasourceTable() {
                 // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
                 navigate("/configuration/datasource/martdetails/tablechecks", {
                   state: {
-                    expectationsData: res.data,
+                    expectationsData: response.data.datasets_response_id.map((id) => res.data.result[id]),
                     expectations:
                       res.data &&
-                      res.data.result,
+                      res.data.result[response.data.datasets_response_id[0]]
+                        .expectations,
                     reportmart_id: res.data && res.data.report_mart_id,
                     dataset_ids: response.data.datasets_response_id,
                     data_source_id: params.responseid,
                   },
                 });
-                message.success("Profiling Done Successfully!");
+                message.success("Schema information fetched Successfully!");
               })
               .catch((err) => {
                 setBtnLoading(false);
@@ -317,7 +319,7 @@ function DatasourceTable() {
   }
 
   return (
-    <Tableview style={{ marginLeft: loading ? "0" : "200px" }}>
+    <Tableview style={{ marginLeft: loading ? "0" : "100px" }}>
       {!loading ? (
         <React.Fragment>
           <CardComponent>
@@ -352,7 +354,7 @@ function DatasourceTable() {
             </Components> */}
             <Spin
               className="spin"
-              tip="Profiling in Progress..."
+              tip="Fetching Schema info..."
               spinning={screenLoading}
             >
               {textArea ? (

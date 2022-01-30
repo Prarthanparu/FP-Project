@@ -77,7 +77,6 @@ function ConfigTable(props) {
       })
       .catch((err) => {
         setLoading(false);
-        console.log(err);
         message.info("Something went wrong");
       });
   };
