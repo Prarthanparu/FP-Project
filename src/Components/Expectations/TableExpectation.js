@@ -18,6 +18,9 @@ const TableExpectation = () => {
   const expectation = [
     {
       title: "expect_table_row_count_to_equal",
+      kwargs: {
+        value: "",
+      },
     },
     {
       title: "expect_value_at_index",
@@ -27,21 +30,38 @@ const TableExpectation = () => {
     },
     {
       title: "expect_table_columns_to_match_set",
+      kwargs: {
+        column_set: "",
+        exact_match: "",
+      },
     },
     {
       title: "expect_table_columns_to_match_ordered_list",
+      kwargs: {
+        column_list: "",
+      },
     },
     {
       title: "expect_table_row_count_to_be_between",
+      kwargs: {
+        min_value: "",
+        max_value: "",
+      },
     },
     {
       title: "expect_table_column_count_to_equal",
+      kwargs: {
+        value: "",
+      },
     },
     {
       title: "expect_table_column_count_to_be_between",
+      kwargs: {
+        min_value: "",
+        max_value: "",
+      },
     },
   ];
-
   const columns = [
     {
       width: 100,
