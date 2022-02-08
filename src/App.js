@@ -1,13 +1,15 @@
-import React from "react";
-import styled from "styled-components";
-import "./App.less";
-import AppBody from "./AppBody";
-import Sidebar from "./Components/Sidebar";
-import Header from "./Components/Header";
+import React from 'react';
+import styled from 'styled-components';
+import './App.less';
+import AppBody from './AppBody';
+import Sidebar from './Components/Sidebar';
+import Header from './Components/Header';
+import { store } from './redux/store';
+import { Provider } from 'react-redux';
 
 function App() {
   return (
-    <React.Fragment>
+    <Provider store={store}>
       <Header />
       <MainBody>
         <Sidebar />
@@ -17,7 +19,7 @@ function App() {
           </Collections>
         </InnerBody>
       </MainBody>
-    </React.Fragment>
+    </Provider>
   );
 }
 
