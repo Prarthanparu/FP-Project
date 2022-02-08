@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import {
   SearchOutlined,
   FilterOutlined,
@@ -7,73 +7,76 @@ import {
   EyeInvisibleFilled,
   EditFilled,
   DeleteOutlined,
-} from "@ant-design/icons";
-import { Button, Input, Form, Table } from "antd";
-import SelectedTableCard from "../SelectedTableCard";
-import { useNavigate, useLocation } from "react-router-dom";
-import { List, Steps, Popover } from "antd";
-import ModalComponent from "../../Components/Modal";
+} from '@ant-design/icons';
+import { Button, Input, Form, Table } from 'antd';
+import SelectedTableCard from '../SelectedTableCard';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { List, Steps, Popover } from 'antd';
+import ModalComponent from '../../Components/Modal';
+import { useDispatch } from 'react-redux';
+import { addTableExpectation } from '../../redux/slices/dataSourceSlice';
 
 const TableExpectation = () => {
   const expectation = [
     {
-      title: "expect_table_row_count_to_equal",
+      title: 'expect_table_row_count_to_equal',
       kwargs: {
-        value: "",
+        value: '',
       },
     },
     {
-      title: "expect_value_at_index",
+      title: 'expect_value_at_index',
     },
     {
-      title: "expect_table_row_count_to_equal_other_table",
+      title: 'expect_table_row_count_to_equal_other_table',
     },
     {
-      title: "expect_table_columns_to_match_set",
+      title: 'expect_table_columns_to_match_set',
       kwargs: {
-        column_set: "",
-        exact_match: "",
+        column_set: '',
+        exact_match: '',
       },
     },
     {
-      title: "expect_table_columns_to_match_ordered_list",
+      title: 'expect_table_columns_to_match_ordered_list',
       kwargs: {
-        column_list: "",
+        column_list: '',
       },
     },
     {
-      title: "expect_table_row_count_to_be_between",
+      title: 'expect_table_row_count_to_be_between',
       kwargs: {
-        min_value: "",
-        max_value: "",
+        min_value: '',
+        max_value: '',
       },
     },
     {
-      title: "expect_table_column_count_to_equal",
+      title: 'expect_table_column_count_to_equal',
       kwargs: {
-        value: "",
+        value: '',
       },
     },
     {
-      title: "expect_table_column_count_to_be_between",
+      title: 'expect_table_column_count_to_be_between',
       kwargs: {
-        min_value: "",
-        max_value: "",
+        min_value: '',
+        max_value: '',
       },
     },
   ];
   const columns = [
     {
       width: 100,
-      title: "Select All",
-      dataIndex: "name",
-      key: "name",
-      fixed: "center",
+      title: 'Select All',
+      dataIndex: 'name',
+      key: 'name',
+      fixed: 'center',
     },
   ];
 
   const { state } = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { Step } = Steps;
   const [tableExpectaions, setTableExpectations] = useState([]);
@@ -112,7 +115,7 @@ const TableExpectation = () => {
       setSelectedTableExpectations(
         filterItems(
           state && state.expectationsData[currentTableIndex].expectations,
-          "expect_table"
+          'expect_table'
         )
       );
     }
@@ -136,8 +139,7 @@ const TableExpectation = () => {
         <span>
           step {index} status: {status}
         </span>
-      }
-    >
+      }>
       {dot}
     </Popover>
   );
@@ -149,7 +151,7 @@ const TableExpectation = () => {
     <SearchOutlined
       style={{
         fontSize: 20,
-        color: "#ef7434",
+        color: '#ef7434',
       }}
     />
   );
@@ -158,7 +160,7 @@ const TableExpectation = () => {
     <FilterOutlined
       style={{
         fontSize: 20,
-        color: "#ef7434",
+        color: '#ef7434',
       }}
     />
   );
@@ -176,6 +178,19 @@ const TableExpectation = () => {
   };
 
   const handleNext = (e) => {
+    const { expectationsData } = state;
+    let expectionsPayload = {};
+    if (expectationsData && expectationsData.length > 0) {
+      const { expectation_suite_name } = expectationsData[currentTableIndex];
+      expectionsPayload = {
+        [expectation_suite_name]: {
+          expectation: [...selectedTableExpectations],
+        },
+      };
+
+      dispatch(addTableExpectation(expectionsPayload));
+    }
+
     if (currentTableIndex <= tableExpectaions.length - 2) {
       let payloadTableExpectations = [
         ...payload.table_expectations,
@@ -188,7 +203,7 @@ const TableExpectation = () => {
       setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
       setCurrentTableIndex(currentTableIndex + 1);
     } else {
-      navigate("/configuration/datasource/martdetails/columnchecks", {
+      navigate('/configuration/datasource/martdetails/columnchecks', {
         state: { ...state, payload: payload },
       });
     }
@@ -221,8 +236,7 @@ const TableExpectation = () => {
                     icon={<EditOutlined />}
                     onClick={(e) => {
                       setIsModalVisible(true);
-                    }}
-                  ></Button>,
+                    }}></Button>,
                   <Button
                     key={item.expectation_type}
                     id={item.expectation_type}
@@ -237,10 +251,8 @@ const TableExpectation = () => {
                       );
                       e.preventDefault();
                     }}
-                    icon={<DeleteOutlined />}
-                  ></Button>,
-                ]}
-              >
+                    icon={<DeleteOutlined />}></Button>,
+                ]}>
                 <List.Item.Meta title={<a>{item.expectation_type}</a>} />
               </List.Item>
             )}
@@ -289,7 +301,7 @@ const TableExpectation = () => {
         </ExpectationsList>
         <ButtonContent>
           <Button
-            type="primary"
+            type='primary'
             onClick={(e) => {
               // TODO fix this with dynamic content.
               let data = selectedRowKeys.map((key) => {
@@ -305,8 +317,7 @@ const TableExpectation = () => {
                 ...data,
               ];
               setSelectedTableExpectations(newSelectedTableExpectations);
-            }}
-          >
+            }}>
             Apply
           </Button>
 
@@ -319,33 +330,31 @@ const TableExpectation = () => {
           setIsModalVisible={setIsModalVisible}
           handleOk={handleOk}
           handleCancel={handleCancel}
-          OkText="Apply"
-          width="400px"
-        >
+          OkText='Apply'
+          width='400px'>
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}>
             <a>Define Parameters</a>
             <h4>This is a parameter Name</h4>
-            <Form form={form} layout="vertical">
-              <Form.Item label="Name">
+            <Form form={form} layout='vertical'>
+              <Form.Item label='Name'>
                 <Input
-                  id="name"
-                  type="text"
+                  id='name'
+                  type='text'
                   style={{ width: 250, height: 41 }}
-                  placeholder="Name"
+                  placeholder='Name'
                 />
               </Form.Item>
-              <Form.Item label="Name">
+              <Form.Item label='Name'>
                 <Input
-                  id="name"
-                  type="text"
+                  id='name'
+                  type='text'
                   style={{ width: 250, height: 41 }}
-                  placeholder="Name"
+                  placeholder='Name'
                 />
               </Form.Item>
             </Form>
