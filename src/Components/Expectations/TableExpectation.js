@@ -15,6 +15,7 @@ import { List, Steps, Popover } from 'antd';
 import ModalComponent from '../../Components/Modal';
 import { useDispatch } from 'react-redux';
 import { addTableExpectation } from '../../redux/slices/dataSourceSlice';
+import ExpectationKwargsUpdate from './ExpectationKwargsUpdate';
 
 const TableExpectation = () => {
   const expectation = [
@@ -91,13 +92,13 @@ const TableExpectation = () => {
     []
   );
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
+  const [kwargsArray, setKwargsArray] = useState();
+  const [currentExpectation, setCurrentExpectation] = useState();
   const [payload, setPayload] = useState({
     table_expectations: [],
     column_expectations: [],
   });
 
-  const [form] = Form.useForm();
   useEffect(() => {
     const filterItems = (arr, query) => {
       return arr.filter(function (el) {
@@ -164,18 +165,6 @@ const TableExpectation = () => {
       }}
     />
   );
-  const handleOk = () => {
-    let data = selectedRowKeys.map((key) => {
-      return {
-        expectation_type: key,
-        kwargs: {},
-        meta: {},
-      };
-    });
-  };
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
 
   const handleNext = (e) => {
     const { expectationsData } = state;
@@ -218,6 +207,24 @@ const TableExpectation = () => {
     onChange: onSelectChange,
   };
 
+  const handleEditButton = (data) => {
+    const selectTableExpRow = selectedTableExpectations.filter(
+      (el) => el.expectation_type === data
+    );
+    let kwargsarrray = [];
+
+    if (selectTableExpRow && selectTableExpRow.length > 0) {
+      if (selectTableExpRow[0].kwargs) {
+        kwargsarrray = Object.keys(selectTableExpRow[0].kwargs);
+      }
+    }
+    setCurrentExpectation(data);
+    setKwargsArray(kwargsarrray);
+    setIsModalVisible(true);
+  };
+
+  console.log(selectedTableExpectations);
+
   return (
     <Tableview>
       <CardComponent>
@@ -234,9 +241,9 @@ const TableExpectation = () => {
                   <Button
                     key={item.expectation_type}
                     icon={<EditOutlined />}
-                    onClick={(e) => {
-                      setIsModalVisible(true);
-                    }}></Button>,
+                    onClick={() =>
+                      handleEditButton(item.expectation_type)
+                    }></Button>,
                   <Button
                     key={item.expectation_type}
                     id={item.expectation_type}
@@ -325,41 +332,12 @@ const TableExpectation = () => {
         </ButtonContent>
       </TableContent>
       {isModalVisible && (
-        <ModalComponent
+        <ExpectationKwargsUpdate
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}
-          handleOk={handleOk}
-          handleCancel={handleCancel}
-          OkText='Apply'
-          width='400px'>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}>
-            <a>Define Parameters</a>
-            <h4>This is a parameter Name</h4>
-            <Form form={form} layout='vertical'>
-              <Form.Item label='Name'>
-                <Input
-                  id='name'
-                  type='text'
-                  style={{ width: 250, height: 41 }}
-                  placeholder='Name'
-                />
-              </Form.Item>
-              <Form.Item label='Name'>
-                <Input
-                  id='name'
-                  type='text'
-                  style={{ width: 250, height: 41 }}
-                  placeholder='Name'
-                />
-              </Form.Item>
-            </Form>
-          </div>
-        </ModalComponent>
+          kwargsArray={kwargsArray}
+          currentExpectation={currentExpectation}
+        />
       )}
     </Tableview>
   );
