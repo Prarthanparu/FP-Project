@@ -94,6 +94,7 @@ const TableExpectation = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [kwargsArray, setKwargsArray] = useState();
   const [currentExpectation, setCurrentExpectation] = useState();
+
   const [payload, setPayload] = useState({
     table_expectations: [],
     column_expectations: [],
@@ -211,6 +212,7 @@ const TableExpectation = () => {
     const selectTableExpRow = selectedTableExpectations.filter(
       (el) => el.expectation_type === data
     );
+
     let kwargsarrray = [];
 
     if (selectTableExpRow && selectTableExpRow.length > 0) {
@@ -223,7 +225,15 @@ const TableExpectation = () => {
     setIsModalVisible(true);
   };
 
-  console.log(selectedTableExpectations);
+  const handleKwargsValue = (values) => {
+    const getIndex = selectedTableExpectations.findIndex(
+      (el) => el.expectation_type === currentExpectation
+    );
+
+    if (getIndex >= 0) {
+      selectedTableExpectations[getIndex].kwargs = values;
+    }
+  };
 
   return (
     <Tableview>
@@ -337,6 +347,7 @@ const TableExpectation = () => {
           setIsModalVisible={setIsModalVisible}
           kwargsArray={kwargsArray}
           currentExpectation={currentExpectation}
+          handleKwargsValue={handleKwargsValue}
         />
       )}
     </Tableview>

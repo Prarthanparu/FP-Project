@@ -45,7 +45,7 @@ function ColumnExpectation() {
   const [selectedColumn, setSelectedColumn] = useState();
   const dispatch = useDispatch();
 
-  const myreduxstate = useSelector((state) => state);
+  const datasource = useSelector((state) => state.datasource);
 
   const proxy = process.env.REACT_APP_PROXY;
   const expectationsuiteUrl = proxy + '/api/expectationsuite';
@@ -227,28 +227,33 @@ function ColumnExpectation() {
       setCurrentTableIndex(currentTableIndex + 1);
     } else {
       setScreenLoading(true);
-
-      Axios.post(
-        expectationsuiteUrl,
-        {
-          dataset_ids: state.dataset_ids,
-          report_mart_id: state.reportmart_id,
-          datasource_id: state.data_source_id,
-          payload: payload,
+      const { column_expectations, table_expectations } = datasource;
+      const params = {
+        dataset_ids: state.dataset_ids,
+        report_mart_id: state.reportmart_id,
+        datasource_id: state.data_source_id,
+        payload: {
+          column_expectations,
+          table_expectations,
         },
-        {
-          headers: {
-            type: 'reportmart',
-          },
-        }
-      )
+      };
+
+      Axios.post(expectationsuiteUrl, params, {
+        headers: { type: 'reportmart' },
+      })
         .then((res) => {
           setScreenLoading(false);
           // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
           navigate(
             '/configuration/datasource/martdetails/columnchecks/datadocs',
             {
-              state: { ...state, payload: payload },
+              state: {
+                ...state,
+                payload: {
+                  column_expectations,
+                  table_expectations,
+                },
+              },
             }
           );
           message.success('Profiling Done Successfully!');
@@ -266,6 +271,7 @@ function ColumnExpectation() {
                 : err.message,
           });
         });
+
       setScreenLoading(false);
     }
   };

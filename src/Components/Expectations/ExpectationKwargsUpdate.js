@@ -1,3 +1,4 @@
+import { propsToAttrMap } from '@vue/shared';
 import { Button, Input, Form, Table } from 'antd';
 
 import ModalComponent from '../Modal';
@@ -7,18 +8,25 @@ function ExpectationKwargsUpdate({
   setIsModalVisible,
   kwargsArray,
   currentExpectation,
+  handleKwargsValue,
 }) {
-  const handleFormSubmit = (values) => {
-    console.log(values);
+  const [form] = Form.useForm();
+
+  const handleOk = () => {
+    form.submit();
+  };
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
-  const handleOk = () => {};
-  const handleCancel = () => {
+  const handleSubmit = (values) => {
+    handleKwargsValue(values);
     setIsModalVisible(false);
   };
 
   return (
     <ModalComponent
+      form={form}
       isModalVisible={isModalVisible}
       setIsModalVisible={setIsModalVisible}
       handleOk={handleOk}
@@ -33,10 +41,10 @@ function ExpectationKwargsUpdate({
         }}>
         <a>Define Parameters</a>
         <h4>{currentExpectation}e</h4>
-        <Form onFinish={(values) => handleFormSubmit(values)} layout='vertical'>
+        <Form form={form} onFinish={handleSubmit} layout='vertical'>
           {kwargsArray &&
             kwargsArray.map((item) => (
-              <Form.Item key={item} label={item}>
+              <Form.Item key={item} label={item} name={item}>
                 <Input
                   id={item}
                   type='text'
@@ -45,15 +53,6 @@ function ExpectationKwargsUpdate({
                 />
               </Form.Item>
             ))}
-
-          <Form.Item>
-            <Button type='primary' htmlType='submit'>
-              Submit
-            </Button>
-          </Form.Item>
-          <Button key='back' onClick={handleCancel}>
-            Cancle
-          </Button>
         </Form>
       </div>
     </ModalComponent>
