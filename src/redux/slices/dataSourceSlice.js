@@ -29,6 +29,12 @@ export const dataSourceSlice = createSlice({
     addTableExpectation: (state, action) => {
       state.table_expectations = [...state.table_expectations, action.payload];
     },
+    addColumnExpectation: (state, action) => {
+      state.column_expectations = [
+        ...state.column_expectations,
+        ...action.payload,
+      ];
+    },
   },
 });
 
@@ -37,6 +43,7 @@ export const {
   addExpectionsIds,
   addExpectationData,
   addTableExpectation,
+  addColumnExpectation,
 } = dataSourceSlice.actions;
 
 export default dataSourceSlice.reducer;

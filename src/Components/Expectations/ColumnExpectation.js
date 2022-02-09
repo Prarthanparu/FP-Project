@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { SearchOutlined, FilterOutlined } from "@ant-design/icons";
-import SelectedTableCard from "../SelectedTableCard";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import SelectedTableCard from '../SelectedTableCard';
 import {
   Button,
   Input,
@@ -12,36 +12,43 @@ import {
   Spin,
   Form,
   notification,
-} from "antd";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Steps, Popover } from "antd";
-import ModalComponent from "../../Components/Modal";
-import Axios from "axios";
-import { static_column_expectations } from "./ColumnExpectations";
+} from 'antd';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Steps, Popover } from 'antd';
+import ModalComponent from '../../Components/Modal';
+import Axios from 'axios';
+import { static_column_expectations } from './ColumnExpectations';
+import { useDispatch, useSelector } from 'react-redux';
+import { addColumnExpectation } from '../../redux/slices/dataSourceSlice';
 
 function ColumnExpectation() {
-
   const { state } = useLocation();
   const [columnData, setColumnData] = useState([]);
   const navigate = useNavigate();
 
   const { Step } = Steps;
   const [tableExpectaions, setTableExpectations] = useState([]);
-  const [currentTableExpectation, setCurrentTableExpectation] = useState(state.expectationsData[0]);
+  const [currentTableExpectation, setCurrentTableExpectation] = useState(
+    state.expectationsData[0]
+  );
   const [currentTableIndex, setCurrentTableIndex] = useState(0);
   const [customExpectations, setCustomExpectations] = useState([]);
 
   // user selected table expections
-  const [selectedColumnExpectations, setSelectedColumnExpectations] = useState([]);
+  const [selectedColumnExpectations, setSelectedColumnExpectations] = useState(
+    []
+  );
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
   const [payload, setPayload] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalData, setModalData] = useState([]);
   const [selectedColumn, setSelectedColumn] = useState();
+  const dispatch = useDispatch();
+
+  const myreduxstate = useSelector((state) => state);
 
   const proxy = process.env.REACT_APP_PROXY;
-  const expectationsuiteUrl = proxy + "/api/expectationsuite";
+  const expectationsuiteUrl = proxy + '/api/expectationsuite';
 
   const [screenLoading, setScreenLoading] = useState(false);
 
@@ -49,7 +56,6 @@ function ColumnExpectation() {
   useEffect(() => {
     setPayload(state.payload);
   }, []);
-
 
   useEffect(() => {
     const filterItems = (arr, query) => {
@@ -59,22 +65,36 @@ function ColumnExpectation() {
         );
       });
     };
-    if (currentTableIndex >= 0 && currentTableIndex < state.expectationsData.length) {
-      setTableExpectations(state.expectationsData)
+    if (
+      currentTableIndex >= 0 &&
+      currentTableIndex < state.expectationsData.length
+    ) {
+      setTableExpectations(state.expectationsData);
       setCurrentTableExpectation(state.expectationsData[currentTableIndex]);
-      const filteredExpectations = filterItems(state && state.expectationsData[currentTableIndex].expectations, "expect_column");
+      const filteredExpectations = filterItems(
+        state && state.expectationsData[currentTableIndex].expectations,
+        'expect_column'
+      );
       setSelectedColumnExpectations(filteredExpectations);
       let uniqueColumns = [];
-      filteredExpectations.forEach(element => {
-        if (uniqueColumns.find(x => x.columnName === element.kwargs.column) === undefined) {
-          uniqueColumns.push({ columnName: element.kwargs.column, columnExpectations: [element.expectation_type], selectedExpectations: [] });
+      filteredExpectations.forEach((element) => {
+        if (
+          uniqueColumns.find((x) => x.columnName === element.kwargs.column) ===
+          undefined
+        ) {
+          uniqueColumns.push({
+            columnName: element.kwargs.column,
+            columnExpectations: [element.expectation_type],
+            selectedExpectations: [],
+          });
         } else {
-          uniqueColumns.find(x => x.columnName === element.kwargs.column).selectedExpectations.push(element.expectation_type);
+          uniqueColumns
+            .find((x) => x.columnName === element.kwargs.column)
+            .selectedExpectations.push(element.expectation_type);
         }
       });
       setColumnData(uniqueColumns);
     }
-
   }, [state, currentTableIndex, tableExpectaions]);
 
   useEffect(() => {
@@ -82,53 +102,65 @@ function ColumnExpectation() {
       .map((item) => {
         return item.expectation_type;
       })
-      .join(",");
+      .join(',');
 
     const newObj = {};
-    newObj["expectation_type"] = exp_arr;
-  }, [columnData.length]);
+    newObj['expectation_type'] = exp_arr;
+  }, [columnData]);
 
   const columns = [
     {
-      title: "Column Name",
+      title: 'Column Name',
       width: 50,
-      dataIndex: "columnName",
-      key: "columnName",
-      fixed: "center",
+      dataIndex: 'columnName',
+      key: 'columnName',
+      fixed: 'center',
     },
     {
-      title: "Expectations",
+      title: 'Expectations',
       width: 60,
-      dataIndex: "selectedExpectations",
-      key: "selectedExpectations",
+      dataIndex: 'selectedExpectations',
+      key: 'selectedExpectations',
       render: (items) => {
-        return items.join(", ");
+        return items.join(', ');
       },
       // render: (items) =>},
-      fixed: "center",
+      fixed: 'center',
     },
     {
-      title: "Add Expectations",
-      dataIndex: "columnName",
-      key: "columnName",
+      title: 'Add Expectations',
+      dataIndex: 'columnName',
+      key: 'columnName',
       width: 20,
       render: (columnName) => (
-        <div style={{ display: "flex", flexDirection: "row", gap: 30 }}>
-          <Button type="secondary" id={columnName} onClick={(e) => {
-            setSelectedColumn(e.target.parentNode.id);
-            let columnExpectaionsFromStore = columnData.find((col) => col.columnName === e.target.parentNode.id).columnExpectations;
-            setModalData(static_column_expectations.filter(function (el) {
-              return (
-                columnExpectaionsFromStore.find(x => x === el.title) === undefined
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 30 }}>
+          <Button
+            type='secondary'
+            id={columnName}
+            onClick={(e) => {
+              setSelectedColumn(e.target.parentNode.id);
+              let columnExpectaionsFromStore = columnData.find(
+                (col) => col.columnName === e.target.parentNode.id
+              ).columnExpectations;
+              setModalData(
+                static_column_expectations
+                  .filter(function (el) {
+                    return (
+                      columnExpectaionsFromStore.find((x) => x === el.title) ===
+                      undefined
+                    );
+                  })
+                  .map((item) => {
+                    return {
+                      key: item.title,
+                      name: item.title,
+                    };
+                  })
               );
-            }).map(item => {
-              return {
-                key: item.title,
-                name: item.title
-              }
-            }));
-            setIsModalVisible(true);
-          }}>Select</Button>
+              setIsModalVisible(true);
+            }}>
+            Select
+          </Button>
         </div>
       ),
     },
@@ -140,8 +172,7 @@ function ColumnExpectation() {
         <span>
           step {index} status: {status}
         </span>
-      }
-    >
+      }>
       {dot}
     </Popover>
   );
@@ -153,7 +184,7 @@ function ColumnExpectation() {
     <SearchOutlined
       style={{
         fontSize: 20,
-        color: "#ef7434",
+        color: '#ef7434',
       }}
     />
   );
@@ -162,39 +193,41 @@ function ColumnExpectation() {
     <FilterOutlined
       style={{
         fontSize: 20,
-        color: "#ef7434",
+        color: '#ef7434',
       }}
     />
   );
 
   const handleNext = () => {
-    console.log(currentTableIndex, tableExpectaions.length - 2)
-    if (currentTableIndex <= tableExpectaions.length - 2) {
-      console.log(columnData)
-      console.log(selectedColumnExpectations)
+    console.log('current tab Index = ', currentTableIndex);
+    console.log('tableExpec = ', tableExpectaions);
+    if (currentTableIndex < tableExpectaions.length) {
+      console.log(columnData);
+      console.log(selectedColumnExpectations);
       let colPayload = [];
-      columnData.forEach(element => {
+      columnData.forEach((element) => {
         let colExpectations = [];
-        element.selectedExpectations.forEach(item => {
+        element.selectedExpectations.forEach((item) => {
           colExpectations.push({
             expectation_type: item,
             kwargs: {
-              column: element.columnName
-            }
-          })
+              column: element.columnName,
+            },
+          });
         });
         colPayload = [...colPayload, ...colExpectations];
       });
-      console.log(colPayload)
 
-      let payloadColumnExpectations = [...payload.column_expectations, { [currentTableExpectation?.expectation_suite_name]: colPayload }];
-      setPayload({ ...payload, column_expectations: payloadColumnExpectations });
+      let payloadColumnExpectations = [
+        { [currentTableExpectation?.expectation_suite_name]: colPayload },
+      ];
 
+      dispatch(addColumnExpectation(payloadColumnExpectations));
       setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
       setCurrentTableIndex(currentTableIndex + 1);
-    }
-    if (currentTableIndex === tableExpectaions.length - 1) {
+    } else {
       setScreenLoading(true);
+
       Axios.post(
         expectationsuiteUrl,
         {
@@ -205,32 +238,35 @@ function ColumnExpectation() {
         },
         {
           headers: {
-            type: "reportmart",
+            type: 'reportmart',
           },
         }
       )
         .then((res) => {
           setScreenLoading(false);
           // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-          navigate("/configuration/datasource/martdetails/columnchecks/datadocs", {
-            state: { ...state, payload: payload },
-          });
-          message.success("Profiling Done Successfully!");
+          navigate(
+            '/configuration/datasource/martdetails/columnchecks/datadocs',
+            {
+              state: { ...state, payload: payload },
+            }
+          );
+          message.success('Profiling Done Successfully!');
         })
         .catch((err) => {
           setScreenLoading(false);
           notification.error({
             message:
-              err.message === "Request failed with status code 500"
-                ? "500"
-                : "Error",
+              err.message === 'Request failed with status code 500'
+                ? '500'
+                : 'Error',
             description:
-              err.message === "Request failed with status code 500"
-                ? "Internal Server Error"
+              err.message === 'Request failed with status code 500'
+                ? 'Internal Server Error'
                 : err.message,
           });
         });
-
+      setScreenLoading(false);
     }
   };
 
@@ -243,27 +279,29 @@ function ColumnExpectation() {
     onChange: onSelectChange,
   };
 
-
   const handleOk = () => {
     let data = selectedRowKeys.map((key) => {
       return {
-        "expectation_type": key,
-        "kwargs": {},
-        "meta": {}
-      }
+        expectation_type: key,
+        kwargs: {},
+        meta: {},
+      };
     });
 
-    let newSelectedExpectations = [...columnData.find((col) => col.columnName === selectedColumn).selectedExpectations];
-    selectedRowKeys.forEach(element => {
-      if (newSelectedExpectations.find(x => x === element) === undefined) {
+    let newSelectedExpectations = [
+      ...columnData.find((col) => col.columnName === selectedColumn)
+        .selectedExpectations,
+    ];
+    selectedRowKeys.forEach((element) => {
+      if (newSelectedExpectations.find((x) => x === element) === undefined) {
         newSelectedExpectations.push(element);
       }
-    }
-    );
+    });
     let newColumnData = [...columnData];
-    newColumnData.find((col) => col.columnName === selectedColumn).selectedExpectations = newSelectedExpectations;
+    newColumnData.find(
+      (col) => col.columnName === selectedColumn
+    ).selectedExpectations = newSelectedExpectations;
     setColumnData(newColumnData);
-
     setIsModalVisible(false);
   };
   const handleCancel = () => {
@@ -273,7 +311,9 @@ function ColumnExpectation() {
   return (
     <Tableview>
       <CardComponent>
-        <SelectedTableCard tableName={currentTableExpectation?.expectation_suite_name} />
+        <SelectedTableCard
+          tableName={currentTableExpectation?.expectation_suite_name}
+        />
       </CardComponent>
       <TableContent>
         <Header>
@@ -306,17 +346,16 @@ function ColumnExpectation() {
           </CheckboxSelect>
         </Components> */}
         <Spin
-          className="spin"
-          tip="Profiling in Progress..."
-          spinning={screenLoading}
-        >
+          className='spin'
+          tip='Profiling in Progress...'
+          spinning={screenLoading}>
           <ExpectationsList>
             <Table
               columns={columns}
               dataSource={columnData}
               pagination={false}
               scroll={{ x: 800, y: 400 }}
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
             />
           </ExpectationsList>
         </Spin>
@@ -330,21 +369,22 @@ function ColumnExpectation() {
           setIsModalVisible={setIsModalVisible}
           handleOk={handleOk}
           handleCancel={handleCancel}
-          OkText="Apply"
-          width="850px"
-        >
+          OkText='Apply'
+          width='850px'>
           <Table
-            columns={[{
-              title: "Select All",
-              dataIndex: "key",
-              key: "key",
-              fixed: "center",
-            }]}
+            columns={[
+              {
+                title: 'Select All',
+                dataIndex: 'key',
+                key: 'key',
+                fixed: 'center',
+              },
+            ]}
             rowSelection={rowSelection}
             dataSource={modalData}
             pagination={false}
             scroll={{ x: 700, y: 400 }}
-            style={{ width: "100%" }}
+            style={{ width: '100%' }}
           />
         </ModalComponent>
       )}
