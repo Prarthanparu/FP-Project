@@ -1,5 +1,4 @@
-import { propsToAttrMap } from '@vue/shared';
-import { Button, Input, Form, Table } from 'antd';
+import { Input, Form } from 'antd';
 
 import ModalComponent from '../Modal';
 
