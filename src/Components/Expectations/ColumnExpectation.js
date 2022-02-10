@@ -32,7 +32,6 @@ function ColumnExpectation() {
     state.expectationsData[0]
   );
   const [currentTableIndex, setCurrentTableIndex] = useState(0);
-  const [customExpectations, setCustomExpectations] = useState([]);
 
   // user selected table expections
   const [selectedColumnExpectations, setSelectedColumnExpectations] = useState(
@@ -122,7 +121,14 @@ function ColumnExpectation() {
       dataIndex: 'selectedExpectations',
       key: 'selectedExpectations',
       render: (items) => {
-        return items.join(', ');
+        return items.map((item) => (
+          <div key={item}>
+            {item},{' '}
+            <span className='close_btn' onClick={() => removeExpectation(item)}>
+              Remove
+            </span>
+          </div>
+        ));
       },
       // render: (items) =>},
       fixed: 'center',
@@ -166,6 +172,19 @@ function ColumnExpectation() {
     },
   ];
 
+  const removeExpectation = (value) => {
+    for (let i = 0; i < columnData.length; i++) {
+      const { selectedExpectations } = columnData[i];
+      const getIndex = selectedExpectations.indexOf(value);
+      if (getIndex > -1) {
+        selectedExpectations.splice(getIndex, 1);
+        break;
+      }
+    }
+
+    console.log('colui = ', columnData);
+  };
+
   const customDot = (dot, { status, index }) => (
     <Popover
       content={
@@ -199,11 +218,7 @@ function ColumnExpectation() {
   );
 
   const handleNext = () => {
-    console.log('current tab Index = ', currentTableIndex);
-    console.log('tableExpec = ', tableExpectaions);
-    if (currentTableIndex < tableExpectaions.length) {
-      console.log(columnData);
-      console.log(selectedColumnExpectations);
+    if (currentTableIndex < tableExpectaions.length - 1) {
       let colPayload = [];
       columnData.forEach((element) => {
         let colExpectations = [];
@@ -271,8 +286,6 @@ function ColumnExpectation() {
                 : err.message,
           });
         });
-
-      setScreenLoading(false);
     }
   };
 
