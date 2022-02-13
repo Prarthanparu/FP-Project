@@ -216,9 +216,8 @@ const TableExpectation = () => {
     let kwargsarrray = [];
 
     if (selectTableExpRow && selectTableExpRow.length > 0) {
-      if (selectTableExpRow[0].kwargs) {
+      if (selectTableExpRow[0].kwargs)
         kwargsarrray = Object.keys(selectTableExpRow[0].kwargs);
-      }
     }
     setCurrentExpectation(data);
     setKwargsArray(kwargsarrray);

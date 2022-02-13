@@ -13,7 +13,7 @@ const ModalComponent = (props) => {
       width={props.width}
       footer={[
         <Button key='back' onClick={props.handleCancel}>
-          Cancle
+          Cancel
         </Button>,
         <Button
           key='submit'

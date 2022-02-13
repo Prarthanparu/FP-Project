@@ -17,7 +17,7 @@ export default function BasicModal() {
   };
 
   const onFinish = (values) => {
-    console.log('Form submited! = ', values);
+    //console.log('Form submited! = ', values);
 
     setIsModalVisible(false);
   };

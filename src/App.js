@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Provider } from 'react-redux';
 import './App.less';
 import AppBody from './AppBody';
 import Sidebar from './Components/Sidebar';
 import Header from './Components/Header';
 import { store } from './redux/store';
-import { Provider } from 'react-redux';
 
 function App() {
   return (
