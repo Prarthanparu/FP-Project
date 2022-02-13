@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Axios from 'axios';
-import { Button, Table, Spin, Steps, Popover } from 'antd';
+import {
+  Button,
+  Table,
+  Spin,
+  Steps,
+  Popover,
+  message,
+  notification,
+} from 'antd';
 import styled from 'styled-components';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -38,8 +46,8 @@ function ColumnExpectation() {
   const [currentTableExpectation, setCurrentTableExpectation] = useState(
     state.expectationsData[0]
   );
-  //const proxy = process.env.REACT_APP_PROXY;
-  //const expectationsuiteUrl = proxy + '/api/expectationsuite';
+  const proxy = process.env.REACT_APP_PROXY;
+  const expectationsuiteUrl = proxy + '/api/expectationsuite';
   const [screenLoading, setScreenLoading] = useState(false);
 
   //  Initialize the state with the data from the state
