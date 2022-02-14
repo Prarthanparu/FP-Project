@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   expectionsData: {},
@@ -7,7 +7,7 @@ const initialState = {
 };
 
 export const dataSourceSlice = createSlice({
-  name: 'datasourcetable',
+  name: "datasourcetable",
   initialState,
   reducers: {
     addExpectionsIds: (state, action) => {

@@ -5,7 +5,7 @@ import {
   RadarChartOutlined,
   DatabaseOutlined,
   HddOutlined,
-  PhoneOutlined,
+  SettingOutlined,
   ReadOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -44,8 +44,8 @@ function Sidebar() {
       <SidebarFooterComponents>
         <ul>
           <li key="1">
-            <PhoneOutlined style={{ fontSize: 20 }} />
-            <h5>Support</h5>
+            <SettingOutlined style={{ fontSize: 20 }} />
+            <h5>Settings</h5>
           </li>
           <li>
             <ReadOutlined style={{ fontSize: 20 }} />
