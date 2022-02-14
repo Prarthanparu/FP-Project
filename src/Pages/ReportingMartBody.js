@@ -2,33 +2,35 @@ import React, { useState } from "react";
 import {
   EyeOutlined,
   EditOutlined,
+  FundViewOutlined,
   PlayCircleOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import Axios from "axios";
 import moment from "moment";
 import Iframe from "react-iframe";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Input,
   DatePicker,
-  Checkbox,
   Table,
   message,
   Spin,
-  Form,
   notification,
   Space,
   Modal,
 } from "antd";
+import ModalComponent from "../Components/Modal";
 
 const ReportingMartBody = ({ suiteData }) => {
   const proxy = process.env.REACT_APP_PROXY;
   const visualizationUrl = proxy + "/api/visualization";
   const expectationURL = proxy + "/api/expectationsuite";
-  const params = useParams();
+  const reportmartQualityChecks = proxy + "/api/reportmart_quality_checks";
+
   const navigate = useNavigate();
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [reportMartData, setReportMartData] = useState([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [showReport, setShowReport] = useState(false);
@@ -69,11 +71,13 @@ const ReportingMartBody = ({ suiteData }) => {
               title="Execute"
               style={{ fontSize: "20px" }}
               onClick={(e) => {
+                setIsModalVisible(true);
                 setScreenLoading(true);
                 Axios.post(
                   expectationURL,
                   {
                     report_mart_id: reportMartId,
+                    // add payload
                   },
                   {
                     headers: {
@@ -133,6 +137,11 @@ const ReportingMartBody = ({ suiteData }) => {
     }
     setExpandedRowKeys(keys);
   };
+
+  const handleShowReport = (e) => {
+    navigate(`/configuration/reportmart/detailedview`);
+  };
+
   const expandedRowRender = () => {
     const columns = [
       {
@@ -182,16 +191,28 @@ const ReportingMartBody = ({ suiteData }) => {
         dataIndex: "datadoc_location",
         key: "datadoc_location",
         render: (record) => (
-          <Space
-            size="middle"
-            id={{ record }}
-            onClick={(e) => {
-              setDataDocLocation(record);
-              setShowReport(true);
-            }}
-          >
-            <EyeOutlined style={{ fontSize: "20px" }} />
-          </Space>
+          <div style={{ display: "flex", flexDirection: "row", gap: 30 }}>
+            <Space
+              size="middle"
+              id={{ record }}
+              onClick={(e) => {
+                setDataDocLocation(record);
+                setShowReport(true);
+              }}
+            >
+              <EyeOutlined
+                title="View Docs"
+                style={{ fontSize: "20px", cursor: "pointer" }}
+              />
+            </Space>
+            <Space size="middle">
+              <FundViewOutlined
+                onClick={handleShowReport}
+                title="View Details"
+                style={{ fontSize: "20px", cursor: "pointer" }}
+              />
+            </Space>
+          </div>
         ),
       },
     ];
@@ -228,6 +249,7 @@ const ReportingMartBody = ({ suiteData }) => {
           dataSource={suiteData}
           expandedRowKeys={expandedRowKeys}
           style={{ width: "99%" }}
+          scroll={{ y: 500 }}
         />
       </Spin>
       <Modal
@@ -247,6 +269,14 @@ const ReportingMartBody = ({ suiteData }) => {
           position="relative"
         />
       </Modal>
+      {isModalVisible && (
+        <ModalComponent
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+          OkText="Create"
+          width="461.15px"
+        ></ModalComponent>
+      )}
     </Wrapper>
   );
 };

@@ -1,27 +1,28 @@
-import React from 'react';
-import styled from 'styled-components';
-import Logo from '../Components/Flying_Base.png';
-import { Input, Space, Avatar } from 'antd';
-import { Menu, Dropdown, Button, message } from 'antd';
-import { DownOutlined, UserOutlined } from '@ant-design/icons';
-import { InfoCircleOutlined, BellOutlined } from '@ant-design/icons';
-import '../App.less';
+import React from "react";
+import styled from "styled-components";
+import Logo from "../Components/Flying_Base.png";
+import { Input, Space, Avatar } from "antd";
+import { Menu, Dropdown, Button, message } from "antd";
+import { DownOutlined, UserOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, BellOutlined } from "@ant-design/icons";
+import "../App.less";
 
 function handleMenuClick(e) {
-  message.info('Selected.');
+  message.info("Selected.");
 }
 
 function Header() {
   const { Search } = Input;
+  const onSearch = (value) => console.log(value);
   const menu = (
     <Menu onClick={handleMenuClick}>
-      <Menu.Item key='1' icon={<UserOutlined />}>
+      <Menu.Item key="1" icon={<UserOutlined />}>
         1st menu item
       </Menu.Item>
-      <Menu.Item key='2' icon={<UserOutlined />}>
+      <Menu.Item key="2" icon={<UserOutlined />}>
         2nd menu item
       </Menu.Item>
-      <Menu.Item key='3' icon={<UserOutlined />}>
+      <Menu.Item key="3" icon={<UserOutlined />}>
         3rd menu item
       </Menu.Item>
     </Menu>
@@ -32,11 +33,11 @@ function Header() {
       <FirstDiv>
         <LogoContainer>
           <a>
-            <img src={Logo} alt='' />
+            <img src={Logo} alt="" />
           </a>
         </LogoContainer>
         <HeaderSearch>
-          <Space direction='vertical'>
+          <Space direction="vertical">
             {/* <Search
               placeholder="Search Anything (⌘)"
               onSearch={onSearch}

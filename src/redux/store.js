@@ -1,5 +1,5 @@
-import { configureStore, compose } from '@reduxjs/toolkit';
-import datasourceReducer from './slices/dataSourceSlice';
+import { configureStore, compose } from "@reduxjs/toolkit";
+import datasourceReducer from "./slices/dataSourceSlice";
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 

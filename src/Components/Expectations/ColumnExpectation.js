@@ -433,7 +433,6 @@ function ColumnExpectation() {
             style={{ width: 147, height: 41 }}
             suffix={suffix1}
           />
-
           <DatePicker size={"large"} />
           <CheckboxSelect>
             <Checkbox onChange={onChange}>Select All</Checkbox>

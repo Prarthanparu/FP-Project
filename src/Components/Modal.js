@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal, Button } from 'antd';
+import React from "react";
+import { Modal, Button } from "antd";
 
 const ModalComponent = (props) => {
   return (
@@ -12,17 +12,19 @@ const ModalComponent = (props) => {
       closable={false}
       width={props.width}
       footer={[
-        <Button key='back' onClick={props.handleCancel}>
-          Cancel
+        <Button key="back" onClick={props.handleCancel}>
+          Cancle
         </Button>,
         <Button
-          key='submit'
-          type='primary'
+          key="submit"
+          type="primary"
           loading={props.loading}
-          onClick={props.handleOk}>
+          onClick={props.handleOk}
+        >
           {props.OkText}
         </Button>,
-      ]}>
+      ]}
+    >
       {props.children}
     </Modal>
   );
