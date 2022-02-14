@@ -163,7 +163,6 @@ function DatasourceTable() {
       },
     })
       .then((res) => {
-        console.log(res);
         Axios.post(reportMart, null, {
           headers: {
             datasource_id: location.state.response_id
@@ -240,7 +239,6 @@ function DatasourceTable() {
           },
         }
       ).then((response) => {
-        console.log(response);
         Axios.post(
           reportmartDetailsUrl,
           {

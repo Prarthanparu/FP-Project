@@ -195,90 +195,119 @@ function ColumnExpectation() {
     />
   );
 
-  const handleNext = () => {
-    if (currentTableIndex < tableExpectaions.length - 1) {
-      let colPayload = [];
-      columnData.forEach((element) => {
-        let colExpectations = [];
-        element.selectedExpectations.forEach((item) => {
-          if (editKwargsObj[item]) {
-            const colObj = { column: element.columnName };
-            let kwOj = {
-              ...editKwargsObj[item],
-              ...colObj,
-            };
-            colExpectations.push({
-              expectation_type: item,
-              kwargs: kwOj,
-            });
-          } else {
-            colExpectations.push({
-              expectation_type: item,
-              kwargs: {
-                column: element.columnName,
-              },
-            });
-          }
-        });
-        colPayload = [...colPayload, ...colExpectations];
+  const getPayloadExpectation = () => {
+    let colPayload = [];
+    columnData.forEach((element) => {
+      let colExpectations = [];
+      element.selectedExpectations.forEach((item) => {
+        if (editKwargsObj[item]) {
+          const colObj = { column: element.columnName };
+          let kwOj = {
+            ...editKwargsObj[item],
+            ...colObj,
+          };
+          colExpectations.push({
+            expectation_type: item,
+            kwargs: kwOj,
+          });
+        } else {
+          colExpectations.push({
+            expectation_type: item,
+            kwargs: {
+              column: element.columnName,
+            },
+          });
+        }
       });
+      colPayload = [...colPayload, ...colExpectations];
+    });
 
-      let payloadColumnExpectations = [
-        { [currentTableExpectation?.expectation_suite_name]: colPayload },
-      ];
+    const payloadColumnExpectations = [
+      { [currentTableExpectation?.expectation_suite_name]: colPayload },
+    ];
+    return payloadColumnExpectations;
+  };
 
+  const submitCall = () => {
+    console.log('submit call ');
+    /*
+    setScreenLoading(true);
+    const { column_expectations, table_expectations } = datasource;
+
+    const params = {
+      dataset_ids: state.dataset_ids,
+      report_mart_id: state.reportmart_id,
+      datasource_id: state.data_source_id,
+      payload: {
+        column_expectations,
+        table_expectations,
+      },
+    };
+
+    setScreenLoading(false);
+
+    Axios.post(expectationsuiteUrl, params, {
+      headers: { type: 'reportmart' },
+    })
+      .then((res) => {
+        setScreenLoading(false);
+        // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
+        navigate(
+          '/configuration/datasource/martdetails/columnchecks/datadocs',
+          {
+            state: {
+              ...state,
+              payload: {
+                column_expectations,
+                table_expectations,
+              },
+            },
+          }
+        );
+        message.success('Profiling Done Successfully!');
+      })
+      .catch((err) => {
+        setScreenLoading(false);
+        notification.error({
+          message:
+            err.message === 'Request failed with status code 500'
+              ? '500'
+              : 'Error',
+          description:
+            err.message === 'Request failed with status code 500'
+              ? 'Internal Server Error'
+              : err.message,
+        });
+      });
+      */
+  };
+
+  const handleNext = () => {
+    console.log('tabIndex = ', currentTableIndex);
+    console.log('table expectation  = ', tableExpectaions.length);
+    if (tableExpectaions.length === 1) {
+      const payloadColumnExpectations = getPayloadExpectation();
       dispatch(addColumnExpectation(payloadColumnExpectations));
+
       setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
       setCurrentTableIndex(currentTableIndex + 1);
+      submitCall();
     } else {
-      setScreenLoading(true);
-      const { column_expectations, table_expectations } = datasource;
+      console.log('tabIndex else  = ', currentTableIndex);
+      console.log('table expectation else   = ', tableExpectaions.length);
 
-      const params = {
-        dataset_ids: state.dataset_ids,
-        report_mart_id: state.reportmart_id,
-        datasource_id: state.data_source_id,
-        payload: {
-          column_expectations,
-          table_expectations,
-        },
-      };
-
-      setScreenLoading(false);
-
-      Axios.post(expectationsuiteUrl, params, {
-        headers: { type: 'reportmart' },
-      })
-        .then((res) => {
-          setScreenLoading(false);
-          // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-          navigate(
-            '/configuration/datasource/martdetails/columnchecks/datadocs',
-            {
-              state: {
-                ...state,
-                payload: {
-                  column_expectations,
-                  table_expectations,
-                },
-              },
-            }
-          );
-          message.success('Profiling Done Successfully!');
-        })
-        .catch((err) => {
-          setScreenLoading(false);
-          notification.error({
-            message:
-              err.message === 'Request failed with status code 500'
-                ? '500'
-                : 'Error',
-            description:
-              err.message === 'Request failed with status code 500'
-                ? 'Internal Server Error'
-                : err.message,
-          });
-        });
+      if (currentTableIndex < tableExpectaions.length - 1) {
+        const payloadColumnExpectations = getPayloadExpectation();
+        dispatch(addColumnExpectation(payloadColumnExpectations));
+        setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
+        setCurrentTableIndex(currentTableIndex + 1);
+      } else {
+        const payloadColumnExpectations = getPayloadExpectation();
+        dispatch(addColumnExpectation(payloadColumnExpectations));
+        setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
+        setCurrentTableIndex(currentTableIndex + 1);
+        submitCall();
+      }
     }
   };
 
