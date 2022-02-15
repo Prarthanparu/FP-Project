@@ -49,8 +49,8 @@ const ReportingMartBody = ({ suiteData }) => {
       expectationURL,
       {
         report_mart_id: martId,
-        date,
         period,
+        date: moment(date).format("YYYY-MM-DD"),
       },
       {
         headers: {
@@ -59,12 +59,24 @@ const ReportingMartBody = ({ suiteData }) => {
       }
     )
       .then((res) => {
+        console.log(res);
         setScreenLoading(false);
-        setIsModalVisible(false);
+        // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
+        message.success("Profiling Done Successfully!");
+        navigate("/configuration/reportmart/refresh");
       })
       .catch((err) => {
         setScreenLoading(false);
-        console.log(err);
+        notification.error({
+          message:
+            err.message === "Request failed with status code 500"
+              ? "500"
+              : "Error",
+          description:
+            err.message === "Request failed with status code 500"
+              ? "Internal Server Error"
+              : err.message,
+        });
       });
   };
 
@@ -102,40 +114,7 @@ const ReportingMartBody = ({ suiteData }) => {
               style={{ fontSize: "20px" }}
               onClick={(e) => {
                 setIsModalVisible(true);
-                setScreenLoading(true);
                 setMartId(reportMartId);
-                Axios.post(
-                  expectationURL,
-                  {
-                    report_mart_id: reportMartId,
-                    // add payload
-                  },
-                  {
-                    headers: {
-                      type: "fullmart",
-                    },
-                  }
-                )
-                  .then((res) => {
-                    console.log(res);
-                    setScreenLoading(false);
-                    // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-                    message.success("Profiling Done Successfully!");
-                    navigate("/configuration/reportmart/refresh");
-                  })
-                  .catch((err) => {
-                    setScreenLoading(false);
-                    notification.error({
-                      message:
-                        err.message === "Request failed with status code 500"
-                          ? "500"
-                          : "Error",
-                      description:
-                        err.message === "Request failed with status code 500"
-                          ? "Internal Server Error"
-                          : err.message,
-                    });
-                  });
               }}
             />
           </section>
@@ -169,11 +148,15 @@ const ReportingMartBody = ({ suiteData }) => {
     setExpandedRowKeys(keys);
   };
 
-  const handleShowReport = (e) => {
-    navigate(`/configuration/reportmart/detailedview`, { e });
+  const handleShowReport = (mart, suit) => {
+    const execution_id = suit.id;
+    const report_mart_id = mart.report_mart_id;
+    navigate(`/configuration/reportmart/detailedview`, {
+      state: { execution_id, report_mart_id },
+    });
   };
 
-  const expandedRowRender = () => {
+  const expandedRowRender = (mart) => {
     const columns = [
       {
         title: "Processed Date",
@@ -221,7 +204,7 @@ const ReportingMartBody = ({ suiteData }) => {
         title: "Action",
         dataIndex: "datadoc_location",
         key: "datadoc_location",
-        render: (record) => (
+        render: (record, suit) => (
           <div style={{ display: "flex", flexDirection: "row", gap: 30 }}>
             <Space
               size="middle"
@@ -238,7 +221,7 @@ const ReportingMartBody = ({ suiteData }) => {
             </Space>
             <Space size="middle">
               <FundViewOutlined
-                onClick={() => handleShowReport(record)}
+                onClick={() => handleShowReport(mart, suit)}
                 title="View Details"
                 style={{ fontSize: "20px", cursor: "pointer" }}
               />
@@ -305,6 +288,7 @@ const ReportingMartBody = ({ suiteData }) => {
           OkText="Create"
           width="461.15px"
           handleOk={() => handleCreat()}
+          handleCancel={() => setIsModalVisible(false)}
         >
           <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
             <Form.Item label="Select Date">
