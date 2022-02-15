@@ -136,20 +136,14 @@ function DetailedView() {
                             <ul>
                               <li>
                                 <h5>
-                                  {
-                                    item.table_expecatation_list.split(",")
-                                      .length
-                                  }{" "}
-                                  Table Level Findings
+                                  {item.applied_table_expectations} Table Level
+                                  Findings
                                 </h5>
                               </li>
                               <li>
                                 <h5>
-                                  {
-                                    item.column_expecatation_list.split(",")
-                                      .length
-                                  }{" "}
-                                  Column Level Findings
+                                  {item.applied_column_expectation} Column Level
+                                  Findings
                                 </h5>
                               </li>
                             </ul>
