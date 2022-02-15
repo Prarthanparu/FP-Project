@@ -12,16 +12,18 @@ import Iframe from "react-iframe";
 import { useNavigate } from "react-router-dom";
 import {
   Input,
-  DatePicker,
   Table,
   message,
   Spin,
   notification,
   Space,
   Modal,
+  Select,
+  Form,
+  DatePicker,
 } from "antd";
 import ModalComponent from "../Components/Modal";
-
+const { Option } = Select;
 const ReportingMartBody = ({ suiteData }) => {
   const proxy = process.env.REACT_APP_PROXY;
   const visualizationUrl = proxy + "/api/visualization";
@@ -35,8 +37,50 @@ const ReportingMartBody = ({ suiteData }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [showReport, setShowReport] = useState(false);
   const [dataDocLocation, setDataDocLocation] = useState("");
+  const [date, setDate] = useState("");
+  const [period, setPeriod] = useState("6");
+  const [martId, setMartId] = useState(moment().format("DD-MM-YYYY"));
 
   const [screenLoading, setScreenLoading] = useState(false);
+
+  const handleCreat = () => {
+    if (date) {
+      setScreenLoading(true);
+      Axios.post(
+        expectationURL,
+        {
+          report_mart_id: martId,
+          period,
+          date: moment(date).format("YYYY-MM-DD"),
+        },
+        {
+          headers: {
+            type: "fullmart",
+          },
+        }
+      )
+        .then((res) => {
+          console.log(res);
+          setScreenLoading(false);
+          // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
+          message.success("Profiling Done Successfully!");
+          navigate("/configuration/reportmart/refresh");
+        })
+        .catch((err) => {
+          setScreenLoading(false);
+          notification.error({
+            message:
+              err.message === "Request failed with status code 500"
+                ? "500"
+                : "Error",
+            description:
+              err.message === "Request failed with status code 500"
+                ? "Internal Server Error"
+                : err.message,
+          });
+        });
+    }
+  };
 
   const columns = [
     { title: "Name", dataIndex: "report_mart_name", key: "report_mart_name" },
@@ -72,39 +116,7 @@ const ReportingMartBody = ({ suiteData }) => {
               style={{ fontSize: "20px" }}
               onClick={(e) => {
                 setIsModalVisible(true);
-                setScreenLoading(true);
-                Axios.post(
-                  expectationURL,
-                  {
-                    report_mart_id: reportMartId,
-                    // add payload
-                  },
-                  {
-                    headers: {
-                      type: "fullmart",
-                    },
-                  }
-                )
-                  .then((res) => {
-                    console.log(res);
-                    setScreenLoading(false);
-                    // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-                    message.success("Profiling Done Successfully!");
-                    navigate("/configuration/reportmart/refresh");
-                  })
-                  .catch((err) => {
-                    setScreenLoading(false);
-                    notification.error({
-                      message:
-                        err.message === "Request failed with status code 500"
-                          ? "500"
-                          : "Error",
-                      description:
-                        err.message === "Request failed with status code 500"
-                          ? "Internal Server Error"
-                          : err.message,
-                    });
-                  });
+                setMartId(reportMartId);
               }}
             />
           </section>
@@ -138,11 +150,15 @@ const ReportingMartBody = ({ suiteData }) => {
     setExpandedRowKeys(keys);
   };
 
-  const handleShowReport = (e) => {
-    navigate(`/configuration/reportmart/detailedview`);
+  const handleShowReport = (mart, suit) => {
+    const execution_id = suit.id;
+    const report_mart_id = mart.report_mart_id;
+    navigate(`/configuration/reportmart/detailedview`, {
+      state: { execution_id, report_mart_id },
+    });
   };
 
-  const expandedRowRender = () => {
+  const expandedRowRender = (mart) => {
     const columns = [
       {
         title: "Processed Date",
@@ -190,7 +206,7 @@ const ReportingMartBody = ({ suiteData }) => {
         title: "Action",
         dataIndex: "datadoc_location",
         key: "datadoc_location",
-        render: (record) => (
+        render: (record, suit) => (
           <div style={{ display: "flex", flexDirection: "row", gap: 30 }}>
             <Space
               size="middle"
@@ -207,7 +223,7 @@ const ReportingMartBody = ({ suiteData }) => {
             </Space>
             <Space size="middle">
               <FundViewOutlined
-                onClick={handleShowReport}
+                onClick={() => handleShowReport(mart, suit)}
                 title="View Details"
                 style={{ fontSize: "20px", cursor: "pointer" }}
               />
@@ -227,8 +243,6 @@ const ReportingMartBody = ({ suiteData }) => {
       />
     );
   };
-
-  console.log("showReport", showReport);
 
   return (
     <Wrapper>
@@ -275,7 +289,21 @@ const ReportingMartBody = ({ suiteData }) => {
           setIsModalVisible={setIsModalVisible}
           OkText="Create"
           width="461.15px"
-        ></ModalComponent>
+          handleOk={() => handleCreat()}
+          handleCancel={() => setIsModalVisible(false)}
+        >
+          <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+            <Form.Item label="Select Date">
+              <StyledDatePicker onChange={(e) => setDate(e._d)} />
+            </Form.Item>
+            <Form.Item label="Select Period">
+              <Select defaultValue={period} onChange={(e) => setPeriod(e)}>
+                <Option value="6">0-6 Moths</Option>
+                <Option value="12">6-12 Months</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </ModalComponent>
       )}
     </Wrapper>
   );
@@ -306,3 +334,10 @@ const WrapperHeader = styled.div`
     font-weight: bold;
   }
 `;
+
+const StyledDatePicker = styled(DatePicker)`
+  width: 100%;
+`;
+// const DatePicker = styled(DatePicker)`
+//   width: 100%;
+// `;
