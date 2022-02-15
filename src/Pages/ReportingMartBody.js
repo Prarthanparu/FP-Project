@@ -38,46 +38,48 @@ const ReportingMartBody = ({ suiteData }) => {
   const [showReport, setShowReport] = useState(false);
   const [dataDocLocation, setDataDocLocation] = useState("");
   const [date, setDate] = useState("");
-  const [period, setPeriod] = useState("");
-  const [martId, setMartId] = useState("");
+  const [period, setPeriod] = useState("6");
+  const [martId, setMartId] = useState(moment().format("DD-MM-YYYY"));
 
   const [screenLoading, setScreenLoading] = useState(false);
 
   const handleCreat = () => {
-    setScreenLoading(true);
-    Axios.post(
-      expectationURL,
-      {
-        report_mart_id: martId,
-        period,
-        date: moment(date).format("YYYY-MM-DD"),
-      },
-      {
-        headers: {
-          type: "fullmart",
+    if (date) {
+      setScreenLoading(true);
+      Axios.post(
+        expectationURL,
+        {
+          report_mart_id: martId,
+          period,
+          date: moment(date).format("YYYY-MM-DD"),
         },
-      }
-    )
-      .then((res) => {
-        console.log(res);
-        setScreenLoading(false);
-        // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-        message.success("Profiling Done Successfully!");
-        navigate("/configuration/reportmart/refresh");
-      })
-      .catch((err) => {
-        setScreenLoading(false);
-        notification.error({
-          message:
-            err.message === "Request failed with status code 500"
-              ? "500"
-              : "Error",
-          description:
-            err.message === "Request failed with status code 500"
-              ? "Internal Server Error"
-              : err.message,
+        {
+          headers: {
+            type: "fullmart",
+          },
+        }
+      )
+        .then((res) => {
+          console.log(res);
+          setScreenLoading(false);
+          // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
+          message.success("Profiling Done Successfully!");
+          navigate("/configuration/reportmart/refresh");
+        })
+        .catch((err) => {
+          setScreenLoading(false);
+          notification.error({
+            message:
+              err.message === "Request failed with status code 500"
+                ? "500"
+                : "Error",
+            description:
+              err.message === "Request failed with status code 500"
+                ? "Internal Server Error"
+                : err.message,
+          });
         });
-      });
+    }
   };
 
   const columns = [
@@ -295,7 +297,7 @@ const ReportingMartBody = ({ suiteData }) => {
               <StyledDatePicker onChange={(e) => setDate(e._d)} />
             </Form.Item>
             <Form.Item label="Select Period">
-              <Select defaultValue="6" onChange={(e) => setPeriod(e)}>
+              <Select defaultValue={period} onChange={(e) => setPeriod(e)}>
                 <Option value="6">0-6 Moths</Option>
                 <Option value="12">6-12 Months</Option>
               </Select>
