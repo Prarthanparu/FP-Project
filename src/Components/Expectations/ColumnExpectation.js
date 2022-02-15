@@ -229,9 +229,6 @@ function ColumnExpectation() {
   };
 
   const submitCall = () => {
-    console.log('submit call ');
-    /*
-    setScreenLoading(true);
     const { column_expectations, table_expectations } = datasource;
 
     const params = {
@@ -279,30 +276,27 @@ function ColumnExpectation() {
               : err.message,
         });
       });
-      */
   };
 
   const handleNext = () => {
-    console.log('tabIndex = ', currentTableIndex);
-    console.log('table expectation  = ', tableExpectaions.length);
     if (tableExpectaions.length === 1) {
       const payloadColumnExpectations = getPayloadExpectation();
+      setScreenLoading(true);
       dispatch(addColumnExpectation(payloadColumnExpectations));
-
       setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
       setCurrentTableIndex(currentTableIndex + 1);
       submitCall();
     } else {
-      console.log('tabIndex else  = ', currentTableIndex);
-      console.log('table expectation else   = ', tableExpectaions.length);
-
       if (currentTableIndex < tableExpectaions.length - 1) {
+        setScreenLoading(true);
         const payloadColumnExpectations = getPayloadExpectation();
         dispatch(addColumnExpectation(payloadColumnExpectations));
         setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
         setCurrentTableIndex(currentTableIndex + 1);
+        setScreenLoading(false);
       } else {
         const payloadColumnExpectations = getPayloadExpectation();
+        setScreenLoading(true);
         dispatch(addColumnExpectation(payloadColumnExpectations));
         setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
         setCurrentTableIndex(currentTableIndex + 1);
