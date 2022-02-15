@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { List, Divider, Menu, Dropdown, Button } from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function DetailedView() {
   const data = [
@@ -28,6 +29,24 @@ function DetailedView() {
       title: "quality_check_result",
     },
   ];
+  const [state, setState] = useState([]);
+  useEffect(() => {
+    const proxy = process.env.REACT_APP_PROXY;
+    const report_mart_id = window.history.state.idx;
+    const reportmartQualityChecks = proxy + "/api/reportmart_quality_checks";
+    axios
+      .get(reportmartQualityChecks, {
+        headers: {
+          report_mart_id,
+        },
+      })
+      .then((res) => {
+        setState(res.data.output);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, []);
   const menu = (
     <Menu>
       <Menu.Item>

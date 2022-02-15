@@ -139,7 +139,7 @@ const ReportingMartBody = ({ suiteData }) => {
   };
 
   const handleShowReport = (e) => {
-    navigate(`/configuration/reportmart/detailedview`);
+    navigate(`/configuration/reportmart/detailedview`, { e });
   };
 
   const expandedRowRender = () => {
@@ -207,7 +207,7 @@ const ReportingMartBody = ({ suiteData }) => {
             </Space>
             <Space size="middle">
               <FundViewOutlined
-                onClick={handleShowReport}
+                onClick={() => handleShowReport(record)}
                 title="View Details"
                 style={{ fontSize: "20px", cursor: "pointer" }}
               />
