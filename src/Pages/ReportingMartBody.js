@@ -12,16 +12,18 @@ import Iframe from "react-iframe";
 import { useNavigate } from "react-router-dom";
 import {
   Input,
-  DatePicker,
   Table,
   message,
   Spin,
   notification,
   Space,
   Modal,
+  Select,
+  Form,
+  DatePicker,
 } from "antd";
 import ModalComponent from "../Components/Modal";
-
+const { Option } = Select;
 const ReportingMartBody = ({ suiteData }) => {
   const proxy = process.env.REACT_APP_PROXY;
   const visualizationUrl = proxy + "/api/visualization";
@@ -275,7 +277,19 @@ const ReportingMartBody = ({ suiteData }) => {
           setIsModalVisible={setIsModalVisible}
           OkText="Create"
           width="461.15px"
-        ></ModalComponent>
+        >
+          <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+            <Form.Item label="Select Date">
+              <StyledDatePicker onChange={console.log} />
+            </Form.Item>
+            <Form.Item label="Select Period">
+              <Select defaultValue="6" onChange={console.log}>
+                <Option value="6">0-6 Moths</Option>
+                <Option value="12">6-12 Months</Option>
+              </Select>
+            </Form.Item>
+          </Form>
+        </ModalComponent>
       )}
     </Wrapper>
   );
@@ -306,3 +320,10 @@ const WrapperHeader = styled.div`
     font-weight: bold;
   }
 `;
+
+const StyledDatePicker = styled(DatePicker)`
+  width: 100%;
+`;
+// const DatePicker = styled(DatePicker)`
+//   width: 100%;
+// `;
