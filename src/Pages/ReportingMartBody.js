@@ -37,8 +37,36 @@ const ReportingMartBody = ({ suiteData }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [showReport, setShowReport] = useState(false);
   const [dataDocLocation, setDataDocLocation] = useState("");
+  const [date, setDate] = useState("");
+  const [period, setPeriod] = useState("");
+  const [martId, setMartId] = useState("");
 
   const [screenLoading, setScreenLoading] = useState(false);
+
+  const handleCreat = () => {
+    setScreenLoading(true);
+    Axios.post(
+      expectationURL,
+      {
+        report_mart_id: martId,
+        date,
+        period,
+      },
+      {
+        headers: {
+          type: "fullmart",
+        },
+      }
+    )
+      .then((res) => {
+        setScreenLoading(false);
+        setIsModalVisible(false);
+      })
+      .catch((err) => {
+        setScreenLoading(false);
+        console.log(err);
+      });
+  };
 
   const columns = [
     { title: "Name", dataIndex: "report_mart_name", key: "report_mart_name" },
@@ -75,6 +103,7 @@ const ReportingMartBody = ({ suiteData }) => {
               onClick={(e) => {
                 setIsModalVisible(true);
                 setScreenLoading(true);
+                setMartId(reportMartId);
                 Axios.post(
                   expectationURL,
                   {
@@ -230,8 +259,6 @@ const ReportingMartBody = ({ suiteData }) => {
     );
   };
 
-  console.log("showReport", showReport);
-
   return (
     <Wrapper>
       <WrapperHeader>
@@ -277,13 +304,14 @@ const ReportingMartBody = ({ suiteData }) => {
           setIsModalVisible={setIsModalVisible}
           OkText="Create"
           width="461.15px"
+          handleOk={() => handleCreat()}
         >
           <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
             <Form.Item label="Select Date">
-              <StyledDatePicker onChange={console.log} />
+              <StyledDatePicker onChange={(e) => setDate(e._d)} />
             </Form.Item>
             <Form.Item label="Select Period">
-              <Select defaultValue="6" onChange={console.log}>
+              <Select defaultValue="6" onChange={(e) => setPeriod(e)}>
                 <Option value="6">0-6 Moths</Option>
                 <Option value="12">6-12 Months</Option>
               </Select>
