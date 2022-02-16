@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   expectionsData: {},
@@ -7,7 +7,7 @@ const initialState = {
 };
 
 export const dataSourceSlice = createSlice({
-  name: "datasourcetable",
+  name: 'datasourcetable',
   initialState,
   reducers: {
     addExpectionsIds: (state, action) => {
@@ -28,6 +28,9 @@ export const dataSourceSlice = createSlice({
         ...action.payload,
       ];
     },
+    clearTableExpectation: (state, action) => {
+      state.table_expectations = [];
+    },
   },
 });
 
@@ -36,6 +39,7 @@ export const {
   addExpectationData,
   addTableExpectation,
   addColumnExpectation,
+  clearTableExpectation,
 } = dataSourceSlice.actions;
 
 export default dataSourceSlice.reducer;

@@ -12,13 +12,13 @@ import {
 } from 'antd';
 import styled from 'styled-components';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 import SelectedTableCard from '../SelectedTableCard';
 import ModalComponent from '../../Components/Modal';
 import { static_column_expectations } from './ColumnExpectations';
-import { addColumnExpectation } from '../../redux/slices/dataSourceSlice';
 import ExpectationKwargsUpdate from './ExpectationKwargsUpdate';
+import { checkObj } from '../../util/helper';
+import { clearTableExpectation } from '../../redux/slices/dataSourceSlice';
 
 function ColumnExpectation() {
   const [columnData, setColumnData] = useState([]);
@@ -29,7 +29,6 @@ function ColumnExpectation() {
     []
   );
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [payload, setPayload] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [modalData, setModalData] = useState([]);
@@ -37,12 +36,10 @@ function ColumnExpectation() {
   const [kwargsArray, setKwargsArray] = useState([]);
   const [currentExpectation, setCurrentExpectation] = useState();
   const [editKwargsObj, setEditKwargsObj] = useState({});
-
-  const navigate = useNavigate();
+  const [payloadColumnExpectations, setPayloadColumnExpectations] = useState(
+    {}
+  );
   const { state } = useLocation();
-  const { Step } = Steps;
-  const dispatch = useDispatch();
-  const datasource = useSelector((state) => state.datasource);
   const [currentTableExpectation, setCurrentTableExpectation] = useState(
     state.expectationsData[0]
   );
@@ -50,10 +47,11 @@ function ColumnExpectation() {
   const expectationsuiteUrl = proxy + '/api/expectationsuite';
   const [screenLoading, setScreenLoading] = useState(false);
 
-  //  Initialize the state with the data from the state
-  useEffect(() => {
-    setPayload(state.payload);
-  }, []);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { Step } = Steps;
+  const { expectationsData } = state;
+  const datasource = useSelector((state) => state.datasource);
 
   useEffect(() => {
     const filterItems = (arr, query) => {
@@ -195,7 +193,9 @@ function ColumnExpectation() {
     />
   );
 
-  const getPayloadExpectation = () => {
+  const handleSubmit = async () => {
+    const { table_expectations } = datasource;
+
     let colPayload = [];
     columnData.forEach((element) => {
       let colExpectations = [];
@@ -222,43 +222,39 @@ function ColumnExpectation() {
       colPayload = [...colPayload, ...colExpectations];
     });
 
-    const payloadColumnExpectations = [
-      { [currentTableExpectation?.expectation_suite_name]: colPayload },
-    ];
-    return payloadColumnExpectations;
-  };
+    const payloadExpectations = {
+      [currentTableExpectation?.expectation_suite_name]: colPayload,
+    };
 
-  const submitCall = () => {
-    const { column_expectations, table_expectations } = datasource;
+    const final_column_expectations = [payloadExpectations];
+
+    if (!checkObj(payloadColumnExpectations)) {
+      final_column_expectations.push(payloadColumnExpectations);
+    }
 
     const params = {
       dataset_ids: state.dataset_ids,
       report_mart_id: state.reportmart_id,
       datasource_id: state.data_source_id,
       payload: {
-        column_expectations,
-        table_expectations,
+        column_expectations: final_column_expectations,
+        table_expectations: table_expectations,
       },
+      period: '6',
+      date: '02/14/2022',
     };
-
-    setScreenLoading(false);
 
     Axios.post(expectationsuiteUrl, params, {
       headers: { type: 'reportmart' },
     })
       .then((res) => {
         setScreenLoading(false);
+        dispatch(clearTableExpectation);
         // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
         navigate(
           '/configuration/datasource/martdetails/columnchecks/datadocs',
           {
-            state: {
-              ...state,
-              payload: {
-                column_expectations,
-                table_expectations,
-              },
-            },
+            params,
           }
         );
         message.success('Profiling Done Successfully!');
@@ -279,35 +275,48 @@ function ColumnExpectation() {
   };
 
   const handleNext = () => {
-    if (tableExpectaions.length === 1) {
-      const payloadColumnExpectations = getPayloadExpectation();
-      setScreenLoading(true);
-      dispatch(addColumnExpectation(payloadColumnExpectations));
-      setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
-      setCurrentTableIndex(currentTableIndex + 1);
-      submitCall();
-    } else {
-      if (currentTableIndex < tableExpectaions.length - 1) {
-        setScreenLoading(true);
-        const payloadColumnExpectations = getPayloadExpectation();
-        dispatch(addColumnExpectation(payloadColumnExpectations));
-        setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
-        setCurrentTableIndex(currentTableIndex + 1);
-        setScreenLoading(false);
-      } else {
-        const payloadColumnExpectations = getPayloadExpectation();
-        setScreenLoading(true);
-        dispatch(addColumnExpectation(payloadColumnExpectations));
-        setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
-        setCurrentTableIndex(currentTableIndex + 1);
-        submitCall();
-      }
-    }
+    setScreenLoading(true);
+    let colPayload = [];
+    columnData.forEach((element) => {
+      let colExpectations = [];
+      element.selectedExpectations.forEach((item) => {
+        if (editKwargsObj[item]) {
+          const colObj = { column: element.columnName };
+          let kwOj = {
+            ...editKwargsObj[item],
+            ...colObj,
+          };
+          colExpectations.push({
+            expectation_type: item,
+            kwargs: kwOj,
+          });
+        } else {
+          colExpectations.push({
+            expectation_type: item,
+            kwargs: {
+              column: element.columnName,
+            },
+          });
+        }
+      });
+      colPayload = [...colPayload, ...colExpectations];
+    });
+
+    const payloadExpectations = {
+      [currentTableExpectation?.expectation_suite_name]: colPayload,
+    };
+
+    setPayloadColumnExpectations((prevState) => ({
+      ...prevState,
+      ...payloadExpectations,
+    }));
+    setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
+    setCurrentTableIndex(currentTableIndex + 1);
+    setScreenLoading(false);
   };
 
   function onSelectChange(selectedRowKeys) {
     setSelectedRowKeys(selectedRowKeys);
-    console.log('asf = ', selectedColumn);
   }
 
   const rowSelection = {
@@ -396,6 +405,11 @@ function ColumnExpectation() {
     setIsModalVisible(true);
   };
 
+  let showSubmitBuuton = false;
+  if (expectationsData && expectationsData.length > 0)
+    showSubmitBuuton = currentTableIndex + 1 === expectationsData.length;
+  if (currentTableIndex >= expectationsData.length) showSubmitBuuton = true;
+
   return (
     <Tableview>
       <CardComponent>
@@ -447,7 +461,11 @@ function ColumnExpectation() {
           </ExpectationsList>
         </Spin>
         <ButtonContent>
-          <Button onClick={handleNext}>Next</Button>
+          {showSubmitBuuton ? (
+            <Button onClick={handleSubmit}>Submit</Button>
+          ) : (
+            <Button onClick={handleNext}>Next</Button>
+          )}
         </ButtonContent>
       </TableContent>
       {isModalVisible && (

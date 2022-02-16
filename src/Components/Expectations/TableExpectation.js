@@ -1,74 +1,74 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import {
   SearchOutlined,
   FilterOutlined,
   EditOutlined,
   DeleteOutlined,
-} from "@ant-design/icons";
-import { Button, Table } from "antd";
-import SelectedTableCard from "../SelectedTableCard";
-import { useNavigate, useLocation } from "react-router-dom";
-import { List, Steps, Popover } from "antd";
-import { useDispatch } from "react-redux";
-import { addTableExpectation } from "../../redux/slices/dataSourceSlice";
-import ExpectationKwargsUpdate from "./ExpectationKwargsUpdate";
+} from '@ant-design/icons';
+import { Button, Table } from 'antd';
+import SelectedTableCard from '../SelectedTableCard';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { List, Steps, Popover } from 'antd';
+import { useDispatch } from 'react-redux';
+import { addTableExpectation } from '../../redux/slices/dataSourceSlice';
+import ExpectationKwargsUpdate from './ExpectationKwargsUpdate';
 
 const TableExpectation = () => {
   const expectation = [
     {
-      title: "expect_table_row_count_to_equal",
+      title: 'expect_table_row_count_to_equal',
       kwargs: {
-        value: "",
+        value: '',
       },
     },
     {
-      title: "expect_value_at_index",
+      title: 'expect_value_at_index',
     },
     {
-      title: "expect_table_row_count_to_equal_other_table",
+      title: 'expect_table_row_count_to_equal_other_table',
     },
     {
-      title: "expect_table_columns_to_match_set",
+      title: 'expect_table_columns_to_match_set',
       kwargs: {
-        column_set: "",
-        exact_match: "",
+        column_set: '',
+        exact_match: '',
       },
     },
     {
-      title: "expect_table_columns_to_match_ordered_list",
+      title: 'expect_table_columns_to_match_ordered_list',
       kwargs: {
-        column_list: "",
+        column_list: '',
       },
     },
     {
-      title: "expect_table_row_count_to_be_between",
+      title: 'expect_table_row_count_to_be_between',
       kwargs: {
-        min_value: "",
-        max_value: "",
+        min_value: '',
+        max_value: '',
       },
     },
     {
-      title: "expect_table_column_count_to_equal",
+      title: 'expect_table_column_count_to_equal',
       kwargs: {
-        value: "",
+        value: '',
       },
     },
     {
-      title: "expect_table_column_count_to_be_between",
+      title: 'expect_table_column_count_to_be_between',
       kwargs: {
-        min_value: "",
-        max_value: "",
+        min_value: '',
+        max_value: '',
       },
     },
   ];
   const columns = [
     {
       width: 100,
-      title: "Select All",
-      dataIndex: "name",
-      key: "name",
-      fixed: "center",
+      title: 'Select All',
+      dataIndex: 'name',
+      key: 'name',
+      fixed: 'center',
     },
   ];
 
@@ -90,6 +90,8 @@ const TableExpectation = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [kwargsArray, setKwargsArray] = useState();
   const [currentExpectation, setCurrentExpectation] = useState();
+
+  const { expectationsData } = state;
 
   const [payload, setPayload] = useState({
     table_expectations: [],
@@ -113,7 +115,7 @@ const TableExpectation = () => {
       setSelectedTableExpectations(
         filterItems(
           state && state.expectationsData[currentTableIndex].expectations,
-          "expect_table"
+          'expect_table'
         )
       );
     }
@@ -137,8 +139,7 @@ const TableExpectation = () => {
         <span>
           step {index} status: {status}
         </span>
-      }
-    >
+      }>
       {dot}
     </Popover>
   );
@@ -150,7 +151,7 @@ const TableExpectation = () => {
     <SearchOutlined
       style={{
         fontSize: 20,
-        color: "#ef7434",
+        color: '#ef7434',
       }}
     />
   );
@@ -159,13 +160,12 @@ const TableExpectation = () => {
     <FilterOutlined
       style={{
         fontSize: 20,
-        color: "#ef7434",
+        color: '#ef7434',
       }}
     />
   );
 
-  const handleNext = (e) => {
-    const { expectationsData } = state;
+  const handleNext = async (e) => {
     let expectionsPayload = {};
     if (expectationsData && expectationsData.length > 0) {
       const { expectation_suite_name } = expectationsData[currentTableIndex];
@@ -178,19 +178,27 @@ const TableExpectation = () => {
       dispatch(addTableExpectation(expectionsPayload));
     }
 
-    if (currentTableIndex <= tableExpectaions.length - 2) {
-      let payloadTableExpectations = [
-        ...payload.table_expectations,
-        {
-          [currentTableExpectation?.expectation_suite_name]:
-            selectedTableExpectations,
+    setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
+    setCurrentTableIndex(currentTableIndex + 1);
+  };
+
+  const handleSubmit = async () => {
+    let expectionsPayload = {};
+    if (
+      expectationsData &&
+      expectationsData.length > 0 &&
+      currentTableIndex + 1 === expectationsData.length
+    ) {
+      const { expectation_suite_name } = expectationsData[currentTableIndex];
+      expectionsPayload = {
+        [expectation_suite_name]: {
+          expectation: [...selectedTableExpectations],
         },
-      ];
-      setPayload({ ...payload, table_expectations: payloadTableExpectations });
-      setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
+      };
+
+      dispatch(addTableExpectation(expectionsPayload));
       setCurrentTableIndex(currentTableIndex + 1);
-    } else {
-      navigate("/configuration/datasource/martdetails/columnchecks", {
+      navigate('/configuration/datasource/martdetails/columnchecks', {
         state: { ...state, payload: payload },
       });
     }
@@ -232,6 +240,98 @@ const TableExpectation = () => {
     }
   };
 
+  let showSubmitBuuton = false;
+  if (expectationsData && expectationsData.length > 0)
+    showSubmitBuuton = currentTableIndex + 1 === expectationsData.length;
+  if (currentTableIndex >= expectationsData.length) showSubmitBuuton = true;
+
+  const t = {
+    dataset_ids: [6],
+    report_mart_id: '1',
+    datasource_id: '9',
+    period: '6',
+    date: '02/14/2022',
+    payload: {
+      table_expectations: [
+        {
+          sample1: [
+            {
+              expectation_type: 'expect_table_columns_to_match_ordered_list',
+              kwargs: {
+                column_list: [
+                  'travelCode',
+                  'userCode',
+                  'name',
+                  'place',
+                  'to',
+                  'flightType',
+                  'from',
+                  'days',
+                  'price',
+                  'total',
+                  'date',
+                ],
+              },
+              meta: {},
+            },
+            {
+              expectation_type: 'expect_table_row_count_to_be_between',
+              kwargs: {
+                max_value: 39203,
+                min_value: 39203,
+              },
+              meta: {},
+            },
+          ],
+        },
+      ],
+      column_expectations: [
+        {
+          sample1: [
+            {
+              expectation_type: 'expect_column_min_to_be_between',
+              kwargs: {
+                column: 'travelCode',
+                max_value: 0,
+                min_value: 0,
+              },
+              meta: {},
+            },
+            {
+              expectation_type: 'expect_column_max_to_be_between_custom',
+              kwargs: {
+                column: 'travelCode',
+                max_value: 131424,
+                min_value: 131424,
+              },
+              meta: {},
+            },
+            {
+              expectation_type: 'expect_column_mean_to_be_between',
+              kwargs: {
+                column: 'travelCode',
+                max_value: 65649.03402800806,
+                min_value: 65649.03402800806,
+              },
+              meta: {},
+            },
+            {
+              expectation_type: 'expect_column_median_to_be_between',
+              kwargs: {
+                column: 'travelCode',
+                max_value: 65534,
+                min_value: 65534,
+              },
+              meta: {},
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  console.log('tt = ', t);
+
   return (
     <Tableview>
       <CardComponent>
@@ -248,8 +348,9 @@ const TableExpectation = () => {
                   <Button
                     key={item.expectation_type}
                     icon={<EditOutlined />}
-                    onClick={() => handleEditButton(item.expectation_type)}
-                  ></Button>,
+                    onClick={() =>
+                      handleEditButton(item.expectation_type)
+                    }></Button>,
                   <Button
                     key={item.expectation_type}
                     id={item.expectation_type}
@@ -264,10 +365,8 @@ const TableExpectation = () => {
                       );
                       e.preventDefault();
                     }}
-                    icon={<DeleteOutlined />}
-                  ></Button>,
-                ]}
-              >
+                    icon={<DeleteOutlined />}></Button>,
+                ]}>
                 <List.Item.Meta title={<a>{item.expectation_type}</a>} />
               </List.Item>
             )}
@@ -315,7 +414,7 @@ const TableExpectation = () => {
         </ExpectationsList>
         <ButtonContent>
           <Button
-            type="primary"
+            type='primary'
             onClick={(e) => {
               // TODO fix this with dynamic content.
               let data = selectedRowKeys.map((key) => {
@@ -331,12 +430,16 @@ const TableExpectation = () => {
                 ...data,
               ];
               setSelectedTableExpectations(newSelectedTableExpectations);
-            }}
-          >
+            }}>
             Apply
           </Button>
+          {showSubmitBuuton ? (
+            <Button onClick={handleSubmit}>Submit</Button>
+          ) : (
+            <Button onClick={handleNext}>Next</Button>
+          )}
 
-          <Button onClick={handleNext}>Next</Button>
+          {/* <Button onClick={handleNext}>Next</Button> */}
         </ButtonContent>
       </TableContent>
       {isModalVisible && (
