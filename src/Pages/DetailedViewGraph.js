@@ -118,7 +118,6 @@ function DetailedViewGraph() {
     return <Line {...config} />;
   };
   const handleRedirect = () => {
-    console.log("click");
     setOpen(true);
   };
   const listData = window && window.history && window.history.state.usr;
@@ -204,7 +203,7 @@ function DetailedViewGraph() {
                       <br />
                     </span>
                   ))}
-                </p>{" "}
+                </p>
                 <Icon
                   onClick={(e) => {
                     handleRedirect();
@@ -274,6 +273,8 @@ const DetailedViewGraphHeaderTwo = styled.div`
 const Flex = styled.p`
   display: flex;
   align-items: start;
+  max-height: 100px;
+  overflow-y: auto;
 `;
 const Icon = styled(EyeOutlined)`
   margin-left: 10px;
