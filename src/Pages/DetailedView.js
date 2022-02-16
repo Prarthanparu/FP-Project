@@ -64,8 +64,10 @@ function DetailedView() {
   );
 
   const navigate = useNavigate();
-  const handleClickDataset = (e) => {
-    navigate(`/configuration/reportmart/detailedview/individualdata`);
+  const handleClickDataset = (list) => {
+    navigate(`/configuration/reportmart/detailedview/individualdata`, {
+      state: list,
+    });
   };
   return (
     <DetailedViewBody className="scroll">
@@ -91,7 +93,7 @@ function DetailedView() {
                 renderItem={(item) => (
                   <List.Item>
                     <List.Item.Meta
-                      onClick={handleClickDataset}
+                      onClick={() => handleClickDataset(item)}
                       style={{
                         border: "1px solid black",
                         padding: "20px",

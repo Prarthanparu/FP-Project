@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Collapse } from "antd";
+import { Collapse, Space } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
-import { DownOutlined } from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import { Pie, Line } from "@ant-design/plots";
-
+import { useNavigate } from "react-router-dom";
+import GraphModal from "../Components/GraphModal";
 function DetailedViewGraph() {
   const { Panel } = Collapse;
-
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
   const text = `
 -->  Row Count of 725 is outside of the expected range of 1681 and 2377
 `;
@@ -115,6 +117,11 @@ function DetailedViewGraph() {
 
     return <Line {...config} />;
   };
+  const handleRedirect = () => {
+    console.log("click");
+    setOpen(true);
+  };
+  const listData = window && window.history && window.history.state.usr;
 
   return (
     <MainBody>
@@ -134,7 +141,7 @@ function DetailedViewGraph() {
       </DetailedViewGraphBody>
       <DetailedViewGraphContent>
         <TableContentHeader>
-          <h1>Gross Charge Off Rate</h1>
+          <h1>Table Expectations</h1>
         </TableContentHeader>
         <TableContent>
           <Collapse
@@ -146,18 +153,34 @@ function DetailedViewGraph() {
             className="site-collapse-custom-collapse"
           >
             <Panel
-              header="report_mart_dataset"
+              header={listData.datset_name}
               key="1"
               className="site-collapse-custom-panel"
             >
-              <p>{text}</p>
+              <Flex>
+                <p>
+                  {listData.table_expecatation_list.map((i, index) => (
+                    <span key={`${index}`}>
+                      {i}
+                      <br />
+                    </span>
+                  ))}
+                </p>{" "}
+                <Icon
+                  onClick={(e) => {
+                    handleRedirect();
+                  }}
+                  title="View Docs"
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                />
+              </Flex>
             </Panel>
           </Collapse>
         </TableContent>
       </DetailedViewGraphContent>
       <DetailedViewGraphContent>
         <TableContentHeader>
-          <h1>Net Charge Offs</h1>
+          <h1> Column Expectations</h1>
         </TableContentHeader>
         <TableContent>
           <Collapse
@@ -169,15 +192,38 @@ function DetailedViewGraph() {
             className="site-collapse-custom-collapse"
           >
             <Panel
-              header="report_mart_dataset"
+              header={listData.datset_name}
               key="1"
               className="site-collapse-custom-panel"
             >
-              <p>{text}</p>
+              <Flex>
+                <p>
+                  {listData.column_expecatation_list.map((i, index) => (
+                    <span key={`${index}`}>
+                      {i}
+                      <br />
+                    </span>
+                  ))}
+                </p>{" "}
+                <Icon
+                  onClick={(e) => {
+                    handleRedirect();
+                  }}
+                  title="View Docs"
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                />
+              </Flex>
             </Panel>
           </Collapse>
         </TableContent>
       </DetailedViewGraphContent>
+      {open && (
+        <GraphModal
+          isModalVisible={open}
+          setIsModalVisible={setOpen}
+          handleCancel={() => setOpen(false)}
+        />
+      )}
     </MainBody>
   );
 }
@@ -224,4 +270,15 @@ const DetailedViewGraphHeaderTwo = styled.div`
   display: flex;
   flex: 0.2;
   align-items: center;
+`;
+const Flex = styled.p`
+  display: flex;
+  align-items: start;
+`;
+const Icon = styled(EyeOutlined)`
+  margin-left: 10px;
+  cursor: pointer;
+  &:hover {
+    color: orange;
+  }
 `;
