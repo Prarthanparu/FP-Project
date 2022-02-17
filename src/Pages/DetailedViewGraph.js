@@ -159,14 +159,12 @@ function DetailedViewGraph() {
               className="site-collapse-custom-panel"
             >
               <Flex>
-                <span>
-                  {listData.table_expecatation_list.map((i, index) => (
-                    <span key={`${index}`}>
-                      {i}
-                      <br />
-                    </span>
-                  ))}
-                </span>
+                {listData.table_expecatation_list.map((i, index) => (
+                  <span key={`${index}`}>
+                    <br />
+                    {i}
+                  </span>
+                ))}
                 <Icon
                   onClick={(e) => {
                     handleRedirect("table");
@@ -197,26 +195,13 @@ function DetailedViewGraph() {
               key="1"
               className="site-collapse-custom-panel"
             >
-              <Flex
-                onClick={(e) => {
-                  handleRedirect("column");
-                }}
-              >
-                <span>
-                  {listData.column_expecatation_list.map((i, index) => (
-                    <span key={`${index}`}>
-                      {i}
-                      <br />
-                    </span>
-                  ))}
-                </span>
-                <Icon
-                  onClick={(e) => {
-                    handleRedirect("column");
-                  }}
-                  title="View Docs"
-                  style={{ fontSize: "20px", cursor: "pointer" }}
-                />
+              <Flex>
+                {listData.column_expecatation_list.map((i, index) => (
+                  <span key={`${index}`}>
+                    <br />
+                    {i}
+                  </span>
+                ))}
               </Flex>
             </Panel>
           </Collapse>
@@ -250,7 +235,6 @@ const DetailedViewGraphBody = styled.div`
   width: 100%;
   border: 1px solid black;
   background-color: #2d2d2f;
-
   flex: 1;
   padding-left: 50px;
 `;
@@ -279,14 +263,13 @@ const DetailedViewGraphHeaderTwo = styled.div`
   align-items: center;
 `;
 const Flex = styled.p`
-  display: flex;
-  align-items: end;
   max-height: 100px;
   overflow-y: auto;
-  margin-bottom: 0;
 `;
 const Icon = styled(EyeOutlined)`
-  margin-left: 10px;
+  margin-left: 20px;
+  position: relative;
+  top: 4px;
   cursor: pointer;
   &:hover {
     color: orange;
