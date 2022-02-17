@@ -210,6 +210,13 @@ function DetailedViewGraph() {
                     </span>
                   ))}
                 </span>
+                <Icon
+                  onClick={(e) => {
+                    handleRedirect("column");
+                  }}
+                  title="View Docs"
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                />
               </Flex>
             </Panel>
           </Collapse>
