@@ -161,7 +161,7 @@ function DetailedViewGraph() {
               <Flex>
                 {listData.table_expecatation_list.map((i, index) => (
                   <span key={`${index}`}>
-                    <br />
+                    {index !== 0 && <br />}
                     {i}
                   </span>
                 ))}
@@ -198,7 +198,7 @@ function DetailedViewGraph() {
               <Flex>
                 {listData.column_expecatation_list.map((i, index) => (
                   <span key={`${index}`}>
-                    <br />
+                    {index !== 0 && <br />}
                     {i}
                   </span>
                 ))}
