@@ -198,17 +198,20 @@ function ColumnExpectation() {
 
     let colPayload = [];
     columnData.forEach((element) => {
+      console.log('ele = ', element);
       let colExpectations = [];
       element.selectedExpectations.forEach((item) => {
-        if (editKwargsObj[item]) {
+        if (editKwargsObj[item] !== undefined) {
           const colObj = { column: element.columnName };
           let kwOj = {
+            column: element.columnName,
             ...editKwargsObj[item],
             ...colObj,
           };
           colExpectations.push({
             expectation_type: item,
             kwargs: kwOj,
+            meta: {},
           });
         } else {
           colExpectations.push({
@@ -216,6 +219,7 @@ function ColumnExpectation() {
             kwargs: {
               column: element.columnName,
             },
+            meta: {},
           });
         }
       });
@@ -280,9 +284,10 @@ function ColumnExpectation() {
     columnData.forEach((element) => {
       let colExpectations = [];
       element.selectedExpectations.forEach((item) => {
-        if (editKwargsObj[item]) {
+        if (editKwargsObj[item] !== undefined) {
           const colObj = { column: element.columnName };
           let kwOj = {
+            column: element.columnName,
             ...editKwargsObj[item],
             ...colObj,
           };
@@ -374,13 +379,12 @@ function ColumnExpectation() {
   };
 
   const handleKwargsValue = (values) => {
-    const kObj = {
-      ...editKwargsObj,
+    setEditKwargsObj((prevState) => ({
+      ...prevState,
       [currentExpectation]: {
         ...values,
       },
-    };
-    setEditKwargsObj(kObj);
+    }));
   };
 
   const handleSelected = (e) => {
