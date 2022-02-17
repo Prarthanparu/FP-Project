@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  expectionsData: {},
+  expectionsData: [],
   table_expectations: [],
   column_expectations: [],
 };
@@ -14,10 +14,7 @@ export const dataSourceSlice = createSlice({
       state.expectionsData = { ...state.expectionsData, ...action.payload };
     },
     addExpectationData: (state, action) => {
-      state.expectionsData.results = {
-        ...state.expectionsData.results,
-        ...action.payload,
-      };
+      state.expectionsData = [...state.expectionsData, ...action.payload];
     },
     addTableExpectation: (state, action) => {
       state.table_expectations = [...state.table_expectations, action.payload];

@@ -11,7 +11,12 @@ import {
   notification,
 } from 'antd';
 import styled from 'styled-components';
-import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  FilterOutlined,
+  CloseOutlined,
+  FormOutlined,
+} from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SelectedTableCard from '../SelectedTableCard';
 import ModalComponent from '../../Components/Modal';
@@ -121,13 +126,17 @@ function ColumnExpectation() {
         return items.map((item) => (
           <div key={item}>
             {item},{' '}
-            <span className='close_btn' onClick={() => removeExpectation(item)}>
-              Remove
+            <span
+              style={{ marginLeft: '5px' }}
+              className='close_btn'
+              onClick={() => removeExpectation(item)}>
+              <CloseOutlined />
             </span>
             <span
+              style={{ marginLeft: '5px' }}
               className='edit_btn'
               onClick={() => editExpectationKwargs(item)}>
-              Edit
+              <FormOutlined />
             </span>
           </div>
         ));
@@ -194,9 +203,7 @@ function ColumnExpectation() {
   );
 
   const handleSubmit = async () => {
-    const { table_expectations } = datasource;
-
-    // const filterStaticColumnExpecctations = static_column_expectations.filter((val) => val.title === item);
+    const { table_expectations, expectionsData } = datasource;
 
     let colPayload = [];
     columnData.forEach((element) => {
@@ -206,7 +213,6 @@ function ColumnExpectation() {
         if (editKwargsObj[item] !== undefined) {
           const colObj = { column: element.columnName };
           let kwOj = {
-            column: element.columnName,
             ...editKwargsObj[item],
             ...colObj,
           };
@@ -217,8 +223,9 @@ function ColumnExpectation() {
           });
         } else {
           let kwOj = { expectation_type: item, meta: {} };
-          const selectedArray = static_column_expectations.filter(
-            (val) => val.title === item
+
+          const selectedArray = expectionsData.filter(
+            (val) => val.expectation_type === item
           );
           if (selectedArray && selectedArray[0] && selectedArray[0].kwargs) {
             kwOj = {
@@ -286,6 +293,7 @@ function ColumnExpectation() {
 
   const handleNext = () => {
     setScreenLoading(true);
+    const { expectionsData } = datasource;
     let colPayload = [];
     columnData.forEach((element) => {
       let colExpectations = [];
@@ -293,24 +301,28 @@ function ColumnExpectation() {
         if (editKwargsObj[item] !== undefined) {
           const colObj = { column: element.columnName };
           let kwOj = {
-            column: element.columnName,
             ...editKwargsObj[item],
             ...colObj,
           };
           colExpectations.push({
             expectation_type: item,
             kwargs: kwOj,
+            meta: {},
           });
         } else {
-          const selectedArray = static_column_expectations.filter(
-            (val) => val.title === item
+          let kwOj = { expectation_type: item, meta: {} };
+
+          const selectedArray = expectionsData.filter(
+            (val) => val.expectation_type === item
           );
-          console.log('se else = ', selectedArray);
+          if (selectedArray && selectedArray[0] && selectedArray[0].kwargs) {
+            kwOj = {
+              ...kwOj,
+              kwargs: selectedArray[0].kwargs,
+            };
+          }
           colExpectations.push({
-            expectation_type: item,
-            kwargs: {
-              column: element.columnName,
-            },
+            ...kwOj,
           });
         }
       });
