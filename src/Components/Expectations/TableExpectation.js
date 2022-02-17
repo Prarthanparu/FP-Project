@@ -191,9 +191,7 @@ const TableExpectation = () => {
     ) {
       const { expectation_suite_name } = expectationsData[currentTableIndex];
       expectionsPayload = {
-        [expectation_suite_name]: {
-          expectation: [...selectedTableExpectations],
-        },
+        [expectation_suite_name]: [...selectedTableExpectations],
       };
 
       dispatch(addTableExpectation(expectionsPayload));

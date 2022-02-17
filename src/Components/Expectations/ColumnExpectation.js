@@ -196,9 +196,11 @@ function ColumnExpectation() {
   const handleSubmit = async () => {
     const { table_expectations } = datasource;
 
+    // const filterStaticColumnExpecctations = static_column_expectations.filter((val) => val.title === item);
+
     let colPayload = [];
     columnData.forEach((element) => {
-      console.log('ele = ', element);
+      // console.log('ele = ', element);
       let colExpectations = [];
       element.selectedExpectations.forEach((item) => {
         if (editKwargsObj[item] !== undefined) {
@@ -214,12 +216,18 @@ function ColumnExpectation() {
             meta: {},
           });
         } else {
+          let kwOj = { expectation_type: item, meta: {} };
+          const selectedArray = static_column_expectations.filter(
+            (val) => val.title === item
+          );
+          if (selectedArray && selectedArray[0] && selectedArray[0].kwargs) {
+            kwOj = {
+              ...kwOj,
+              kwargs: selectedArray[0].kwargs,
+            };
+          }
           colExpectations.push({
-            expectation_type: item,
-            kwargs: {
-              column: element.columnName,
-            },
-            meta: {},
+            ...kwOj,
           });
         }
       });
@@ -244,8 +252,6 @@ function ColumnExpectation() {
         column_expectations: final_column_expectations,
         table_expectations: table_expectations,
       },
-      period: '6',
-      date: '02/14/2022',
     };
 
     Axios.post(expectationsuiteUrl, params, {
@@ -296,6 +302,10 @@ function ColumnExpectation() {
             kwargs: kwOj,
           });
         } else {
+          const selectedArray = static_column_expectations.filter(
+            (val) => val.title === item
+          );
+          console.log('se else = ', selectedArray);
           colExpectations.push({
             expectation_type: item,
             kwargs: {
