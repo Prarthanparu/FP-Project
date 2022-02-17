@@ -22,7 +22,8 @@ const months = [
 const GraphModal = (props) => {
   const proxy = process.env.REACT_APP_PROXY;
   const [tableData, setTableData] = useState([]);
-  const [columnData, setColumnData] = useState([]);
+  const [columnData, setcolumnData] = useState([]);
+  const [columnHistoryData, setColumnHistoryData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -39,39 +40,85 @@ const GraphModal = (props) => {
   }, []);
   const apiHandler = (res) => {
     let current = res.expect_table_row_count_to_be_between.current_Expectations;
-    const tableData = Object.keys(current.Observed_row_count).map((key) => {
-      return {
-        category: `${current.month[key]}-${current.year[key]}}`,
-        current: current.Observed_row_count[key],
-        month: months[key],
-      };
+    let history = res.expect_table_row_count_to_be_between.history_expectations;
+    const table = [];
+    Object.keys(current.Observed_row_count).map((key) => {
+      table.push(
+        {
+          date: `${months[key]}-${current.year[key]}`,
+          category: "observed",
+          value: current.Observed_row_count[key],
+        },
+        {
+          date: `${months[key]}-${current.year[key]}`,
+          category: "upper",
+          value: current.upper_bound_std[key],
+        },
+        {
+          date: `${months[key]}-${current.year[key]}`,
+          category: "lower",
+          value: current.lower_bound_std[key],
+        },
+        {
+          date: `${months[key]}-${current.year[key]}`,
+          category: "history_observed",
+          value: history.Observed_row_count[key],
+        }
+      );
     });
     let current1 = res.expect_column_mean_to_be_between.current_Expectations;
     let history1 = res.expect_column_mean_to_be_between.history_expectations;
-    const columnData = Object.keys(current1.Observed_Value).map((key, item) => {
-      return {
-        history: history1.Observed_Value[key],
-        category: `${current1.month[key]}-${current1.year[key]}}`,
-        current: current1.Observed_Value[key],
-        month: months[key],
-      };
+    const column = [];
+    Object.keys(current1.Observed_Value).map((key) => {
+      column.push(
+        {
+          category: "observed",
+          value: current1.Observed_Value[key],
+          date: `${months[key]}-${current1.year[key]}`,
+        },
+        {
+          category: "upper_bound",
+          value: history1.upper_bound_std[key],
+          date: `${months[key]}-${current1.year[key]}`,
+        },
+        {
+          category: "lower_bound",
+          value: history1.lower_bound_std[key],
+          date: `${months[key]}-${current1.year[key]}`,
+        },
+        {
+          category: "observed_history",
+          value: history1.Observed_Value[key],
+          date: `${months[key]}-${current1.year[key]}`,
+        }
+      );
     });
     setIsLoading(false);
-    setTableData(tableData);
-    setColumnData(columnData);
+    setTableData(table);
+    setcolumnData(column);
   };
   const config = {
-    xField: "month",
-    yField: "current",
     height: 200,
     width: "100%",
-    color: ["#1979C9", "#D62A0D"],
-    title: "asdfasdfasdf",
+    xField: "date",
+    yField: "value",
+    seriesField: "category",
+    color: ["#1979C9", "#D62A0D", "#FAA219", "#FAD219"],
     legend: {
       layout: "horizontal",
-      position: "right",
+      position: "top",
     },
-    style: { padding: "8px", border: "1px solid #c5c5c5" },
+    xAxis: {
+      title: {
+        text: "2021 Year and Month",
+      },
+    },
+    yAxis: {
+      title: {
+        text: "Observed Values",
+      },
+    },
+    style: { padding: "8px", border: "1px solid gray" },
   };
   const tableConfig = {
     ...config,
@@ -82,13 +129,20 @@ const GraphModal = (props) => {
     data: columnData,
   };
   return (
-    <ModalComponent width="461.15px" {...props}>
+    <ModalComponent OkText="Ok" width="661.15px" {...props}>
       <Spin spinning={isLoading}>
-        <Title>Table Expectation</Title>
-        <Line {...tableConfig} />
+        {props.type === "table" ? (
+          <>
+            <Title>Table Expectation</Title>
+            <Line {...tableConfig} />
+          </>
+        ) : (
+          <>
+            <Title>Column Expectation</Title>
+            <Line {...columnConfig} />
+          </>
+        )}
         <br />
-        <Title>Column Expectation</Title>
-        <Line {...columnConfig} />
       </Spin>
     </ModalComponent>
   );

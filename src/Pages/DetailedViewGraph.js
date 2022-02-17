@@ -10,6 +10,7 @@ function DetailedViewGraph() {
   const { Panel } = Collapse;
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [type, setType] = useState("");
   const text = `
 -->  Row Count of 725 is outside of the expected range of 1681 and 2377
 `;
@@ -117,8 +118,9 @@ function DetailedViewGraph() {
 
     return <Line {...config} />;
   };
-  const handleRedirect = () => {
+  const handleRedirect = (type) => {
     setOpen(true);
+    setType(type);
   };
   const listData = window && window.history && window.history.state.usr;
 
@@ -157,17 +159,17 @@ function DetailedViewGraph() {
               className="site-collapse-custom-panel"
             >
               <Flex>
-                <p>
+                <span>
                   {listData.table_expecatation_list.map((i, index) => (
                     <span key={`${index}`}>
                       {i}
                       <br />
                     </span>
                   ))}
-                </p>{" "}
+                </span>
                 <Icon
                   onClick={(e) => {
-                    handleRedirect();
+                    handleRedirect("table");
                   }}
                   title="View Docs"
                   style={{ fontSize: "20px", cursor: "pointer" }}
@@ -195,22 +197,19 @@ function DetailedViewGraph() {
               key="1"
               className="site-collapse-custom-panel"
             >
-              <Flex>
-                <p>
+              <Flex
+                onClick={(e) => {
+                  handleRedirect("column");
+                }}
+              >
+                <span>
                   {listData.column_expecatation_list.map((i, index) => (
                     <span key={`${index}`}>
                       {i}
                       <br />
                     </span>
                   ))}
-                </p>
-                <Icon
-                  onClick={(e) => {
-                    handleRedirect();
-                  }}
-                  title="View Docs"
-                  style={{ fontSize: "20px", cursor: "pointer" }}
-                />
+                </span>
               </Flex>
             </Panel>
           </Collapse>
@@ -219,8 +218,10 @@ function DetailedViewGraph() {
       {open && (
         <GraphModal
           isModalVisible={open}
+          type={type}
           setIsModalVisible={setOpen}
           handleCancel={() => setOpen(false)}
+          handleOk={() => setOpen(false)}
         />
       )}
     </MainBody>
@@ -272,9 +273,10 @@ const DetailedViewGraphHeaderTwo = styled.div`
 `;
 const Flex = styled.p`
   display: flex;
-  align-items: start;
+  align-items: end;
   max-height: 100px;
   overflow-y: auto;
+  margin-bottom: 0;
 `;
 const Icon = styled(EyeOutlined)`
   margin-left: 10px;
