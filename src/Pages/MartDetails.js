@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Table, Spin, Popconfirm, notification } from 'antd';
-import styled from 'styled-components';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import Axios from 'axios';
-import moment from 'moment';
+import React, { useState, useEffect } from "react";
+import { Button, Table, Spin, Popconfirm, notification } from "antd";
+import styled from "styled-components";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import Axios from "axios";
+import moment from "moment";
 
 function DatasourceMartDetails() {
   const { state } = useLocation();
@@ -13,7 +13,7 @@ function DatasourceMartDetails() {
   const navigate = useNavigate();
 
   const proxy = process.env.REACT_APP_PROXY;
-  const datasourceUrl = proxy + '/api/datasource';
+  const datasourceUrl = proxy + "/api/datasource";
 
   useEffect(() => {
     Axios.get(datasourceUrl)
@@ -28,27 +28,27 @@ function DatasourceMartDetails() {
 
   const handleClick = () => {
     navigate(
-      '/configuration/datasource/martdetails/qualitychecks/tablechecks',
+      "/configuration/datasource/martdetails/qualitychecks/tablechecks",
       { state: state }
     );
   };
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
       render: (text) => <a>{text}</a>,
     },
     {
-      title: 'Created Date',
-      dataIndex: 'created_on',
-      key: 'created_on',
-      render: (record) => moment(record).format('YYYY-DD-MMMM'),
+      title: "Created Date",
+      dataIndex: "created_on",
+      key: "created_on",
+      render: (record) => moment(record).format("YYYY-DD-MMMM"),
     },
     {
-      title: 'Total Datasets',
-      dataIndex: 'datasets_count',
-      key: 'datasets_count',
+      title: "Total Datasets",
+      dataIndex: "datasets_count",
+      key: "datasets_count",
       render: (record) =>
         `${
           record
@@ -60,28 +60,30 @@ function DatasourceMartDetails() {
         } `,
     },
     {
-      title: 'Source Type',
-      dataIndex: 'source_type',
-      key: 'source_type',
+      title: "Source Type",
+      dataIndex: "source_type",
+      key: "source_type",
     },
     {
-      title: 'Actions',
-      key: '',
-      dataIndex: '',
+      title: "Actions",
+      key: "",
+      dataIndex: "",
       render: (record) => (
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'row',
+            display: "flex",
+            flexDirection: "row",
             gap: 60,
-            justifyContent: 'flex-start',
-          }}>
+            justifyContent: "flex-start",
+          }}
+        >
           <a onClick={() => handleEdit(record)}>
             <EditOutlined />
           </a>
           <Popconfirm
-            title='Are you Sure you want to delete the Record?'
-            onConfirm={() => handleDelete(record)}>
+            title="Are you Sure you want to delete the Record?"
+            onConfirm={() => handleDelete(record)}
+          >
             <DeleteOutlined />
           </Popconfirm>
         </div>
@@ -89,7 +91,7 @@ function DatasourceMartDetails() {
     },
   ];
   const handleEdit = (e) => {
-    navigate('/configuration/' + e.id + '/datasourcetable/' + e.id, {
+    navigate("/configuration/" + e.id + "/datasourcetable/" + e.id, {
       state: e,
     });
   };
@@ -103,13 +105,13 @@ function DatasourceMartDetails() {
       .then((res) => {
         console.log(res);
         notification.success({
-          description: 'Datasource deleted sucessfully',
+          description: "Datasource deleted sucessfully",
         });
       })
       .catch((e) => {
         console.log(e);
         notification.error({
-          description: 'Something went worng',
+          description: "Something went worng",
         });
       });
     setTimeout(() => {
@@ -131,7 +133,7 @@ function DatasourceMartDetails() {
           <MartContent>
             <CardView>
               <Table
-                style={{ width: '99%', height: '100%' }}
+                style={{ width: "99%", height: "100%" }}
                 scroll={{ x: 1500, y: 400 }}
                 columns={columns}
                 dataSource={tableList}
@@ -140,15 +142,15 @@ function DatasourceMartDetails() {
             </CardView>
           </MartContent>
           <ButtonContent>
-            <Link to='/'>
-              {' '}
-              <Button type='primary'>Add New Connections</Button>
+            <Link to="/">
+              {" "}
+              <Button type="primary">Add New Connections</Button>
             </Link>
             <Button onClick={() => handleClick()}>Define Checks</Button>
           </ButtonContent>
         </>
       ) : (
-        <Spin className='loading' />
+        <Spin className="loading" />
       )}
     </MartBody>
   );

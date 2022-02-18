@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Collapse } from "antd";
+import { Collapse, Space } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
-import { DownOutlined } from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import { Pie, Line } from "@ant-design/plots";
-
+import { useNavigate } from "react-router-dom";
+import GraphModal from "../Components/GraphModal";
 function DetailedViewGraph() {
   const { Panel } = Collapse;
-
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState("");
   const text = `
 -->  Row Count of 725 is outside of the expected range of 1681 and 2377
 `;
@@ -115,6 +118,11 @@ function DetailedViewGraph() {
 
     return <Line {...config} />;
   };
+  const handleRedirect = (type) => {
+    setOpen(true);
+    setType(type);
+  };
+  const listData = window && window.history && window.history.state.usr;
 
   return (
     <MainBody>
@@ -134,7 +142,7 @@ function DetailedViewGraph() {
       </DetailedViewGraphBody>
       <DetailedViewGraphContent>
         <TableContentHeader>
-          <h1>Gross Charge Off Rate</h1>
+          <h1>Table Expectations</h1>
         </TableContentHeader>
         <TableContent>
           <Collapse
@@ -146,18 +154,34 @@ function DetailedViewGraph() {
             className="site-collapse-custom-collapse"
           >
             <Panel
-              header="report_mart_dataset"
+              header={listData.datset_name}
               key="1"
               className="site-collapse-custom-panel"
             >
-              <p>{text}</p>
+              <Flex>
+                <span>
+                  {listData.table_expecatation_list.map((i, index) => (
+                    <span key={`${index}`}>
+                      {i}
+                      <br />
+                    </span>
+                  ))}
+                </span>
+                <Icon
+                  onClick={(e) => {
+                    handleRedirect("table");
+                  }}
+                  title="View Docs"
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                />
+              </Flex>
             </Panel>
           </Collapse>
         </TableContent>
       </DetailedViewGraphContent>
       <DetailedViewGraphContent>
         <TableContentHeader>
-          <h1>Net Charge Offs</h1>
+          <h1> Column Expectations</h1>
         </TableContentHeader>
         <TableContent>
           <Collapse
@@ -169,15 +193,44 @@ function DetailedViewGraph() {
             className="site-collapse-custom-collapse"
           >
             <Panel
-              header="report_mart_dataset"
+              header={listData.datset_name}
               key="1"
               className="site-collapse-custom-panel"
             >
-              <p>{text}</p>
+              <Flex
+                onClick={(e) => {
+                  handleRedirect("column");
+                }}
+              >
+                <span>
+                  {listData.column_expecatation_list.map((i, index) => (
+                    <span key={`${index}`}>
+                      {i}
+                      <br />
+                    </span>
+                  ))}
+                </span>
+                <Icon
+                  onClick={(e) => {
+                    handleRedirect("column");
+                  }}
+                  title="View Docs"
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                />
+              </Flex>
             </Panel>
           </Collapse>
         </TableContent>
       </DetailedViewGraphContent>
+      {open && (
+        <GraphModal
+          isModalVisible={open}
+          type={type}
+          setIsModalVisible={setOpen}
+          handleCancel={() => setOpen(false)}
+          handleOk={() => setOpen(false)}
+        />
+      )}
     </MainBody>
   );
 }
@@ -197,7 +250,6 @@ const DetailedViewGraphBody = styled.div`
   width: 100%;
   border: 1px solid black;
   background-color: #2d2d2f;
-
   flex: 1;
   padding-left: 50px;
 `;
@@ -224,4 +276,18 @@ const DetailedViewGraphHeaderTwo = styled.div`
   display: flex;
   flex: 0.2;
   align-items: center;
+`;
+const Flex = styled.p`
+  display: flex;
+  align-items: end;
+  max-height: 100px;
+  overflow-y: auto;
+  margin-bottom: 0;
+`;
+const Icon = styled(EyeOutlined)`
+  margin-left: 10px;
+  cursor: pointer;
+  &:hover {
+    color: orange;
+  }
 `;

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Axios from "axios";
 import {
   Button,
   Table,
@@ -9,21 +9,21 @@ import {
   Popover,
   message,
   notification,
-} from 'antd';
-import styled from 'styled-components';
+} from "antd";
+import styled from "styled-components";
 import {
   SearchOutlined,
   FilterOutlined,
   CloseOutlined,
   FormOutlined,
-} from '@ant-design/icons';
-import { useLocation, useNavigate } from 'react-router-dom';
-import SelectedTableCard from '../SelectedTableCard';
-import ModalComponent from '../../Components/Modal';
-import { static_column_expectations } from './ColumnExpectations';
-import ExpectationKwargsUpdate from './ExpectationKwargsUpdate';
-import { checkObj } from '../../util/helper';
-import { clearTableExpectation } from '../../redux/slices/dataSourceSlice';
+} from "@ant-design/icons";
+import { useLocation, useNavigate } from "react-router-dom";
+import SelectedTableCard from "../SelectedTableCard";
+import ModalComponent from "../../Components/Modal";
+import { static_column_expectations } from "./ColumnExpectations";
+import ExpectationKwargsUpdate from "./ExpectationKwargsUpdate";
+import { checkObj } from "../../util/helper";
+import { clearTableExpectation } from "../../redux/slices/dataSourceSlice";
 
 function ColumnExpectation() {
   const [columnData, setColumnData] = useState([]);
@@ -49,7 +49,7 @@ function ColumnExpectation() {
     state.expectationsData[0]
   );
   const proxy = process.env.REACT_APP_PROXY;
-  const expectationsuiteUrl = proxy + '/api/expectationsuite';
+  const expectationsuiteUrl = proxy + "/api/expectationsuite";
   const [screenLoading, setScreenLoading] = useState(false);
 
   const dispatch = useDispatch();
@@ -74,7 +74,7 @@ function ColumnExpectation() {
       setCurrentTableExpectation(state.expectationsData[currentTableIndex]);
       const filteredExpectations = filterItems(
         state && state.expectationsData[currentTableIndex].expectations,
-        'expect_column'
+        "expect_column"
       );
       setSelectedColumnExpectations(filteredExpectations);
       let uniqueColumns = [];
@@ -103,55 +103,57 @@ function ColumnExpectation() {
       .map((item) => {
         return item.expectation_type;
       })
-      .join(',');
+      .join(",");
 
     const newObj = {};
-    newObj['expectation_type'] = exp_arr;
+    newObj["expectation_type"] = exp_arr;
   }, [columnData]);
 
   const columns = [
     {
-      title: 'Column Name',
+      title: "Column Name",
       width: 50,
-      dataIndex: 'columnName',
-      key: 'columnName',
-      fixed: 'center',
+      dataIndex: "columnName",
+      key: "columnName",
+      fixed: "center",
     },
     {
-      title: 'Expectations',
+      title: "Expectations",
       width: 60,
-      dataIndex: 'selectedExpectations',
-      key: 'selectedExpectations',
+      dataIndex: "selectedExpectations",
+      key: "selectedExpectations",
       render: (items) => {
         return items.map((item) => (
           <div key={item}>
-            {item},{' '}
+            {item},{" "}
             <span
-              style={{ marginLeft: '5px' }}
-              className='close_btn'
-              onClick={() => removeExpectation(item)}>
+              style={{ marginLeft: "5px" }}
+              className="close_btn"
+              onClick={() => removeExpectation(item)}
+            >
               <CloseOutlined />
             </span>
             <span
-              style={{ marginLeft: '5px' }}
-              className='edit_btn'
-              onClick={() => editExpectationKwargs(item)}>
+              style={{ marginLeft: "5px" }}
+              className="edit_btn"
+              onClick={() => editExpectationKwargs(item)}
+            >
               <FormOutlined />
             </span>
           </div>
         ));
       },
       // render: (items) =>},
-      fixed: 'center',
+      fixed: "center",
     },
     {
-      title: 'Add Expectations',
-      dataIndex: 'columnName',
-      key: 'columnName',
+      title: "Add Expectations",
+      dataIndex: "columnName",
+      key: "columnName",
       width: 20,
       render: (columnName) => (
-        <div style={{ display: 'flex', flexDirection: 'row', gap: 30 }}>
-          <Button type='secondary' id={columnName} onClick={handleSelected}>
+        <div style={{ display: "flex", flexDirection: "row", gap: 30 }}>
+          <Button type="secondary" id={columnName} onClick={handleSelected}>
             Select
           </Button>
         </div>
@@ -176,7 +178,8 @@ function ColumnExpectation() {
         <span>
           step {index} status: {status}
         </span>
-      }>
+      }
+    >
       {dot}
     </Popover>
   );
@@ -188,7 +191,7 @@ function ColumnExpectation() {
     <SearchOutlined
       style={{
         fontSize: 20,
-        color: '#ef7434',
+        color: "#ef7434",
       }}
     />
   );
@@ -197,7 +200,7 @@ function ColumnExpectation() {
     <FilterOutlined
       style={{
         fontSize: 20,
-        color: '#ef7434',
+        color: "#ef7434",
       }}
     />
   );
@@ -262,30 +265,30 @@ function ColumnExpectation() {
     };
 
     Axios.post(expectationsuiteUrl, params, {
-      headers: { type: 'reportmart' },
+      headers: { type: "reportmart" },
     })
       .then((res) => {
         setScreenLoading(false);
         dispatch(clearTableExpectation);
         // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
         navigate(
-          '/configuration/datasource/martdetails/columnchecks/datadocs',
+          "/configuration/datasource/martdetails/columnchecks/datadocs",
           {
             params,
           }
         );
-        message.success('Profiling Done Successfully!');
+        message.success("Profiling Done Successfully!");
       })
       .catch((err) => {
         setScreenLoading(false);
         notification.error({
           message:
-            err.message === 'Request failed with status code 500'
-              ? '500'
-              : 'Error',
+            err.message === "Request failed with status code 500"
+              ? "500"
+              : "Error",
           description:
-            err.message === 'Request failed with status code 500'
-              ? 'Internal Server Error'
+            err.message === "Request failed with status code 500"
+              ? "Internal Server Error"
               : err.message,
         });
       });
@@ -386,14 +389,14 @@ function ColumnExpectation() {
     const selectedArray = static_column_expectations.filter(
       (item) => item.title === value
     );
-    let localKwargs = '';
+    let localKwargs = "";
     if (selectedArray && selectedArray.length > 0)
       localKwargs = selectedArray[0] && selectedArray[0].kwargs;
 
     if (localKwargs) {
       let localKwargsArray = [];
       Object.keys(localKwargs).map((item) => {
-        if (item !== 'column') localKwargsArray.push(item);
+        if (item !== "column") localKwargsArray.push(item);
       });
       setKwargsArray(localKwargsArray);
       setIsEditModalVisible(true);
@@ -473,16 +476,17 @@ function ColumnExpectation() {
           </CheckboxSelect>
         </Components> */}
         <Spin
-          className='spin'
-          tip='Profiling in Progress...'
-          spinning={screenLoading}>
+          className="spin"
+          tip="Profiling in Progress..."
+          spinning={screenLoading}
+        >
           <ExpectationsList>
             <Table
               columns={columns}
               dataSource={columnData}
               pagination={false}
               scroll={{ x: 800, y: 400 }}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </ExpectationsList>
         </Spin>
@@ -500,27 +504,28 @@ function ColumnExpectation() {
           setIsModalVisible={setIsModalVisible}
           handleOk={handleOk}
           handleCancel={handleCancel}
-          OkText='Apply'
-          width='850px'>
+          OkText="Apply"
+          width="850px"
+        >
           <Table
             columns={[
               {
-                title: 'Select All',
-                dataIndex: 'key',
-                key: 'key',
-                fixed: 'center',
+                title: "Select All",
+                dataIndex: "key",
+                key: "key",
+                fixed: "center",
               },
               {
-                title: 'Action',
-                dataIndex: 'edit',
-                key: 'edit',
+                title: "Action",
+                dataIndex: "edit",
+                key: "edit",
               },
             ]}
             rowSelection={rowSelection}
             dataSource={modalData}
             pagination={false}
             scroll={{ x: 700, y: 400 }}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
         </ModalComponent>
       )}

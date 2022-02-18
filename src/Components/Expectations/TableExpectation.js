@@ -1,74 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import {
   SearchOutlined,
   FilterOutlined,
   EditOutlined,
   DeleteOutlined,
-} from '@ant-design/icons';
-import { Button, Table } from 'antd';
-import SelectedTableCard from '../SelectedTableCard';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { List, Steps, Popover } from 'antd';
-import { useDispatch } from 'react-redux';
-import { addTableExpectation } from '../../redux/slices/dataSourceSlice';
-import ExpectationKwargsUpdate from './ExpectationKwargsUpdate';
+} from "@ant-design/icons";
+import { Button, Table } from "antd";
+import SelectedTableCard from "../SelectedTableCard";
+import { useNavigate, useLocation } from "react-router-dom";
+import { List, Steps, Popover } from "antd";
+import { useDispatch } from "react-redux";
+import { addTableExpectation } from "../../redux/slices/dataSourceSlice";
+import ExpectationKwargsUpdate from "./ExpectationKwargsUpdate";
 
 const TableExpectation = () => {
   const expectation = [
     {
-      title: 'expect_table_row_count_to_equal',
+      title: "expect_table_row_count_to_equal",
       kwargs: {
-        value: '',
+        value: "",
       },
     },
     {
-      title: 'expect_value_at_index',
+      title: "expect_value_at_index",
     },
     {
-      title: 'expect_table_row_count_to_equal_other_table',
+      title: "expect_table_row_count_to_equal_other_table",
     },
     {
-      title: 'expect_table_columns_to_match_set',
+      title: "expect_table_columns_to_match_set",
       kwargs: {
-        column_set: '',
-        exact_match: '',
+        column_set: "",
+        exact_match: "",
       },
     },
     {
-      title: 'expect_table_columns_to_match_ordered_list',
+      title: "expect_table_columns_to_match_ordered_list",
       kwargs: {
-        column_list: '',
+        column_list: "",
       },
     },
     {
-      title: 'expect_table_row_count_to_be_between',
+      title: "expect_table_row_count_to_be_between",
       kwargs: {
-        min_value: '',
-        max_value: '',
+        min_value: "",
+        max_value: "",
       },
     },
     {
-      title: 'expect_table_column_count_to_equal',
+      title: "expect_table_column_count_to_equal",
       kwargs: {
-        value: '',
+        value: "",
       },
     },
     {
-      title: 'expect_table_column_count_to_be_between',
+      title: "expect_table_column_count_to_be_between",
       kwargs: {
-        min_value: '',
-        max_value: '',
+        min_value: "",
+        max_value: "",
       },
     },
   ];
+
   const columns = [
     {
       width: 100,
-      title: 'Select All',
-      dataIndex: 'name',
-      key: 'name',
-      fixed: 'center',
+      title: "Select All",
+      dataIndex: "name",
+      key: "name",
+      fixed: "center",
     },
   ];
 
@@ -115,7 +116,7 @@ const TableExpectation = () => {
       setSelectedTableExpectations(
         filterItems(
           state && state.expectationsData[currentTableIndex].expectations,
-          'expect_table'
+          "expect_table"
         )
       );
     }
@@ -139,7 +140,8 @@ const TableExpectation = () => {
         <span>
           step {index} status: {status}
         </span>
-      }>
+      }
+    >
       {dot}
     </Popover>
   );
@@ -151,7 +153,7 @@ const TableExpectation = () => {
     <SearchOutlined
       style={{
         fontSize: 20,
-        color: '#ef7434',
+        color: "#ef7434",
       }}
     />
   );
@@ -160,7 +162,7 @@ const TableExpectation = () => {
     <FilterOutlined
       style={{
         fontSize: 20,
-        color: '#ef7434',
+        color: "#ef7434",
       }}
     />
   );
@@ -192,11 +194,11 @@ const TableExpectation = () => {
         [expectation_suite_name]: [...selectedTableExpectations],
       };
 
-      console.log('ex payload = ', expectionsPayload);
+      console.log("ex payload = ", expectionsPayload);
       dispatch(addTableExpectation(expectionsPayload));
       setCurrentTableIndex(currentTableIndex + 1);
 
-      navigate('/configuration/datasource/martdetails/columnchecks', {
+      navigate("/configuration/datasource/martdetails/columnchecks", {
         state: { ...state, payload: payload },
       });
     }
@@ -259,9 +261,8 @@ const TableExpectation = () => {
                   <Button
                     key={item.expectation_type}
                     icon={<EditOutlined />}
-                    onClick={() =>
-                      handleEditButton(item.expectation_type)
-                    }></Button>,
+                    onClick={() => handleEditButton(item.expectation_type)}
+                  ></Button>,
                   <Button
                     key={item.expectation_type}
                     id={item.expectation_type}
@@ -276,8 +277,10 @@ const TableExpectation = () => {
                       );
                       e.preventDefault();
                     }}
-                    icon={<DeleteOutlined />}></Button>,
-                ]}>
+                    icon={<DeleteOutlined />}
+                  ></Button>,
+                ]}
+              >
                 <List.Item.Meta title={<a>{item.expectation_type}</a>} />
               </List.Item>
             )}
@@ -296,23 +299,6 @@ const TableExpectation = () => {
             ))}
           </Steps>
         </Header>
-
-        {/* <Components>
-          <Input
-            placeholder="Search Your Source"
-            style={{ width: 283, height: 41 }}
-            suffix={suffix}
-          />
-          <Input
-            placeholder="Search Your Source"
-            style={{ width: 147, height: 41 }}
-            suffix={suffix1}
-          />
-          <DatePicker size={"large"} />
-          <CheckboxSelect>
-            <Checkbox onChange={onChange}>Select All</Checkbox>
-          </CheckboxSelect>
-        </Components> */}
         <ExpectationsList>
           <Table
             rowSelection={rowSelection}
@@ -325,7 +311,7 @@ const TableExpectation = () => {
         </ExpectationsList>
         <ButtonContent>
           <Button
-            type='primary'
+            type="primary"
             onClick={(e) => {
               // TODO fix this with dynamic content.
               let data = selectedRowKeys.map((key) => {
@@ -341,7 +327,8 @@ const TableExpectation = () => {
                 ...data,
               ];
               setSelectedTableExpectations(newSelectedTableExpectations);
-            }}>
+            }}
+          >
             Apply
           </Button>
           {showSubmitBuuton ? (
@@ -400,18 +387,6 @@ const Header = styled.div`
   }
 `;
 
-// const Components = styled.div`
-//   display: flex;
-//   width: 100%;
-//   margin-top: 30px;
-//   justify-content: center;
-//   gap: 20px;
-// `;
-// const CheckboxSelect = styled.div`
-//   display: flex;
-//   margin-left: 160px;
-//   align-items: center;
-// `;
 const DefaultExpectations = styled.div`
   height: 400px;
   width: 100%;

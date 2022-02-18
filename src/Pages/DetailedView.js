@@ -1,8 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { List, Divider, Menu, Dropdown, Button } from "antd";
+import {
+  List,
+  Divider,
+  Menu,
+  Dropdown,
+  Button,
+  Spin,
+  Breadcrumb,
+  Alert,
+} from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import moment from "moment";
+import { Link } from "react-router-dom";
 
 function DetailedView() {
   const data = [
@@ -28,6 +40,25 @@ function DetailedView() {
       title: "quality_check_result",
     },
   ];
+  const [state, setState] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    setIsLoading(true);
+    const proxy = process.env.REACT_APP_PROXY;
+    const obj = window.history.state.usr;
+    const reportmartQualityChecks = proxy + "/api/reportmart_quality_checks";
+    axios
+      .get(reportmartQualityChecks, {
+        headers: { ...obj },
+      })
+      .then((res) => {
+        setIsLoading(false);
+        setState(res.data);
+      })
+      .catch((e) => {
+        setIsLoading(false);
+      });
+  }, []);
   const menu = (
     <Menu>
       <Menu.Item>
@@ -43,97 +74,138 @@ function DetailedView() {
   );
 
   const navigate = useNavigate();
-  const handleClickDataset = (e) => {
-    navigate(`/configuration/reportmart/detailedview/individualdata`);
+  const handleClickDataset = (list) => {
+    navigate(`/configuration/reportmart/detailedview/individualdata`, {
+      state: list,
+    });
   };
   return (
     <DetailedViewBody className="scroll">
       <DetailedViewHeader>
-        <a>Datasets Detailed View</a>
+        <ul>
+          <li>
+            <Link
+              style={{
+                marginRight: "10px",
+              }}
+              to="/configuration/reportmart/"
+            >
+              Report Mart Checks{" "}
+            </Link>{" "}
+            /
+            <Link
+              style={{
+                fontSize: "25px",
+                fontWeight: "bold",
+                marginLeft: "10px",
+              }}
+              to="/configuration/reportmart/detailedview"
+            >
+              Detailed Dataset View
+            </Link>
+          </li>
+        </ul>
       </DetailedViewHeader>
       <DetailedViewContent>
         <DetailedViewContents className="scroll" id="scrollableDiv">
-          <InfiniteScroll
-            dataLength={data.length}
-            hasMore={data.length < 50}
-            endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
-            scrollableTarget="scrollableDiv"
+          <Spin
+            className="spin"
+            tip="Profiling in progress..."
+            spinning={isLoading}
           >
-            <List
-              itemLayout="horizontal"
-              dataSource={data}
-              renderItem={(item) => (
-                <List.Item>
-                  <List.Item.Meta
-                    onClick={handleClickDataset}
-                    style={{
-                      border: "1px solid black",
-                      padding: "20px",
-                      borderRadius: "10px",
-                      backgroundColor: "#2D2D2F",
-                      cursor: "pointer",
-                    }}
-                    title={
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          flex: 1,
-                        }}
-                      >
+            <InfiniteScroll
+              dataLength={data.length}
+              hasMore={data.length < 50}
+              endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
+              scrollableTarget="scrollableDiv"
+            >
+              <List
+                itemLayout="horizontal"
+                dataSource={state}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      onClick={() => handleClickDataset(item)}
+                      style={{
+                        border: "1px solid black",
+                        padding: "20px",
+                        borderRadius: "10px",
+                        backgroundColor: "#2D2D2F",
+                        cursor: "pointer",
+                      }}
+                      title={
                         <div
                           style={{
                             display: "flex",
-                            flex: 0.5,
-                            marginLeft: "25px",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            flex: 1,
                           }}
                         >
-                          <h1 style={{ fontSize: "20px" }}>{item.title}</h1>
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            flex: 0.35,
-                            marginLeft: "25px",
-                          }}
-                        >
-                          <a>Run Date: 10-12-2021</a>
-                          <h5>There are Several Critical Findings</h5>
-                          <ul>
-                            <li>
-                              <h5> 05 Table Level Findings</h5>
-                            </li>
-                            <li>
-                              <h5> 10 Column Level Findings</h5>
-                            </li>
-                          </ul>
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            flex: 0.15,
-                            marginLeft: "25px",
-                          }}
-                        >
-                          <Dropdown
-                            overlay={menu}
-                            placement="bottomCenter"
-                            arrow
+                          <div
+                            style={{
+                              display: "flex",
+                              flex: 0.5,
+                              marginLeft: "25px",
+                            }}
                           >
-                            <Button>Take Actions</Button>
-                          </Dropdown>
+                            <h1 style={{ fontSize: "20px" }}>
+                              {item.datset_name}
+                            </h1>
+                          </div>
+
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              flex: 0.35,
+                              marginLeft: "25px",
+                            }}
+                          >
+                            <a>
+                              Run Date:{" "}
+                              {moment(item.processed_date).format("DD-MM-YYYY")}
+                            </a>
+                            <h5>There are Several Critical Findings</h5>
+                            <ul>
+                              <li>
+                                <h5>
+                                  {item.applied_table_expectations} Table Level
+                                  Findings
+                                </h5>
+                              </li>
+                              <li>
+                                <h5>
+                                  {item.applied_column_expectation} Column Level
+                                  Findings
+                                </h5>
+                              </li>
+                            </ul>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              flex: 0.15,
+                              marginLeft: "25px",
+                            }}
+                          >
+                            <Dropdown
+                              overlay={menu}
+                              placement="bottomCenter"
+                              arrow
+                            >
+                              <Button>Take Actions</Button>
+                            </Dropdown>
+                          </div>
                         </div>
-                      </div>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
-          </InfiniteScroll>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            </InfiniteScroll>
+          </Spin>
         </DetailedViewContents>
       </DetailedViewContent>
     </DetailedViewBody>
@@ -152,9 +224,8 @@ const DetailedViewBody = styled.div`
 const DetailedViewHeader = styled.div`
   margin-bottom: 20px;
   display: flex;
-  > a {
-    font-size: 25px;
-    font-weight: bold;
+  > ul {
+    list-style: none;
   }
 `;
 
@@ -163,7 +234,6 @@ const DetailedViewContent = styled.div`
   flex-direction: column;
 `;
 const DetailedViewContents = styled.div`
-
   height: 700px;
   overflow: auto;
   
