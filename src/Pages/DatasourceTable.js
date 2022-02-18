@@ -68,15 +68,11 @@ function DatasourceTable() {
       },
     })
       .then((res) => {
-        const newArr1 = [];
-        // send all datasets for perstitence and mark selected ones
-        tableData.forEach((e, index) => {
-          newArr1.push({
-            name: e,
-            id: index,
-          });
-        });
-        setColumnDataInfo(newArr1);
+        const arr = res.data.loanpayments.map((item, index) => ({
+          id: index,
+          name: item,
+        }));
+        setColumnDataInfo(arr);
       })
       .catch((err) => {
         message.info("Something went wrong");
@@ -494,8 +490,8 @@ function DatasourceTable() {
               {columnDataInfo &&
                 columnDataInfo.length > 0 &&
                 columnDataInfo.map((item) => (
-                  <Option key={item.id} value={item.name.name}>
-                    {item.name.name}
+                  <Option key={item.id} value={item.name}>
+                    {item.name}
                   </Option>
                 ))}
             </Select>
