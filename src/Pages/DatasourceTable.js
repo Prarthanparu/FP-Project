@@ -145,11 +145,11 @@ function DatasourceTable() {
         dataset_name: e.key,
         description: e.key,
         selected: selectedRowKeys.includes(e.key),
-        seggregate_column: "XYZ",
+        seggregate_column: dropdownname,
       });
     });
     setPayloadData(newArr);
-  }, [selectedRowKeys, tableData]);
+  }, [selectedRowKeys, tableData, dropdownname]);
 
   const handleOk = () => {
     Axios.post(datasetUrl, payload, {
