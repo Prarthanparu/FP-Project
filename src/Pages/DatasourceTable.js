@@ -26,8 +26,10 @@ function DatasourceTable() {
   const [screenLoading, setScreenLoading] = useState(false);
   const [btnloading, setBtnLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDropdownModalVisible, setIsDropdownModalVisible] = useState(false);
 
   const [name, setName] = useState("");
+  const [dropdownname, setDropdownName] = useState(" ");
   const [menuItems, setMenuItems] = useState([]);
   const [itemReportMartId, setItemReportMartId] = useState();
   const [dropDown, setDropDown] = useState(false);
@@ -79,7 +81,7 @@ function DatasourceTable() {
             justifyContent: "center",
           }}
         >
-          <span style={{ cursor: "pointer" }} onClick={handleOpen}>
+          <span style={{ cursor: "pointer" }} onClick={()=> setIsDropdownModalVisible(true)}>
             <EditFilled />
           </span>
         </div>
@@ -172,9 +174,11 @@ function DatasourceTable() {
       .catch((err) => {
         message.info("Something went wrong");
       });
+    isDropdownModalVisible? setIsDropdownModalVisible(false) : 
     setIsModalVisible(false);
   };
   const handleCancel = () => {
+    isDropdownModalVisible? setIsDropdownModalVisible(false) : 
     setIsModalVisible(false);
   };
   const handleOpen = () => {
@@ -183,6 +187,7 @@ function DatasourceTable() {
   const handleChange = (e) => {
     setName(e.target.value);
   };
+  
 
   useEffect(() => {
     Axios.get(reportMart, {
@@ -218,6 +223,9 @@ function DatasourceTable() {
     } else if (!itemReportMartId) {
       setScreenLoading(false);
       message.info("please choose reporting mart");
+    } else if ( dropdownname === " ") {
+      setScreenLoading(false);
+      message.info("please check report mart and choose reporting mart using edit");
     } else {
       setBtnLoading(!btnloading);
       newArr.push({
@@ -287,6 +295,7 @@ function DatasourceTable() {
                     reportmart_id: res.data && res.data.report_mart_id,
                     dataset_ids: response.data.datasets_response_id,
                     data_source_id: params.responseid,
+                    selectedDropdownName: dropdownname,
                   },
                 });
 
@@ -322,6 +331,23 @@ function DatasourceTable() {
       setItemReportMartId(option.key);
     }
   }
+  const handleDropdownChange = (value) => {
+    setDropdownName(value);
+    console.log({value})
+  };
+
+  const dropdownItem = [{
+    id: 1,
+    name: 'xyx'
+  },
+  {
+    id: 2,
+    name: 'xyz'
+  },{
+    id:3,
+    name: 'abcx'
+  }]
+
 
   return (
     <Tableview style={{ marginLeft: loading ? "0" : "100px" }}>
@@ -420,6 +446,36 @@ function DatasourceTable() {
               />
             </Form.Item>
           </Form>
+        </ModalComponent>
+      )}
+      {isDropdownModalVisible && (
+        <ModalComponent
+          isModalVisible={isDropdownModalVisible}
+          setIsModalVisible={setIsDropdownModalVisible}
+          handleOk={handleOk}
+          handleCancel={handleCancel}
+          OkText="Submit"
+          width="461.15px"
+          title="Reporting Mart Name"
+        >
+           <DropdownElement>
+              <Select
+                style={{ width: 250 }}
+                onChange={handleDropdownChange}
+                placeholder="Choose Reporting Mart"
+              >
+                <Option value="+ Create Reporting Mart">
+                  + Create Reporting Mart
+                </Option>
+                {dropdownItem &&
+                  dropdownItem.length > 0 &&
+                  dropdownItem.map((item) => (
+                    <Option key={item.id} value={item.name}>
+                      {item.name}
+                    </Option>
+                  ))}
+              </Select>
+            </DropdownElement>
         </ModalComponent>
       )}
     </Tableview>
