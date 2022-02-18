@@ -37,6 +37,8 @@ function DatasourceTable() {
   const [textArea, setTextArea] = useState(false);
   const [inputQuery, setInputQuery] = useState();
   const [inputName, setInputName] = useState();
+  const [columnDataInfo, setColumnDataInfo] = useState([]);
+  const [current, setCurrent] = useState(null);
 
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/schemainfo";
@@ -45,6 +47,7 @@ function DatasourceTable() {
   const datasetUrl = proxy + "/api/datasetdetails";
   const reportMart = proxy + "/api/report_mart";
   const reportmartDetailsUrl = proxy + "/api/report_mart_dataset";
+  const columnData = proxy + "/api/columns/" + selectedRowKeys;
 
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -54,6 +57,32 @@ function DatasourceTable() {
   let currentSource = dataSourceTypes.find(
     (eachSource) => eachSource.source_type === location.state.source_type
   );
+
+  const handleColumn = (record) => {
+    setIsDropdownModalVisible(true);
+    setCurrent(record);
+    Axios.get(columnData, {
+      headers: {
+        datasource_id: location.state.id,
+        source_type: location.state.source_type,
+      },
+    })
+      .then((res) => {
+        const newArr1 = [];
+        // send all datasets for perstitence and mark selected ones
+        tableData.forEach((e, index) => {
+          newArr1.push({
+            name: e,
+            id: index,
+          });
+        });
+        setColumnDataInfo(newArr1);
+      })
+      .catch((err) => {
+        message.info("Something went wrong");
+      });
+  };
+
   const columns = [
     {
       width: 60,
@@ -66,8 +95,8 @@ function DatasourceTable() {
     {
       width: 40,
       title: "Segregate column",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "column",
+      key: "column",
       fixed: "center",
     },
     {
@@ -81,7 +110,10 @@ function DatasourceTable() {
             justifyContent: "center",
           }}
         >
-          <span style={{ cursor: "pointer" }} onClick={()=> setIsDropdownModalVisible(true)}>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => handleColumn(record)}
+          >
             <EditFilled />
           </span>
         </div>
@@ -135,7 +167,6 @@ function DatasourceTable() {
         setLoading(false);
       });
   }, [location.state, url, params, currentSource]);
-
   useEffect(() => {
     const newArr = [];
     // send all datasets for perstitence and mark selected ones
@@ -159,6 +190,13 @@ function DatasourceTable() {
       },
     })
       .then((res) => {
+        const data = tableData.map((item, index) => {
+          return {
+            ...item,
+            column: current.key === item.key ? dropdownname : "",
+          };
+        });
+        setTableData([...data]);
         Axios.post(reportMart, null, {
           headers: {
             datasource_id: location.state.response_id
@@ -174,12 +212,14 @@ function DatasourceTable() {
       .catch((err) => {
         message.info("Something went wrong");
       });
-    isDropdownModalVisible? setIsDropdownModalVisible(false) : 
-    setIsModalVisible(false);
+    isDropdownModalVisible
+      ? setIsDropdownModalVisible(false)
+      : setIsModalVisible(false);
   };
   const handleCancel = () => {
-    isDropdownModalVisible? setIsDropdownModalVisible(false) : 
-    setIsModalVisible(false);
+    isDropdownModalVisible
+      ? setIsDropdownModalVisible(false)
+      : setIsModalVisible(false);
   };
   const handleOpen = () => {
     setIsModalVisible(true);
@@ -187,7 +227,6 @@ function DatasourceTable() {
   const handleChange = (e) => {
     setName(e.target.value);
   };
-  
 
   useEffect(() => {
     Axios.get(reportMart, {
@@ -223,9 +262,11 @@ function DatasourceTable() {
     } else if (!itemReportMartId) {
       setScreenLoading(false);
       message.info("please choose reporting mart");
-    } else if ( dropdownname === " ") {
+    } else if (dropdownname === " ") {
       setScreenLoading(false);
-      message.info("please check report mart and choose reporting mart using edit");
+      message.info(
+        "please check report mart and choose reporting mart using edit"
+      );
     } else {
       setBtnLoading(!btnloading);
       newArr.push({
@@ -256,7 +297,6 @@ function DatasourceTable() {
           }
         )
           .then((res) => {
-            console.log(res);
             Axios.post(
               expectationURL,
               {
@@ -271,7 +311,6 @@ function DatasourceTable() {
               }
             )
               .then((res) => {
-                console.log(res);
                 setScreenLoading(false);
                 setBtnLoading(false);
                 const data = res.data;
@@ -317,7 +356,6 @@ function DatasourceTable() {
               });
           })
           .catch((err) => {
-            console.log(err);
             message.info("Something went wrong");
           });
       });
@@ -333,21 +371,7 @@ function DatasourceTable() {
   }
   const handleDropdownChange = (value) => {
     setDropdownName(value);
-    console.log({value})
   };
-
-  const dropdownItem = [{
-    id: 1,
-    name: 'xyx'
-  },
-  {
-    id: 2,
-    name: 'xyz'
-  },{
-    id:3,
-    name: 'abcx'
-  }]
-
 
   return (
     <Tableview style={{ marginLeft: loading ? "0" : "100px" }}>
@@ -402,11 +426,14 @@ function DatasourceTable() {
                 </Option>
                 {menuItems &&
                   menuItems.length > 0 &&
-                  menuItems.map((item) => (
-                    <Option key={item.id} value={item.name}>
-                      {item.name}
-                    </Option>
-                  ))}
+                  menuItems.map(
+                    (item) =>
+                      item.name && (
+                        <Option key={item.id} value={item.name}>
+                          {item.name}
+                        </Option>
+                      )
+                  )}
               </Select>
             </DropdownElement>
             <ButtonPosition>
@@ -456,26 +483,23 @@ function DatasourceTable() {
           handleCancel={handleCancel}
           OkText="Submit"
           width="461.15px"
-          title="Reporting Mart Name"
+          title="Select Column "
         >
-           <DropdownElement>
-              <Select
-                style={{ width: 250 }}
-                onChange={handleDropdownChange}
-                placeholder="Choose Reporting Mart"
-              >
-                <Option value="+ Create Reporting Mart">
-                  + Create Reporting Mart
-                </Option>
-                {dropdownItem &&
-                  dropdownItem.length > 0 &&
-                  dropdownItem.map((item) => (
-                    <Option key={item.id} value={item.name}>
-                      {item.name}
-                    </Option>
-                  ))}
-              </Select>
-            </DropdownElement>
+          <DropdownElement>
+            <Select
+              style={{ width: 250 }}
+              onChange={handleDropdownChange}
+              placeholder="Choose Column"
+            >
+              {columnDataInfo &&
+                columnDataInfo.length > 0 &&
+                columnDataInfo.map((item) => (
+                  <Option key={item.id} value={item.name.name}>
+                    {item.name.name}
+                  </Option>
+                ))}
+            </Select>
+          </DropdownElement>
         </ModalComponent>
       )}
     </Tableview>

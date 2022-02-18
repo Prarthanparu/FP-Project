@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Modal, Button, Form, Input } from "antd";
+import { Modal, Button, Form, Menu, Dropdown } from "antd";
 
 export default function BasicModal() {
   const [form] = Form.useForm();
@@ -21,12 +21,44 @@ export default function BasicModal() {
 
     setIsModalVisible(false);
   };
+  const menu = (
+    <Menu>
+      <Menu.Item>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.antgroup.com"
+        >
+          1st menu item
+        </a>
+      </Menu.Item>
+      <Menu.Item>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.aliyun.com"
+        >
+          2nd menu item
+        </a>
+      </Menu.Item>
+      <Menu.Item>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://www.luohanacademy.com"
+        >
+          3rd menu item
+        </a>
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <>
       <Button type="primary" onClick={showModal}>
         Show Modal
       </Button>
+
       <Modal
         title="Basic Modal"
         visible={isModalVisible}
@@ -41,29 +73,9 @@ export default function BasicModal() {
           </Button>,
         ]}
       >
-        <Form
-          labelCol={{ xs: { span: 6 } }}
-          wrapperCol={{ xs: { span: 12 } }}
-          form={form}
-          onFinish={(values) => onFinish(values)}
-          scrollToFirstError
-        >
-          <Form.Item
-            name="input1"
-            label="Input 1"
-            rules={[{ required: true, message: "This field is required." }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="input2"
-            label="Input 2"
-            rules={[{ required: true, message: "This field is required." }]}
-          >
-            <Input />
-          </Form.Item>
-        </Form>
+        <Dropdown overlay={menu} placement="bottomLeft" arrow>
+          <Button>Column-List</Button>
+        </Dropdown>
       </Modal>
     </>
   );
