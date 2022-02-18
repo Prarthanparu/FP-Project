@@ -26,8 +26,10 @@ function DatasourceTable() {
   const [screenLoading, setScreenLoading] = useState(false);
   const [btnloading, setBtnLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDropdownModalVisible, setIsDropdownModalVisible] = useState(false);
 
   const [name, setName] = useState("");
+  const [dropdownname, setDropdownName] = useState(" ");
   const [menuItems, setMenuItems] = useState([]);
   const [itemReportMartId, setItemReportMartId] = useState();
   const [dropDown, setDropDown] = useState(false);
@@ -35,6 +37,7 @@ function DatasourceTable() {
   const [textArea, setTextArea] = useState(false);
   const [inputQuery, setInputQuery] = useState();
   const [inputName, setInputName] = useState();
+  const [columnDataInfo, setColumnDataInfo] = useState([]);
 
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/schemainfo";
@@ -43,6 +46,7 @@ function DatasourceTable() {
   const datasetUrl = proxy + "/api/datasetdetails";
   const reportMart = proxy + "/api/report_mart";
   const reportmartDetailsUrl = proxy + "/api/report_mart_dataset";
+  const columnData = proxy + "/api/columns/" + selectedRowKeys;
 
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -52,6 +56,32 @@ function DatasourceTable() {
   let currentSource = dataSourceTypes.find(
     (eachSource) => eachSource.source_type === location.state.source_type
   );
+
+  const handleColumn = () => {
+    setIsDropdownModalVisible(true);
+    Axios.get(columnData, {
+      headers: {
+        datasource_id: location.state.id,
+        source_type: location.state.source_type,
+      },
+    })
+      .then((res) => {
+        const newArr1 = [];
+        // send all datasets for perstitence and mark selected ones
+        tableData.forEach((e, index) => {
+          newArr1.push({
+            name: e,
+            id: index,
+          });
+        });
+        setColumnDataInfo(newArr1);
+        console.log(newArr1);
+      })
+      .catch((err) => {
+        message.info("Something went wrong");
+      });
+  };
+
   const columns = [
     {
       width: 60,
@@ -79,7 +109,7 @@ function DatasourceTable() {
             justifyContent: "center",
           }}
         >
-          <span style={{ cursor: "pointer" }} onClick={handleOpen}>
+          <span style={{ cursor: "pointer" }} onClick={handleColumn}>
             <EditFilled />
           </span>
         </div>
@@ -143,11 +173,12 @@ function DatasourceTable() {
         dataset_name: e.key,
         description: e.key,
         selected: selectedRowKeys.includes(e.key),
-        seggregate_column: "XYZ",
+        seggregate_column: dropdownname,
       });
     });
     setPayloadData(newArr);
-  }, [selectedRowKeys, tableData]);
+  }, [selectedRowKeys, tableData, dropdownname]);
+  console.log(selectedRowKeys);
 
   const handleOk = () => {
     Axios.post(datasetUrl, payload, {
@@ -172,10 +203,14 @@ function DatasourceTable() {
       .catch((err) => {
         message.info("Something went wrong");
       });
-    setIsModalVisible(false);
+    isDropdownModalVisible
+      ? setIsDropdownModalVisible(false)
+      : setIsModalVisible(false);
   };
   const handleCancel = () => {
-    setIsModalVisible(false);
+    isDropdownModalVisible
+      ? setIsDropdownModalVisible(false)
+      : setIsModalVisible(false);
   };
   const handleOpen = () => {
     setIsModalVisible(true);
@@ -218,6 +253,11 @@ function DatasourceTable() {
     } else if (!itemReportMartId) {
       setScreenLoading(false);
       message.info("please choose reporting mart");
+    } else if (dropdownname === " ") {
+      setScreenLoading(false);
+      message.info(
+        "please check report mart and choose reporting mart using edit"
+      );
     } else {
       setBtnLoading(!btnloading);
       newArr.push({
@@ -287,6 +327,7 @@ function DatasourceTable() {
                     reportmart_id: res.data && res.data.report_mart_id,
                     dataset_ids: response.data.datasets_response_id,
                     data_source_id: params.responseid,
+                    selectedDropdownName: dropdownname,
                   },
                 });
 
@@ -322,6 +363,10 @@ function DatasourceTable() {
       setItemReportMartId(option.key);
     }
   }
+  const handleDropdownChange = (value) => {
+    setDropdownName(value);
+    console.log({ value });
+  };
 
   return (
     <Tableview style={{ marginLeft: loading ? "0" : "100px" }}>
@@ -420,6 +465,33 @@ function DatasourceTable() {
               />
             </Form.Item>
           </Form>
+        </ModalComponent>
+      )}
+      {isDropdownModalVisible && (
+        <ModalComponent
+          isModalVisible={isDropdownModalVisible}
+          setIsModalVisible={setIsDropdownModalVisible}
+          handleOk={handleOk}
+          handleCancel={handleCancel}
+          OkText="Submit"
+          width="461.15px"
+          title="Select Column "
+        >
+          <DropdownElement>
+            <Select
+              style={{ width: 250 }}
+              onChange={handleDropdownChange}
+              placeholder="Choose Column"
+            >
+              {columnDataInfo &&
+                columnDataInfo.length > 0 &&
+                columnDataInfo.map((item) => (
+                  <Option key={item.id} value={item.name}>
+                    {item.name}
+                  </Option>
+                ))}
+            </Select>
+          </DropdownElement>
         </ModalComponent>
       )}
     </Tableview>

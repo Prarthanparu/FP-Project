@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Iframe from "react-iframe";
 import { useLocation } from "react-router-dom";
 import Axios from "axios";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 function Datadocs() {
   const { state } = useLocation();
@@ -16,7 +16,7 @@ function Datadocs() {
       headers: {
         report_mart_id: state.reportmart_id,
         dataset_ids: [...[-1], ...state.dataset_ids].toString(),
-        data_source_id: state.data_source_id,
+        datasource_id: state.datasource_id,
       },
     })
       .then((res) => {

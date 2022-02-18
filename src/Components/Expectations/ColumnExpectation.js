@@ -122,17 +122,17 @@ function ColumnExpectation() {
       width: 60,
       dataIndex: "selectedExpectations",
       key: "selectedExpectations",
-      render: (items) => {
+      render: (items, row) => {
         return items.map((item) => (
           <div key={item}>
             {item},{" "}
-            <span
+            <button
               style={{ marginLeft: "5px" }}
               className="close_btn"
-              onClick={() => removeExpectation(item)}
+              onClick={() => removeExpectation(item, row.columnName)}
             >
               <CloseOutlined />
-            </span>
+            </button>
             <span
               style={{ marginLeft: "5px" }}
               className="edit_btn"
@@ -161,7 +161,7 @@ function ColumnExpectation() {
     },
   ];
 
-  const removeExpectation = (value) => {
+  const removeExpectation = (value, columnName) => {
     for (let i = 0; i < columnData.length; i++) {
       const { selectedExpectations } = columnData[i];
       const getIndex = selectedExpectations.indexOf(value);
@@ -459,22 +459,6 @@ function ColumnExpectation() {
           </Steps>
         </Header>
 
-        {/* <Components>
-          <Input
-            placeholder="Search Your Source"
-            style={{ width: 283, height: 41 }}
-            suffix={suffix}
-          />
-          <Input
-            placeholder="Search Your Source"
-            style={{ width: 147, height: 41 }}
-            suffix={suffix1}
-          />
-          <DatePicker size={"large"} />
-          <CheckboxSelect>
-            <Checkbox onChange={onChange}>Select All</Checkbox>
-          </CheckboxSelect>
-        </Components> */}
         <Spin
           className="spin"
           tip="Profiling in Progress..."
@@ -575,14 +559,6 @@ const Header = styled.div`
     letter-spacing: 0.05em;
     color: #ef7434;
   }
-`;
-
-const Components = styled.div`
-  display: flex;
-  width: 80%;
-  margin-top: 30px;
-  justify-content: flex-start;
-  gap: 20px;
 `;
 
 const ExpectationsList = styled.div`
