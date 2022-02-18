@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { List, Divider, Menu, Dropdown, Button, Spin } from "antd";
+import {
+  List,
+  Divider,
+  Menu,
+  Dropdown,
+  Button,
+  Spin,
+  Breadcrumb,
+  Alert,
+} from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
+import { Link } from "react-router-dom";
 
 function DetailedView() {
   const data = [
@@ -72,7 +82,29 @@ function DetailedView() {
   return (
     <DetailedViewBody className="scroll">
       <DetailedViewHeader>
-        <a>Datasets Detailed View</a>
+        <ul>
+          <li>
+            <Link
+              style={{
+                marginRight: "10px",
+              }}
+              to="/configuration/reportmart/"
+            >
+              Report Mart Checks{" "}
+            </Link>{" "}
+            /
+            <Link
+              style={{
+                fontSize: "25px",
+                fontWeight: "bold",
+                marginLeft: "10px",
+              }}
+              to="/configuration/reportmart/detailedview"
+            >
+              Detailed Dataset View
+            </Link>
+          </li>
+        </ul>
       </DetailedViewHeader>
       <DetailedViewContent>
         <DetailedViewContents className="scroll" id="scrollableDiv">
@@ -192,9 +224,8 @@ const DetailedViewBody = styled.div`
 const DetailedViewHeader = styled.div`
   margin-bottom: 20px;
   display: flex;
-  > a {
-    font-size: 25px;
-    font-weight: bold;
+  > ul {
+    list-style: none;
   }
 `;
 
@@ -203,7 +234,6 @@ const DetailedViewContent = styled.div`
   flex-direction: column;
 `;
 const DetailedViewContents = styled.div`
-
   height: 700px;
   overflow: auto;
   

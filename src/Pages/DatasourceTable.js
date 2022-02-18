@@ -15,62 +15,8 @@ import { dataSourceTypes } from "../Components/dataSourceTypes";
 import Axios from "axios";
 import ModalComponent from "../Components/Modal";
 import QueryTable from "./QueryTable";
-
-const columns = [
-  {
-    width: 100,
-    title: "Select All",
-    dataIndex: "name",
-    key: "name",
-    fixed: "center",
-  },
-  {
-    width: 40,
-    dataIndex: "date",
-    key: "date",
-    fixed: "center",
-  },
-  {
-    key: "operation",
-    width: 40,
-    render: () => (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 30,
-          justifyContent: "flex-end",
-        }}
-      >
-        <p>
-          <EditFilled />
-        </p>
-        <p>
-          <EyeInvisibleFilled />
-        </p>
-      </div>
-    ),
-  },
-];
-
-const suffix = (
-  <SearchOutlined
-    style={{
-      fontSize: 20,
-      color: "#ef7434",
-    }}
-  />
-);
-
-const suffix1 = (
-  <FilterOutlined
-    style={{
-      fontSize: 20,
-      color: "#ef7434",
-    }}
-  />
-);
-const { Option } = Select;
+import { useDispatch } from "react-redux";
+import { addExpectationData } from "../redux/slices/dataSourceSlice";
 
 function DatasourceTable() {
   const [tableData, setTableData] = useState([]);
@@ -80,6 +26,7 @@ function DatasourceTable() {
   const [screenLoading, setScreenLoading] = useState(false);
   const [btnloading, setBtnLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
   const [name, setName] = useState("");
   const [menuItems, setMenuItems] = useState([]);
   const [itemReportMartId, setItemReportMartId] = useState();
@@ -98,12 +45,66 @@ function DatasourceTable() {
   const reportmartDetailsUrl = proxy + "/api/report_mart_dataset";
 
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   let currentSource = dataSourceTypes.find(
     (eachSource) => eachSource.source_type === location.state.source_type
   );
+  const columns = [
+    {
+      width: 60,
+      title: "Select All",
+      dataIndex: "name",
+      key: "name",
+      fixed: "center",
+    },
+
+    {
+      width: 40,
+      title: "Segregate column",
+      dataIndex: "date",
+      key: "date",
+      fixed: "center",
+    },
+    {
+      key: "operation",
+      width: 40,
+      render: (record) => (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <span style={{ cursor: "pointer" }} onClick={handleOpen}>
+            <EditFilled />
+          </span>
+        </div>
+      ),
+    },
+  ];
+
+  const suffix = (
+    <SearchOutlined
+      style={{
+        fontSize: 20,
+        color: "#ef7434",
+      }}
+    />
+  );
+
+  const suffix1 = (
+    <FilterOutlined
+      style={{
+        fontSize: 20,
+        color: "#ef7434",
+      }}
+    />
+  );
+  const { Option } = Select;
 
   useEffect(() => {
     setLoading(true);
@@ -142,6 +143,7 @@ function DatasourceTable() {
         dataset_name: e.key,
         description: e.key,
         selected: selectedRowKeys.includes(e.key),
+        seggregate_column: "XYZ",
       });
     });
     setPayloadData(newArr);
@@ -174,6 +176,9 @@ function DatasourceTable() {
   };
   const handleCancel = () => {
     setIsModalVisible(false);
+  };
+  const handleOpen = () => {
+    setIsModalVisible(true);
   };
   const handleChange = (e) => {
     setName(e.target.value);
@@ -261,6 +266,14 @@ function DatasourceTable() {
                 console.log(res);
                 setScreenLoading(false);
                 setBtnLoading(false);
+                const data = res.data;
+                const expeData =
+                  data &&
+                  data.result[response.data.datasets_response_id[0]]
+                    .expectations;
+
+                dispatch(addExpectationData(expeData));
+
                 // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
                 navigate("/configuration/datasource/martdetails/tablechecks", {
                   state: {
@@ -276,6 +289,7 @@ function DatasourceTable() {
                     data_source_id: params.responseid,
                   },
                 });
+
                 message.success("Schema information fetched Successfully!");
               })
               .catch((err) => {
@@ -329,20 +343,6 @@ function DatasourceTable() {
                 </h3>
               )}
             </Header>
-            {/* <Components>
-              <Input
-                placeholder="Search Your Source"
-                style={{ width: 283, height: 41 }}
-                suffix={suffix}
-              />
-              <Input
-                placeholder="Search Your Source"
-                style={{ width: 147, height: 41 }}
-                suffix={suffix1}
-              />
-
-              <DatePicker size={"large"} />
-            </Components> */}
             <Spin
               className="spin"
               tip="Fetching Schema info..."

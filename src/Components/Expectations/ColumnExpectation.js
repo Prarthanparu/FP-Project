@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Axios from "axios";
 import {
   Button,
   Table,
@@ -9,16 +9,21 @@ import {
   Popover,
   message,
   notification,
-} from 'antd';
-import styled from 'styled-components';
-import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-
-import SelectedTableCard from '../SelectedTableCard';
-import ModalComponent from '../../Components/Modal';
-import { static_column_expectations } from './ColumnExpectations';
-import { addColumnExpectation } from '../../redux/slices/dataSourceSlice';
-import ExpectationKwargsUpdate from './ExpectationKwargsUpdate';
+} from "antd";
+import styled from "styled-components";
+import {
+  SearchOutlined,
+  FilterOutlined,
+  CloseOutlined,
+  FormOutlined,
+} from "@ant-design/icons";
+import { useLocation, useNavigate } from "react-router-dom";
+import SelectedTableCard from "../SelectedTableCard";
+import ModalComponent from "../../Components/Modal";
+import { static_column_expectations } from "./ColumnExpectations";
+import ExpectationKwargsUpdate from "./ExpectationKwargsUpdate";
+import { checkObj } from "../../util/helper";
+import { clearTableExpectation } from "../../redux/slices/dataSourceSlice";
 
 function ColumnExpectation() {
   const [columnData, setColumnData] = useState([]);
@@ -29,7 +34,6 @@ function ColumnExpectation() {
     []
   );
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [payload, setPayload] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [modalData, setModalData] = useState([]);
@@ -37,23 +41,22 @@ function ColumnExpectation() {
   const [kwargsArray, setKwargsArray] = useState([]);
   const [currentExpectation, setCurrentExpectation] = useState();
   const [editKwargsObj, setEditKwargsObj] = useState({});
-
-  const navigate = useNavigate();
+  const [payloadColumnExpectations, setPayloadColumnExpectations] = useState(
+    {}
+  );
   const { state } = useLocation();
-  const { Step } = Steps;
-  const dispatch = useDispatch();
-  const datasource = useSelector((state) => state.datasource);
   const [currentTableExpectation, setCurrentTableExpectation] = useState(
     state.expectationsData[0]
   );
   const proxy = process.env.REACT_APP_PROXY;
-  const expectationsuiteUrl = proxy + '/api/expectationsuite';
+  const expectationsuiteUrl = proxy + "/api/expectationsuite";
   const [screenLoading, setScreenLoading] = useState(false);
 
-  //  Initialize the state with the data from the state
-  useEffect(() => {
-    setPayload(state.payload);
-  }, []);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { Step } = Steps;
+  const { expectationsData } = state;
+  const datasource = useSelector((state) => state.datasource);
 
   useEffect(() => {
     const filterItems = (arr, query) => {
@@ -71,7 +74,7 @@ function ColumnExpectation() {
       setCurrentTableExpectation(state.expectationsData[currentTableIndex]);
       const filteredExpectations = filterItems(
         state && state.expectationsData[currentTableIndex].expectations,
-        'expect_column'
+        "expect_column"
       );
       setSelectedColumnExpectations(filteredExpectations);
       let uniqueColumns = [];
@@ -100,51 +103,57 @@ function ColumnExpectation() {
       .map((item) => {
         return item.expectation_type;
       })
-      .join(',');
+      .join(",");
 
     const newObj = {};
-    newObj['expectation_type'] = exp_arr;
+    newObj["expectation_type"] = exp_arr;
   }, [columnData]);
 
   const columns = [
     {
-      title: 'Column Name',
+      title: "Column Name",
       width: 50,
-      dataIndex: 'columnName',
-      key: 'columnName',
-      fixed: 'center',
+      dataIndex: "columnName",
+      key: "columnName",
+      fixed: "center",
     },
     {
-      title: 'Expectations',
+      title: "Expectations",
       width: 60,
-      dataIndex: 'selectedExpectations',
-      key: 'selectedExpectations',
+      dataIndex: "selectedExpectations",
+      key: "selectedExpectations",
       render: (items) => {
         return items.map((item) => (
           <div key={item}>
-            {item},{' '}
-            <span className='close_btn' onClick={() => removeExpectation(item)}>
-              Remove
+            {item},{" "}
+            <span
+              style={{ marginLeft: "5px" }}
+              className="close_btn"
+              onClick={() => removeExpectation(item)}
+            >
+              <CloseOutlined />
             </span>
             <span
-              className='edit_btn'
-              onClick={() => editExpectationKwargs(item)}>
-              Edit
+              style={{ marginLeft: "5px" }}
+              className="edit_btn"
+              onClick={() => editExpectationKwargs(item)}
+            >
+              <FormOutlined />
             </span>
           </div>
         ));
       },
       // render: (items) =>},
-      fixed: 'center',
+      fixed: "center",
     },
     {
-      title: 'Add Expectations',
-      dataIndex: 'columnName',
-      key: 'columnName',
+      title: "Add Expectations",
+      dataIndex: "columnName",
+      key: "columnName",
       width: 20,
       render: (columnName) => (
-        <div style={{ display: 'flex', flexDirection: 'row', gap: 30 }}>
-          <Button type='secondary' id={columnName} onClick={handleSelected}>
+        <div style={{ display: "flex", flexDirection: "row", gap: 30 }}>
+          <Button type="secondary" id={columnName} onClick={handleSelected}>
             Select
           </Button>
         </div>
@@ -169,7 +178,8 @@ function ColumnExpectation() {
         <span>
           step {index} status: {status}
         </span>
-      }>
+      }
+    >
       {dot}
     </Popover>
   );
@@ -181,7 +191,7 @@ function ColumnExpectation() {
     <SearchOutlined
       style={{
         fontSize: 20,
-        color: '#ef7434',
+        color: "#ef7434",
       }}
     />
   );
@@ -190,17 +200,20 @@ function ColumnExpectation() {
     <FilterOutlined
       style={{
         fontSize: 20,
-        color: '#ef7434',
+        color: "#ef7434",
       }}
     />
   );
 
-  const getPayloadExpectation = () => {
+  const handleSubmit = async () => {
+    const { table_expectations, expectionsData } = datasource;
+
     let colPayload = [];
     columnData.forEach((element) => {
+      // console.log('ele = ', element);
       let colExpectations = [];
       element.selectedExpectations.forEach((item) => {
-        if (editKwargsObj[item]) {
+        if (editKwargsObj[item] !== undefined) {
           const colObj = { column: element.columnName };
           let kwOj = {
             ...editKwargsObj[item],
@@ -209,111 +222,131 @@ function ColumnExpectation() {
           colExpectations.push({
             expectation_type: item,
             kwargs: kwOj,
+            meta: {},
           });
         } else {
+          let kwOj = { expectation_type: item, meta: {} };
+
+          const selectedArray = expectionsData.filter(
+            (val) => val.expectation_type === item
+          );
+          if (selectedArray && selectedArray[0] && selectedArray[0].kwargs) {
+            kwOj = {
+              ...kwOj,
+              kwargs: selectedArray[0].kwargs,
+            };
+          }
           colExpectations.push({
-            expectation_type: item,
-            kwargs: {
-              column: element.columnName,
-            },
+            ...kwOj,
           });
         }
       });
       colPayload = [...colPayload, ...colExpectations];
     });
 
-    const payloadColumnExpectations = [
-      { [currentTableExpectation?.expectation_suite_name]: colPayload },
-    ];
-    return payloadColumnExpectations;
-  };
+    const payloadExpectations = {
+      [currentTableExpectation?.expectation_suite_name]: colPayload,
+    };
 
-  const submitCall = () => {
-    console.log('submit call ');
-    /*
-    setScreenLoading(true);
-    const { column_expectations, table_expectations } = datasource;
+    const final_column_expectations = [payloadExpectations];
+
+    if (!checkObj(payloadColumnExpectations)) {
+      final_column_expectations.push(payloadColumnExpectations);
+    }
 
     const params = {
       dataset_ids: state.dataset_ids,
       report_mart_id: state.reportmart_id,
       datasource_id: state.data_source_id,
       payload: {
-        column_expectations,
-        table_expectations,
+        column_expectations: final_column_expectations,
+        table_expectations: table_expectations,
       },
     };
 
-    setScreenLoading(false);
-
     Axios.post(expectationsuiteUrl, params, {
-      headers: { type: 'reportmart' },
+      headers: { type: "reportmart" },
     })
       .then((res) => {
         setScreenLoading(false);
+        dispatch(clearTableExpectation);
         // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
         navigate(
-          '/configuration/datasource/martdetails/columnchecks/datadocs',
+          "/configuration/datasource/martdetails/columnchecks/datadocs",
           {
-            state: {
-              ...state,
-              payload: {
-                column_expectations,
-                table_expectations,
-              },
-            },
+            params,
           }
         );
-        message.success('Profiling Done Successfully!');
+        message.success("Profiling Done Successfully!");
       })
       .catch((err) => {
         setScreenLoading(false);
         notification.error({
           message:
-            err.message === 'Request failed with status code 500'
-              ? '500'
-              : 'Error',
+            err.message === "Request failed with status code 500"
+              ? "500"
+              : "Error",
           description:
-            err.message === 'Request failed with status code 500'
-              ? 'Internal Server Error'
+            err.message === "Request failed with status code 500"
+              ? "Internal Server Error"
               : err.message,
         });
       });
-      */
   };
 
   const handleNext = () => {
-    console.log('tabIndex = ', currentTableIndex);
-    console.log('table expectation  = ', tableExpectaions.length);
-    if (tableExpectaions.length === 1) {
-      const payloadColumnExpectations = getPayloadExpectation();
-      dispatch(addColumnExpectation(payloadColumnExpectations));
+    setScreenLoading(true);
+    const { expectionsData } = datasource;
+    let colPayload = [];
+    columnData.forEach((element) => {
+      let colExpectations = [];
+      element.selectedExpectations.forEach((item) => {
+        if (editKwargsObj[item] !== undefined) {
+          const colObj = { column: element.columnName };
+          let kwOj = {
+            ...editKwargsObj[item],
+            ...colObj,
+          };
+          colExpectations.push({
+            expectation_type: item,
+            kwargs: kwOj,
+            meta: {},
+          });
+        } else {
+          let kwOj = { expectation_type: item, meta: {} };
 
-      setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
-      setCurrentTableIndex(currentTableIndex + 1);
-      submitCall();
-    } else {
-      console.log('tabIndex else  = ', currentTableIndex);
-      console.log('table expectation else   = ', tableExpectaions.length);
+          const selectedArray = expectionsData.filter(
+            (val) => val.expectation_type === item
+          );
+          if (selectedArray && selectedArray[0] && selectedArray[0].kwargs) {
+            kwOj = {
+              ...kwOj,
+              kwargs: selectedArray[0].kwargs,
+            };
+          }
+          colExpectations.push({
+            ...kwOj,
+          });
+        }
+      });
+      colPayload = [...colPayload, ...colExpectations];
+    });
 
-      if (currentTableIndex < tableExpectaions.length - 1) {
-        const payloadColumnExpectations = getPayloadExpectation();
-        dispatch(addColumnExpectation(payloadColumnExpectations));
-        setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
-        setCurrentTableIndex(currentTableIndex + 1);
-      } else {
-        const payloadColumnExpectations = getPayloadExpectation();
-        dispatch(addColumnExpectation(payloadColumnExpectations));
-        setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
-        setCurrentTableIndex(currentTableIndex + 1);
-        submitCall();
-      }
-    }
+    const payloadExpectations = {
+      [currentTableExpectation?.expectation_suite_name]: colPayload,
+    };
+
+    setPayloadColumnExpectations((prevState) => ({
+      ...prevState,
+      ...payloadExpectations,
+    }));
+    setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
+    setCurrentTableIndex(currentTableIndex + 1);
+    setScreenLoading(false);
   };
 
   function onSelectChange(selectedRowKeys) {
     setSelectedRowKeys(selectedRowKeys);
-    console.log('asf = ', selectedColumn);
   }
 
   const rowSelection = {
@@ -356,14 +389,14 @@ function ColumnExpectation() {
     const selectedArray = static_column_expectations.filter(
       (item) => item.title === value
     );
-    let localKwargs = '';
+    let localKwargs = "";
     if (selectedArray && selectedArray.length > 0)
       localKwargs = selectedArray[0] && selectedArray[0].kwargs;
 
     if (localKwargs) {
       let localKwargsArray = [];
       Object.keys(localKwargs).map((item) => {
-        if (item !== 'column') localKwargsArray.push(item);
+        if (item !== "column") localKwargsArray.push(item);
       });
       setKwargsArray(localKwargsArray);
       setIsEditModalVisible(true);
@@ -371,13 +404,12 @@ function ColumnExpectation() {
   };
 
   const handleKwargsValue = (values) => {
-    const kObj = {
-      ...editKwargsObj,
+    setEditKwargsObj((prevState) => ({
+      ...prevState,
       [currentExpectation]: {
         ...values,
       },
-    };
-    setEditKwargsObj(kObj);
+    }));
   };
 
   const handleSelected = (e) => {
@@ -401,6 +433,11 @@ function ColumnExpectation() {
     );
     setIsModalVisible(true);
   };
+
+  let showSubmitBuuton = false;
+  if (expectationsData && expectationsData.length > 0)
+    showSubmitBuuton = currentTableIndex + 1 === expectationsData.length;
+  if (currentTableIndex >= expectationsData.length) showSubmitBuuton = true;
 
   return (
     <Tableview>
@@ -439,21 +476,26 @@ function ColumnExpectation() {
           </CheckboxSelect>
         </Components> */}
         <Spin
-          className='spin'
-          tip='Profiling in Progress...'
-          spinning={screenLoading}>
+          className="spin"
+          tip="Profiling in Progress..."
+          spinning={screenLoading}
+        >
           <ExpectationsList>
             <Table
               columns={columns}
               dataSource={columnData}
               pagination={false}
               scroll={{ x: 800, y: 400 }}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
           </ExpectationsList>
         </Spin>
         <ButtonContent>
-          <Button onClick={handleNext}>Next</Button>
+          {showSubmitBuuton ? (
+            <Button onClick={handleSubmit}>Submit</Button>
+          ) : (
+            <Button onClick={handleNext}>Next</Button>
+          )}
         </ButtonContent>
       </TableContent>
       {isModalVisible && (
@@ -462,27 +504,28 @@ function ColumnExpectation() {
           setIsModalVisible={setIsModalVisible}
           handleOk={handleOk}
           handleCancel={handleCancel}
-          OkText='Apply'
-          width='850px'>
+          OkText="Apply"
+          width="850px"
+        >
           <Table
             columns={[
               {
-                title: 'Select All',
-                dataIndex: 'key',
-                key: 'key',
-                fixed: 'center',
+                title: "Select All",
+                dataIndex: "key",
+                key: "key",
+                fixed: "center",
               },
               {
-                title: 'Action',
-                dataIndex: 'edit',
-                key: 'edit',
+                title: "Action",
+                dataIndex: "edit",
+                key: "edit",
               },
             ]}
             rowSelection={rowSelection}
             dataSource={modalData}
             pagination={false}
             scroll={{ x: 700, y: 400 }}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
         </ModalComponent>
       )}

@@ -298,8 +298,8 @@ const ReportingMartBody = ({ suiteData }) => {
             </Form.Item>
             <Form.Item label="Select Period">
               <Select defaultValue={period} onChange={(e) => setPeriod(e)}>
-                <Option value="6">0-6 Moths</Option>
-                <Option value="12">6-12 Months</Option>
+                <Option value="6">6 Months</Option>
+                <Option value="12">12 Months</Option>
               </Select>
             </Form.Item>
           </Form>

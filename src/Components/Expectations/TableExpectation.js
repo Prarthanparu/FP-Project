@@ -62,6 +62,7 @@ const TableExpectation = () => {
       },
     },
   ];
+
   const columns = [
     {
       width: 100,
@@ -90,6 +91,8 @@ const TableExpectation = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [kwargsArray, setKwargsArray] = useState();
   const [currentExpectation, setCurrentExpectation] = useState();
+
+  const { expectationsData } = state;
 
   const [payload, setPayload] = useState({
     table_expectations: [],
@@ -164,32 +167,37 @@ const TableExpectation = () => {
     />
   );
 
-  const handleNext = (e) => {
-    const { expectationsData } = state;
+  const handleNext = async (e) => {
     let expectionsPayload = {};
     if (expectationsData && expectationsData.length > 0) {
       const { expectation_suite_name } = expectationsData[currentTableIndex];
       expectionsPayload = {
-        [expectation_suite_name]: {
-          expectation: [...selectedTableExpectations],
-        },
+        [expectation_suite_name]: [...selectedTableExpectations],
       };
 
       dispatch(addTableExpectation(expectionsPayload));
     }
 
-    if (currentTableIndex <= tableExpectaions.length - 2) {
-      let payloadTableExpectations = [
-        ...payload.table_expectations,
-        {
-          [currentTableExpectation?.expectation_suite_name]:
-            selectedTableExpectations,
-        },
-      ];
-      setPayload({ ...payload, table_expectations: payloadTableExpectations });
-      setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
+    setCurrentTableExpectation(tableExpectaions[currentTableIndex + 1]);
+    setCurrentTableIndex(currentTableIndex + 1);
+  };
+
+  const handleSubmit = async () => {
+    let expectionsPayload = {};
+    if (
+      expectationsData &&
+      expectationsData.length > 0 &&
+      currentTableIndex + 1 === expectationsData.length
+    ) {
+      const { expectation_suite_name } = expectationsData[currentTableIndex];
+      expectionsPayload = {
+        [expectation_suite_name]: [...selectedTableExpectations],
+      };
+
+      console.log("ex payload = ", expectionsPayload);
+      dispatch(addTableExpectation(expectionsPayload));
       setCurrentTableIndex(currentTableIndex + 1);
-    } else {
+
       navigate("/configuration/datasource/martdetails/columnchecks", {
         state: { ...state, payload: payload },
       });
@@ -231,6 +239,11 @@ const TableExpectation = () => {
       selectedTableExpectations[getIndex].kwargs = values;
     }
   };
+
+  let showSubmitBuuton = false;
+  if (expectationsData && expectationsData.length > 0)
+    showSubmitBuuton = currentTableIndex + 1 === expectationsData.length;
+  if (currentTableIndex >= expectationsData.length) showSubmitBuuton = true;
 
   return (
     <Tableview>
@@ -286,23 +299,6 @@ const TableExpectation = () => {
             ))}
           </Steps>
         </Header>
-
-        {/* <Components>
-          <Input
-            placeholder="Search Your Source"
-            style={{ width: 283, height: 41 }}
-            suffix={suffix}
-          />
-          <Input
-            placeholder="Search Your Source"
-            style={{ width: 147, height: 41 }}
-            suffix={suffix1}
-          />
-          <DatePicker size={"large"} />
-          <CheckboxSelect>
-            <Checkbox onChange={onChange}>Select All</Checkbox>
-          </CheckboxSelect>
-        </Components> */}
         <ExpectationsList>
           <Table
             rowSelection={rowSelection}
@@ -335,8 +331,13 @@ const TableExpectation = () => {
           >
             Apply
           </Button>
+          {showSubmitBuuton ? (
+            <Button onClick={handleSubmit}>Submit</Button>
+          ) : (
+            <Button onClick={handleNext}>Next</Button>
+          )}
 
-          <Button onClick={handleNext}>Next</Button>
+          {/* <Button onClick={handleNext}>Next</Button> */}
         </ButtonContent>
       </TableContent>
       {isModalVisible && (
@@ -386,18 +387,6 @@ const Header = styled.div`
   }
 `;
 
-// const Components = styled.div`
-//   display: flex;
-//   width: 100%;
-//   margin-top: 30px;
-//   justify-content: center;
-//   gap: 20px;
-// `;
-// const CheckboxSelect = styled.div`
-//   display: flex;
-//   margin-left: 160px;
-//   align-items: center;
-// `;
 const DefaultExpectations = styled.div`
   height: 400px;
   width: 100%;
