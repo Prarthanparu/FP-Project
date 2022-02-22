@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Collapse, Space } from "antd";
-import { CaretRightOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { EyeOutlined } from "@ant-design/icons";
 import { Pie, Line } from "@ant-design/plots";
 import { useNavigate } from "react-router-dom";
@@ -126,9 +126,15 @@ function DetailedViewGraph() {
     setType(type);
   };
   const listData = window && window.history && window.history.state.usr;
+  const handleBack = () => {
+    navigate(`/configuration/reportmart/detailedview/individualdata`, {
+      state: state.list,
+    });
+  };
 
   return (
     <MainBody>
+      <ArrowLeftOutlined onClick={handleBack} />
       <DetailedViewGraphBody>
         <DetailedViewGraphHeader>
           <h2>Percent of Test failed</h2>

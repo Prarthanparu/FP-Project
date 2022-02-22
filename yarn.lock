@@ -78,7 +78,7 @@
     "@antv/util" "^2.0.9"
     react-content-loader "^5.0.4"
 
-"@ant-design/plots@^1.0.2":
+"@ant-design/plots@^1.0.2", "@ant-design/plots@^1.0.9":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@ant-design/plots/-/plots-1.0.9.tgz#3850bf84112c5778482e0e685601e02ac2106697"
   integrity sha512-Y4+vmNjWbt+hcKcUbbhEsEFdfysUG32aO1y7IvbNtIHK5uTg3wa1e2mWcYJu1Y6sFXgtftKiTvcYMZIQ/0uUvg==

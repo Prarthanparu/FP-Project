@@ -44,8 +44,10 @@ function Sidebar() {
       <SidebarFooterComponents>
         <ul>
           <li key="1">
-            <SettingOutlined style={{ fontSize: 20 }} />
-            <h5>Settings</h5>
+            <Link to="/configuration/setting">
+              <SettingOutlined style={{ fontSize: 20 }} />
+              <h5>Settings</h5>
+            </Link>
           </li>
           <li>
             <ReadOutlined style={{ fontSize: 20 }} />

@@ -11,6 +11,7 @@ import ReportingMart from "./Pages/ReportingMart";
 import Datadocs from "./Pages/Datadocs";
 import DetailedView from "./Pages/DetailedView";
 import DetailedViewGraph from "./Pages/DetailedViewGraph";
+import Setting from "./Pages/Setting";
 
 function AppBody() {
   return (
@@ -52,6 +53,10 @@ function AppBody() {
       <Route
         path="/configuration/reportmart/detailedview/individualdata"
         element={<DetailedViewGraph />}
+      />
+      <Route
+        path="/configuration/setting"
+        element={<Setting />}
       />
     </Routes>
   );
