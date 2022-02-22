@@ -62,6 +62,7 @@ const ReportingMartBody = ({ suiteData }) => {
         .then((res) => {
           console.log(res);
           setScreenLoading(false);
+          setIsModalVisible(false);
           // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
           message.success("Profiling Done Successfully!");
           navigate("/configuration/reportmart/refresh");

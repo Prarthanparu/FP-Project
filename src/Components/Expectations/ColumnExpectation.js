@@ -274,7 +274,7 @@ function ColumnExpectation() {
         navigate(
           "/configuration/datasource/martdetails/columnchecks/datadocs",
           {
-            params,
+            state: {...params}
           }
         );
         message.success("Profiling Done Successfully!");

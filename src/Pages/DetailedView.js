@@ -75,8 +75,9 @@ function DetailedView() {
 
   const navigate = useNavigate();
   const handleClickDataset = (list) => {
+    list.report_mart_id = state[0].report_mart_id;
     navigate(`/configuration/reportmart/detailedview/individualdata`, {
-      state: list,
+      state: list
     });
   };
   return (

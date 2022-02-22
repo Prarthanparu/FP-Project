@@ -29,7 +29,7 @@ const GraphModal = (props) => {
   useEffect(() => {
     const url = proxy + "/api/quality_check_results";
     setIsLoading(true);
-    Axios.get(url, { headers: { report_mart_id: 44, dataset_id: 545 } })
+    Axios.get(url, { headers: { report_mart_id: props.reportMartId, dataset_id: props.datasetId } })
       .then((res) => {
         apiHandler(res.data.result);
       })

@@ -14,9 +14,9 @@ function Datadocs() {
   useEffect(() => {
     Axios.get(url, {
       headers: {
-        report_mart_id: state.reportmart_id,
+        report_mart_id: state.report_mart_id,
         dataset_ids: [...[-1], ...state.dataset_ids].toString(),
-        datasource_id: state.datasource_id,
+        data_source_id: state.datasource_id,
       },
     })
       .then((res) => {

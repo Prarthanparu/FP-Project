@@ -38,6 +38,7 @@ function DatasourceTable() {
   const [inputQuery, setInputQuery] = useState();
   const [inputName, setInputName] = useState();
   const [columnDataInfo, setColumnDataInfo] = useState([]);
+  const [current, setCurrent] = useState(null);
 
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/schemainfo";
@@ -46,7 +47,7 @@ function DatasourceTable() {
   const datasetUrl = proxy + "/api/datasetdetails";
   const reportMart = proxy + "/api/report_mart";
   const reportmartDetailsUrl = proxy + "/api/report_mart_dataset";
-  const columnData = proxy + "/api/columns/" + selectedRowKeys;
+  const columnData = proxy + "/api/date_columns/" + selectedRowKeys;
 
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -57,29 +58,27 @@ function DatasourceTable() {
     (eachSource) => eachSource.source_type === location.state.source_type
   );
 
-  const handleColumn = () => {
-    setIsDropdownModalVisible(true);
+  const handleColumn = (record) => {
+    if(selectedRowKeys && selectedRowKeys.length > 0){
+      setIsDropdownModalVisible(true);
+    setCurrent(record);
     Axios.get(columnData, {
       headers: {
-        datasource_id: location.state.id,
+        datasource_id: location.state.source_id,
         source_type: location.state.source_type,
       },
     })
       .then((res) => {
-        const newArr1 = [];
-        // send all datasets for perstitence and mark selected ones
-        tableData.forEach((e, index) => {
-          newArr1.push({
-            name: e,
-            id: index,
-          });
-        });
-        setColumnDataInfo(newArr1);
-        console.log(newArr1);
-      })
-      .catch((err) => {
+        const values = Object.keys(res.data).map((key, index) => ({
+            id: index, name: res.data[key][0]
+        }));
+        setColumnDataInfo(values);
+      }).catch((err) => {
         message.info("Something went wrong");
       });
+    } else {
+      message.info("Please select a row");
+    }
   };
 
   const columns = [
@@ -94,8 +93,8 @@ function DatasourceTable() {
     {
       width: 40,
       title: "Segregate column",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "column",
+      key: "column",
       fixed: "center",
     },
     {
@@ -109,7 +108,10 @@ function DatasourceTable() {
             justifyContent: "center",
           }}
         >
-          <span style={{ cursor: "pointer" }} onClick={handleColumn}>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => handleColumn(record)}
+          >
             <EditFilled />
           </span>
         </div>
@@ -163,7 +165,6 @@ function DatasourceTable() {
         setLoading(false);
       });
   }, [location.state, url, params, currentSource]);
-
   useEffect(() => {
     const newArr = [];
     // send all datasets for perstitence and mark selected ones
@@ -178,7 +179,6 @@ function DatasourceTable() {
     });
     setPayloadData(newArr);
   }, [selectedRowKeys, tableData, dropdownname]);
-  console.log(selectedRowKeys);
 
   const handleOk = () => {
     Axios.post(datasetUrl, payload, {
@@ -188,6 +188,13 @@ function DatasourceTable() {
       },
     })
       .then((res) => {
+        const data = tableData.map((item, index) => {
+          return {
+            ...item,
+            column: current.key === item.key ? dropdownname : "",
+          };
+        });
+        setTableData([...data]);
         Axios.post(reportMart, null, {
           headers: {
             datasource_id: location.state.response_id
@@ -288,7 +295,6 @@ function DatasourceTable() {
           }
         )
           .then((res) => {
-            console.log(res);
             Axios.post(
               expectationURL,
               {
@@ -303,7 +309,6 @@ function DatasourceTable() {
               }
             )
               .then((res) => {
-                console.log(res);
                 setScreenLoading(false);
                 setBtnLoading(false);
                 const data = res.data;
@@ -349,7 +354,6 @@ function DatasourceTable() {
               });
           })
           .catch((err) => {
-            console.log(err);
             message.info("Something went wrong");
           });
       });
@@ -365,7 +369,6 @@ function DatasourceTable() {
   }
   const handleDropdownChange = (value) => {
     setDropdownName(value);
-    console.log({ value });
   };
 
   return (
@@ -421,11 +424,14 @@ function DatasourceTable() {
                 </Option>
                 {menuItems &&
                   menuItems.length > 0 &&
-                  menuItems.map((item) => (
-                    <Option key={item.id} value={item.name}>
-                      {item.name}
-                    </Option>
-                  ))}
+                  menuItems.map(
+                    (item) =>
+                      item.name && (
+                        <Option key={item.id} value={item.name}>
+                          {item.name}
+                        </Option>
+                      )
+                  )}
               </Select>
             </DropdownElement>
             <ButtonPosition>

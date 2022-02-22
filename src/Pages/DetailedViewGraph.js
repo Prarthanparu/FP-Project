@@ -6,8 +6,11 @@ import { EyeOutlined } from "@ant-design/icons";
 import { Pie, Line } from "@ant-design/plots";
 import { useNavigate } from "react-router-dom";
 import GraphModal from "../Components/GraphModal";
+import { useLocation } from "react-router-dom";
+
 function DetailedViewGraph() {
   const { Panel } = Collapse;
+  const { state } = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("");
@@ -229,6 +232,8 @@ function DetailedViewGraph() {
           setIsModalVisible={setOpen}
           handleCancel={() => setOpen(false)}
           handleOk={() => setOpen(false)}
+          datasetId={state.dataset_id}
+          reportMartId={state.report_mart_id}
         />
       )}
     </MainBody>
