@@ -26,12 +26,12 @@ function DatasourceTable() {
   const [screenLoading, setScreenLoading] = useState(false);
   const [btnloading, setBtnLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isDropdownModalVisible, setIsDropdownModalVisible] = useState(false);
 
   const [name, setName] = useState("");
-  const [deviation, setDeviation] = useState("");
-  const [period, setPeriod] = useState("");
-  const [periodicity, setPeriodicity] = useState("");
+  const [period, setPeriod] = useState(12);
+  const [standardDeviation, setStandardDeviation] = useState(2);
+
+  const [dropdownPeriod, setDropdownPeriod] = useState("");
   const [dropdownname, setDropdownName] = useState(" ");
   const [menuItems, setMenuItems] = useState([]);
   const [itemReportMartId, setItemReportMartId] = useState();
@@ -207,60 +207,37 @@ function DatasourceTable() {
     setPayloadData(newArr);
   }, [selectedRowKeys, tableData, dropdownname]);
 
-  const handleOk = () => {
+  const reportMartSaveHandler = () => {
     if (isModalVisible) {
-      Axios.post(datasetUrl, payload, {
+      Axios.post(reportMart, null, {
         headers: {
-          type: "dataset",
-          source_id: params.responseid,
+          datasource_id: location.state.response_id
+            ? location.state.response_id
+            : location.state.id,
+          reportmart_name: name,
+          period: dropdownPeriod,
         },
       })
         .then((res) => {
-          const data = tableData.map((item, index) => {
-            return {
-              ...item,
-              column: current.key === item.key ? dropdownname : "",
-            };
-          });
-          setTableData([...data]);
-          Axios.post(reportMart, null, {
-            headers: {
-              datasource_id: location.state.response_id
-                ? location.state.response_id
-                : location.state.id,
-              reportmart_name: name,
-              deviation: deviation,
-              period: period,
-              periodicity: periodicity,
-            },
-          }).then((res) => {
-            setDropDown(!dropDown);
-            setIsModalVisible(false);
-          });
+          setDropDown(!dropDown);
+          setIsModalVisible(false);
+          message.info("Report mart saved successfully");
         })
         .catch((err) => {
           message.info("Something went wrong");
         });
     }
-    isDropdownModalVisible
-      ? setIsDropdownModalVisible(false)
-      : setIsModalVisible(false);
+    setIsModalVisible(false);
   };
   const handleCancel = () => {
-    isDropdownModalVisible
-      ? setIsDropdownModalVisible(false)
-      : setIsModalVisible(false);
+    setIsModalVisible(false);
   };
 
   const handleChange = (e) => {
     setName(e.target.value);
-    setDeviation(e.target.value);
-    setPeriodicity(e.target.value);
   };
-  const handleDropdownPeriod = (e) => {
-    debugger;
-    setPeriodicity(e);
-    console.log(e);
+  const handleDropdownPeriod = (value) => {
+    setDropdownPeriod(value);
   };
 
   useEffect(() => {
@@ -404,16 +381,27 @@ function DatasourceTable() {
       });
     }
   };
-  function handleSelectChange(value, option) {
+
+  const reportMartSelectHandler = (value, option) => {
+    debugger;
     if (value === "+ Create Reporting Mart") {
       setIsModalVisible(true);
     } else {
       setSelectedDropdown(value);
       setItemReportMartId(option.key);
     }
-  }
+  };
+
   const handleDropdownChange = (value) => {
     setDropdownName(value);
+  };
+
+  const handlePeriod = (value) => {
+    setPeriod(value);
+  };
+
+  const handleStandardDeviation = (value) => {
+    setStandardDeviation(value);
   };
 
   return (
@@ -461,7 +449,7 @@ function DatasourceTable() {
             <DropdownElement>
               <Select
                 style={{ width: 250 }}
-                onChange={handleSelectChange}
+                onChange={reportMartSelectHandler}
                 placeholder="Choose Reporting Mart"
               >
                 <Option value="+ Create Reporting Mart">
@@ -497,14 +485,14 @@ function DatasourceTable() {
         <ModalComponent
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}
-          handleOk={handleOk}
+          handleOk={reportMartSaveHandler}
           handleCancel={handleCancel}
           OkText="Create"
           width="461.15px"
         >
           <Form form={form} layout="vertical">
             <Form.Item
-              label="Reporting Mart Details"
+              label="Reporting Mart Name"
               style={{ fontWeight: "bold" }}
             >
               <Input
@@ -512,44 +500,40 @@ function DatasourceTable() {
                 id="name"
                 value={name}
                 type="text"
-                placeholder="Please enter Mart Name here"
+                placeholder="Please enter Name here"
               />
-            </Form.Item>
-            <Form.Item>
               <Input
-                onChange={(e) => handleChange(e)}
-                id="deviation"
-                value={deviation}
-                type="number"
-                placeholder="Please enter Standard Deviation"
-              />{" "}
-            </Form.Item>
-            <Form.Item>
-              <Input
-                onChange={(e) => handleChange(e)}
+                onChange={(e) => handlePeriod(e)}
                 id="period"
                 value={period}
                 type="number"
-                placeholder="Please enter Period"
-              />{" "}
-            </Form.Item>
-            <Form.Item>
-              <Select
-                id="periodicity"
-                value={periodicity}
-                onChange={handleDropdownPeriod}
-                placeholder="Please Choose the Period"
-              >
-                <Option key={1} value="month">
-                  month
-                </Option>
-                <Option key={2} value="week">
-                  week
-                </Option>
-                <Option key={3} value="day">
-                  day
-                </Option>
-              </Select>
+                placeholder="Please enter Period here"
+              />
+              <Input
+                onChange={(e) => handleStandardDeviation(e)}
+                id="standardDeviation"
+                value={standardDeviation}
+                type="number"
+                placeholder="Please enter Standard deviation here"
+              />
+              <DropdownElement>
+                <Select
+                  id="dropdownperiod"
+                  value={dropdownPeriod || "month"}
+                  onChange={handleDropdownPeriod}
+                  placeholder="Please Choose the Period"
+                >
+                  <Option key={"month"} value="month">
+                    month
+                  </Option>
+                  <Option key={"week"} value="week">
+                    week
+                  </Option>
+                  <Option key={"day"} value="day">
+                    day
+                  </Option>
+                </Select>
+              </DropdownElement>
             </Form.Item>
           </Form>
         </ModalComponent>
