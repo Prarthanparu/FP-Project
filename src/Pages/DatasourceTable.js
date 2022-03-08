@@ -4,7 +4,6 @@ import {
   SearchOutlined,
   FilterOutlined,
   TableOutlined,
-  EyeInvisibleFilled,
   EditFilled,
 } from "@ant-design/icons";
 import { Input, Table, message, Spin, Form, notification } from "antd";
@@ -40,8 +39,7 @@ function DatasourceTable() {
   const [textArea, setTextArea] = useState(false);
   const [inputQuery, setInputQuery] = useState();
   const [inputName, setInputName] = useState();
-  const [columnDataInfo, setColumnDataInfo] = useState([]);
-  const [current, setCurrent] = useState(null);
+  const [data, setData] = useState([]);
 
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/schemainfo";
@@ -61,11 +59,8 @@ function DatasourceTable() {
     (eachSource) => eachSource.source_type === location.state.source_type
   );
 
-  const handleColumn = (record) => {
-    console.log(selectedRowKeys, "record");
-    setColumnDataInfo([]);
+  const handleColumn = () => {
     if (selectedRowKeys && selectedRowKeys.length > 0) {
-      setCurrent(record);
       Axios.get(columnData, {
         headers: {
           datasource_id: location.state.source_id,
@@ -73,13 +68,7 @@ function DatasourceTable() {
         },
       })
         .then((res) => {
-          console.log(res.data, Object.keys(res.data));
-          const values = Object.keys(res.data).map((key, index) => ({
-            id: index,
-            name: res.data[key][0],
-          }));
-          console.log(values, "jkljkljkl");
-          setColumnDataInfo(values);
+          setData(res.data);
         })
         .catch((err) => {
           message.info("Something went wrong");
@@ -104,7 +93,7 @@ function DatasourceTable() {
       dataIndex: "column",
       key: "column",
       fixed: "center",
-      render: (record) => (
+      render: (record, i) => (
         <div
           style={{
             display: "flex",
@@ -119,11 +108,12 @@ function DatasourceTable() {
               onClick={() => handleColumn(record)}
               placeholder="Choose Column"
             >
-              {columnDataInfo &&
-                columnDataInfo.length > 0 &&
-                columnDataInfo.map((item) => (
-                  <Option key={item.id} value={item.name}>
-                    {item.name}
+              {data &&
+                data[i.key] &&
+                data[i.key].length > 0 &&
+                data[i.key].map((item) => (
+                  <Option key={item} value={item}>
+                    {item}
                   </Option>
                 ))}
             </Select>
@@ -218,9 +208,9 @@ function DatasourceTable() {
             ? location.state.response_id
             : location.state.id,
           reportmart_name: name,
-          period: dropdownPeriod,
+          period: period,
           standard_deviation: standardDeviation,
-          segregation_periodicity: dropdownPeriod,
+          periodicity: dropdownPeriod,
         },
       })
         .then((res) => {
@@ -492,34 +482,50 @@ function DatasourceTable() {
           handleCancel={handleCancel}
           OkText="Create"
           width="461.15px"
+          title={"Reporting Mart Details"}
         >
           <Form form={form} layout="vertical">
-            <h4 style={{ fontWeight: "bold" }}>Reporting Mart Name</h4>
+            <Form.Item
+              label="Reporting Mart Name"
+              style={{ fontWeight: "medium" }}
+            >
+              <Input
+                onChange={(e) => handleChange(e)}
+                id="name"
+                value={name}
+                type="text"
+                placeholder="Please enter Name here"
+              />
+            </Form.Item>
+            <Form.Item
+              label="Reporting Mart Period"
+              style={{ fontWeight: "medium" }}
+            >
+              <Input
+                onChange={(e) => handlePeriod(e)}
+                id="period"
+                value={period}
+                type="number"
+                placeholder="Please enter Period here"
+              />
+            </Form.Item>
+            <Form.Item
+              label="Standard Deviation"
+              style={{ fontWeight: "medium" }}
+            >
+              <Input
+                onChange={(e) => handleStandardDeviation(e)}
+                id="standardDeviation"
+                value={standardDeviation}
+                type="number"
+                placeholder="Please enter Standard deviation here"
+              />
+            </Form.Item>
 
-            <Input
-              onChange={(e) => handleChange(e)}
-              id="name"
-              value={name}
-              type="text"
-              placeholder="Please enter Name here"
-            />
-
-            <Input
-              onChange={(e) => handlePeriod(e)}
-              id="period"
-              value={period}
-              type="number"
-              placeholder="Please enter Period here"
-            />
-
-            <Input
-              onChange={(e) => handleStandardDeviation(e)}
-              id="standardDeviation"
-              value={standardDeviation}
-              type="number"
-              placeholder="Please enter Standard deviation here"
-            />
-            <DropdownElement>
+            <Form.Item
+              label="Segregation - Periodicity"
+              style={{ fontWeight: "medium" }}
+            >
               <Select
                 id="dropdownperiod"
                 value={dropdownPeriod || "month"}
@@ -536,7 +542,7 @@ function DatasourceTable() {
                   day
                 </Option>
               </Select>
-            </DropdownElement>
+            </Form.Item>
           </Form>
         </ModalComponent>
       )}
