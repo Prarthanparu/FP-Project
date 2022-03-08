@@ -62,6 +62,8 @@ function DatasourceTable() {
   );
 
   const handleColumn = (record) => {
+    console.log(selectedRowKeys, "record");
+    setColumnDataInfo([]);
     if (selectedRowKeys && selectedRowKeys.length > 0) {
       setCurrent(record);
       Axios.get(columnData, {
@@ -71,10 +73,12 @@ function DatasourceTable() {
         },
       })
         .then((res) => {
+          console.log(res.data, Object.keys(res.data));
           const values = Object.keys(res.data).map((key, index) => ({
             id: index,
             name: res.data[key][0],
           }));
+          console.log(values, "jkljkljkl");
           setColumnDataInfo(values);
         })
         .catch((err) => {
@@ -173,7 +177,6 @@ function DatasourceTable() {
       ),
       source_type: location.state.source_type,
     };
-    console.log(pay);
     Axios.post(url, pay)
       .then((res) => {
         setLoading(false);
@@ -216,6 +219,8 @@ function DatasourceTable() {
             : location.state.id,
           reportmart_name: name,
           period: dropdownPeriod,
+          standard_deviation: standardDeviation,
+          segregation_periodicity: dropdownPeriod,
         },
       })
         .then((res) => {
@@ -236,8 +241,15 @@ function DatasourceTable() {
   const handleChange = (e) => {
     setName(e.target.value);
   };
+  const handlePeriod = (e) => {
+    setPeriod(e.target.value);
+  };
   const handleDropdownPeriod = (value) => {
     setDropdownPeriod(value);
+  };
+
+  const handleStandardDeviation = (e) => {
+    setStandardDeviation(e.target.value);
   };
 
   useEffect(() => {
@@ -383,7 +395,6 @@ function DatasourceTable() {
   };
 
   const reportMartSelectHandler = (value, option) => {
-    debugger;
     if (value === "+ Create Reporting Mart") {
       setIsModalVisible(true);
     } else {
@@ -394,14 +405,6 @@ function DatasourceTable() {
 
   const handleDropdownChange = (value) => {
     setDropdownName(value);
-  };
-
-  const handlePeriod = (value) => {
-    setPeriod(value);
-  };
-
-  const handleStandardDeviation = (value) => {
-    setStandardDeviation(value);
   };
 
   return (
@@ -491,50 +494,49 @@ function DatasourceTable() {
           width="461.15px"
         >
           <Form form={form} layout="vertical">
-            <Form.Item
-              label="Reporting Mart Name"
-              style={{ fontWeight: "bold" }}
-            >
-              <Input
-                onChange={(e) => handleChange(e)}
-                id="name"
-                value={name}
-                type="text"
-                placeholder="Please enter Name here"
-              />
-              <Input
-                onChange={(e) => handlePeriod(e)}
-                id="period"
-                value={period}
-                type="number"
-                placeholder="Please enter Period here"
-              />
-              <Input
-                onChange={(e) => handleStandardDeviation(e)}
-                id="standardDeviation"
-                value={standardDeviation}
-                type="number"
-                placeholder="Please enter Standard deviation here"
-              />
-              <DropdownElement>
-                <Select
-                  id="dropdownperiod"
-                  value={dropdownPeriod || "month"}
-                  onChange={handleDropdownPeriod}
-                  placeholder="Please Choose the Period"
-                >
-                  <Option key={"month"} value="month">
-                    month
-                  </Option>
-                  <Option key={"week"} value="week">
-                    week
-                  </Option>
-                  <Option key={"day"} value="day">
-                    day
-                  </Option>
-                </Select>
-              </DropdownElement>
-            </Form.Item>
+            <h4 style={{ fontWeight: "bold" }}>Reporting Mart Name</h4>
+
+            <Input
+              onChange={(e) => handleChange(e)}
+              id="name"
+              value={name}
+              type="text"
+              placeholder="Please enter Name here"
+            />
+
+            <Input
+              onChange={(e) => handlePeriod(e)}
+              id="period"
+              value={period}
+              type="number"
+              placeholder="Please enter Period here"
+            />
+
+            <Input
+              onChange={(e) => handleStandardDeviation(e)}
+              id="standardDeviation"
+              value={standardDeviation}
+              type="number"
+              placeholder="Please enter Standard deviation here"
+            />
+            <DropdownElement>
+              <Select
+                id="dropdownperiod"
+                value={dropdownPeriod || "month"}
+                onChange={handleDropdownPeriod}
+                placeholder="Please Choose the Period"
+              >
+                <Option key={"month"} value="month">
+                  month
+                </Option>
+                <Option key={"week"} value="week">
+                  week
+                </Option>
+                <Option key={"day"} value="day">
+                  day
+                </Option>
+              </Select>
+            </DropdownElement>
           </Form>
         </ModalComponent>
       )}
