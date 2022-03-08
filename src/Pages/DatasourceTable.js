@@ -29,6 +29,9 @@ function DatasourceTable() {
   const [isDropdownModalVisible, setIsDropdownModalVisible] = useState(false);
 
   const [name, setName] = useState("");
+  const [deviation, setDeviation] = useState("");
+  const [period, setPeriod] = useState("");
+  const [periodicity, setPeriodicity] = useState("");
   const [dropdownname, setDropdownName] = useState(" ");
   const [menuItems, setMenuItems] = useState([]);
   const [itemReportMartId, setItemReportMartId] = useState();
@@ -59,23 +62,24 @@ function DatasourceTable() {
   );
 
   const handleColumn = (record) => {
-    if(selectedRowKeys && selectedRowKeys.length > 0){
-      setIsDropdownModalVisible(true);
-    setCurrent(record);
-    Axios.get(columnData, {
-      headers: {
-        datasource_id: location.state.source_id,
-        source_type: location.state.source_type,
-      },
-    })
-      .then((res) => {
-        const values = Object.keys(res.data).map((key, index) => ({
-            id: index, name: res.data[key][0]
-        }));
-        setColumnDataInfo(values);
-      }).catch((err) => {
-        message.info("Something went wrong");
-      });
+    if (selectedRowKeys && selectedRowKeys.length > 0) {
+      setCurrent(record);
+      Axios.get(columnData, {
+        headers: {
+          datasource_id: location.state.source_id,
+          source_type: location.state.source_type,
+        },
+      })
+        .then((res) => {
+          const values = Object.keys(res.data).map((key, index) => ({
+            id: index,
+            name: res.data[key][0],
+          }));
+          setColumnDataInfo(values);
+        })
+        .catch((err) => {
+          message.info("Something went wrong");
+        });
     } else {
       message.info("Please select a row");
     }
@@ -91,15 +95,11 @@ function DatasourceTable() {
     },
 
     {
-      width: 40,
+      width: 50,
       title: "Segregate column",
       dataIndex: "column",
       key: "column",
       fixed: "center",
-    },
-    {
-      key: "operation",
-      width: 40,
       render: (record) => (
         <div
           style={{
@@ -108,11 +108,38 @@ function DatasourceTable() {
             justifyContent: "center",
           }}
         >
-          <span
-            style={{ cursor: "pointer" }}
-            onClick={() => handleColumn(record)}
-          >
-            <EditFilled />
+          <DropdownElement>
+            <Select
+              style={{ width: 250 }}
+              onChange={handleDropdownChange}
+              onClick={() => handleColumn(record)}
+              placeholder="Choose Column"
+            >
+              {columnDataInfo &&
+                columnDataInfo.length > 0 &&
+                columnDataInfo.map((item) => (
+                  <Option key={item.id} value={item.name}>
+                    {item.name}
+                  </Option>
+                ))}
+            </Select>
+          </DropdownElement>
+        </div>
+      ),
+    },
+    {
+      key: "operation",
+      width: 20,
+      render: (record) => (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <span style={{ cursor: "pointer" }}>
+            <EditFilled disabled={loading} />
           </span>
         </div>
       ),
@@ -146,7 +173,7 @@ function DatasourceTable() {
       ),
       source_type: location.state.source_type,
     };
-
+    console.log(pay);
     Axios.post(url, pay)
       .then((res) => {
         setLoading(false);
@@ -181,35 +208,40 @@ function DatasourceTable() {
   }, [selectedRowKeys, tableData, dropdownname]);
 
   const handleOk = () => {
-    Axios.post(datasetUrl, payload, {
-      headers: {
-        type: "dataset",
-        source_id: params.responseid,
-      },
-    })
-      .then((res) => {
-        const data = tableData.map((item, index) => {
-          return {
-            ...item,
-            column: current.key === item.key ? dropdownname : "",
-          };
-        });
-        setTableData([...data]);
-        Axios.post(reportMart, null, {
-          headers: {
-            datasource_id: location.state.response_id
-              ? location.state.response_id
-              : location.state.id,
-            reportmart_name: name,
-          },
-        }).then((res) => {
-          setDropDown(!dropDown);
-          setIsModalVisible(false);
-        });
+    if (isModalVisible) {
+      Axios.post(datasetUrl, payload, {
+        headers: {
+          type: "dataset",
+          source_id: params.responseid,
+        },
       })
-      .catch((err) => {
-        message.info("Something went wrong");
-      });
+        .then((res) => {
+          const data = tableData.map((item, index) => {
+            return {
+              ...item,
+              column: current.key === item.key ? dropdownname : "",
+            };
+          });
+          setTableData([...data]);
+          Axios.post(reportMart, null, {
+            headers: {
+              datasource_id: location.state.response_id
+                ? location.state.response_id
+                : location.state.id,
+              reportmart_name: name,
+              deviation: deviation,
+              period: period,
+              periodicity: periodicity,
+            },
+          }).then((res) => {
+            setDropDown(!dropDown);
+            setIsModalVisible(false);
+          });
+        })
+        .catch((err) => {
+          message.info("Something went wrong");
+        });
+    }
     isDropdownModalVisible
       ? setIsDropdownModalVisible(false)
       : setIsModalVisible(false);
@@ -219,11 +251,16 @@ function DatasourceTable() {
       ? setIsDropdownModalVisible(false)
       : setIsModalVisible(false);
   };
-  const handleOpen = () => {
-    setIsModalVisible(true);
-  };
+
   const handleChange = (e) => {
     setName(e.target.value);
+    setDeviation(e.target.value);
+    setPeriodicity(e.target.value);
+  };
+  const handleDropdownPeriod = (e) => {
+    debugger;
+    setPeriodicity(e);
+    console.log(e);
   };
 
   useEffect(() => {
@@ -312,31 +349,39 @@ function DatasourceTable() {
                 setScreenLoading(false);
                 setBtnLoading(false);
                 const data = res.data;
-                const expeData =
-                  data &&
-                  data.result[response.data.datasets_response_id[0]]
-                    .expectations;
+                if (data.result && Object.keys(data.result).length > 0) {
+                  const expeData =
+                    data &&
+                    data.result[response.data.datasets_response_id[0]]
+                      .expectations;
 
-                dispatch(addExpectationData(expeData));
+                  dispatch(addExpectationData(expeData));
 
-                // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-                navigate("/configuration/datasource/martdetails/tablechecks", {
-                  state: {
-                    expectationsData: response.data.datasets_response_id.map(
-                      (id) => res.data.result[id]
-                    ),
-                    expectations:
-                      res.data &&
-                      res.data.result[response.data.datasets_response_id[0]]
-                        .expectations,
-                    reportmart_id: res.data && res.data.report_mart_id,
-                    dataset_ids: response.data.datasets_response_id,
-                    data_source_id: params.responseid,
-                    selectedDropdownName: dropdownname,
-                  },
-                });
+                  // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
+                  navigate(
+                    "/configuration/datasource/martdetails/tablechecks",
+                    {
+                      state: {
+                        expectationsData:
+                          response.data.datasets_response_id.map(
+                            (id) => res.data.result[id]
+                          ),
+                        expectations:
+                          res.data &&
+                          res.data.result[response.data.datasets_response_id[0]]
+                            .expectations,
+                        reportmart_id: res.data && res.data.report_mart_id,
+                        dataset_ids: response.data.datasets_response_id,
+                        data_source_id: params.responseid,
+                        selectedDropdownName: dropdownname,
+                      },
+                    }
+                  );
 
-                message.success("Schema information fetched Successfully!");
+                  message.success("Schema information fetched Successfully!");
+                } else {
+                  message.warn("No data found in the selected report mart");
+                }
               })
               .catch((err) => {
                 setBtnLoading(false);
@@ -459,7 +504,7 @@ function DatasourceTable() {
         >
           <Form form={form} layout="vertical">
             <Form.Item
-              label="Reporting Mart Name"
+              label="Reporting Mart Details"
               style={{ fontWeight: "bold" }}
             >
               <Input
@@ -467,37 +512,46 @@ function DatasourceTable() {
                 id="name"
                 value={name}
                 type="text"
-                placeholder="Please enter Name here"
+                placeholder="Please enter Mart Name here"
               />
             </Form.Item>
+            <Form.Item>
+              <Input
+                onChange={(e) => handleChange(e)}
+                id="deviation"
+                value={deviation}
+                type="number"
+                placeholder="Please enter Standard Deviation"
+              />{" "}
+            </Form.Item>
+            <Form.Item>
+              <Input
+                onChange={(e) => handleChange(e)}
+                id="period"
+                value={period}
+                type="number"
+                placeholder="Please enter Period"
+              />{" "}
+            </Form.Item>
+            <Form.Item>
+              <Select
+                id="periodicity"
+                value={periodicity}
+                onChange={handleDropdownPeriod}
+                placeholder="Please Choose the Period"
+              >
+                <Option key={1} value="month">
+                  month
+                </Option>
+                <Option key={2} value="week">
+                  week
+                </Option>
+                <Option key={3} value="day">
+                  day
+                </Option>
+              </Select>
+            </Form.Item>
           </Form>
-        </ModalComponent>
-      )}
-      {isDropdownModalVisible && (
-        <ModalComponent
-          isModalVisible={isDropdownModalVisible}
-          setIsModalVisible={setIsDropdownModalVisible}
-          handleOk={handleOk}
-          handleCancel={handleCancel}
-          OkText="Submit"
-          width="461.15px"
-          title="Select Column "
-        >
-          <DropdownElement>
-            <Select
-              style={{ width: 250 }}
-              onChange={handleDropdownChange}
-              placeholder="Choose Column"
-            >
-              {columnDataInfo &&
-                columnDataInfo.length > 0 &&
-                columnDataInfo.map((item) => (
-                  <Option key={item.id} value={item.name}>
-                    {item.name}
-                  </Option>
-                ))}
-            </Select>
-          </DropdownElement>
         </ModalComponent>
       )}
     </Tableview>
@@ -566,7 +620,8 @@ const ButtonPosition = styled.div`
 
 const DropdownElement = styled.div`
   display: flex;
-  margin-top: 10px;
+  margin-top: 20px;
   justify-content: flex-start;
   width: 100%;
+  font-weight: lighter;
 `;

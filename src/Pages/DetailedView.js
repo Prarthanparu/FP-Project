@@ -11,7 +11,7 @@ import {
   Alert,
 } from "antd";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import { Link } from "react-router-dom";
@@ -40,12 +40,17 @@ function DetailedView() {
       title: "quality_check_result",
     },
   ];
-  const [state, setState] = useState([]);
+
+  const { state } = useLocation();
+
+  const [martData, setMartData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     setIsLoading(true);
     const proxy = process.env.REACT_APP_PROXY;
-    const obj = window.history.state.usr;
+    const obj = state;
+    console.log(obj);
     const reportmartQualityChecks = proxy + "/api/reportmart_quality_checks";
     axios
       .get(reportmartQualityChecks, {
@@ -53,31 +58,21 @@ function DetailedView() {
       })
       .then((res) => {
         setIsLoading(false);
-        setState(res.data);
+        setMartData(res.data);
       })
       .catch((e) => {
         setIsLoading(false);
       });
   }, []);
-  const menu = (
-    <Menu>
-      <Menu.Item>
-        <h4>1st menu item</h4>
-      </Menu.Item>
-      <Menu.Item>
-        <h4>2nd menu item</h4>
-      </Menu.Item>
-      <Menu.Item>
-        <h4>3rd menu item</h4>
-      </Menu.Item>
-    </Menu>
-  );
 
   const navigate = useNavigate();
   const handleClickDataset = (list) => {
-    list.report_mart_id = state[0].report_mart_id;
+    list.report_mart_id = state.report_mart_id;
+    list.execution_id = state.execution_id;
+
     navigate(`/configuration/reportmart/detailedview/individualdata`, {
-      state: list
+      state: list,
+      headerObj: state,
     });
   };
   return (
@@ -122,11 +117,10 @@ function DetailedView() {
             >
               <List
                 itemLayout="horizontal"
-                dataSource={state}
+                dataSource={martData}
                 renderItem={(item) => (
                   <List.Item>
                     <List.Item.Meta
-                      onClick={() => handleClickDataset(item)}
                       style={{
                         border: "1px solid black",
                         padding: "20px",
@@ -167,18 +161,15 @@ function DetailedView() {
                               Run Date:{" "}
                               {moment(item.processed_date).format("DD-MM-YYYY")}
                             </a>
-                            <h5>There are Several Critical Findings</h5>
                             <ul>
                               <li>
                                 <h5>
-                                  {item.applied_table_expectations} Table Level
-                                  Findings
+                                  {item.applied_table_expectations} Applied table expectaions
                                 </h5>
                               </li>
                               <li>
                                 <h5>
-                                  {item.applied_column_expectation} Column Level
-                                  Findings
+                                  {item.applied_column_expectation} Applied column expectaions
                                 </h5>
                               </li>
                             </ul>
@@ -191,13 +182,12 @@ function DetailedView() {
                               marginLeft: "25px",
                             }}
                           >
-                            <Dropdown
-                              overlay={menu}
-                              placement="bottomCenter"
-                              arrow
+                            <Button
+                              onClick={() => handleClickDataset(item)}
+                              type="secondary"
                             >
-                              <Button>Take Actions</Button>
-                            </Dropdown>
+                              Take Actions
+                            </Button>
                           </div>
                         </div>
                       }

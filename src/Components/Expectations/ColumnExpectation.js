@@ -62,7 +62,7 @@ function ColumnExpectation() {
     const filterItems = (arr, query) => {
       return arr.filter(function (el) {
         return (
-          el.expectation_type.toLowerCase().indexOf(query.toLowerCase()) !== -1
+          el.expectation_type.toLowerCase().indexOf(query.toLowerCase()) !== -1 && el.expectation_type.toLowerCase() === 'expect_column_mean_to_be_between'
         );
       });
     };
@@ -86,7 +86,7 @@ function ColumnExpectation() {
           uniqueColumns.push({
             columnName: element.kwargs.column,
             columnExpectations: [element.expectation_type],
-            selectedExpectations: [],
+            selectedExpectations: [element.expectation_type],
           });
         } else {
           uniqueColumns
@@ -207,9 +207,8 @@ function ColumnExpectation() {
 
   const handleSubmit = async () => {
     const { table_expectations, expectionsData } = datasource;
-
     let colPayload = [];
-    columnData.forEach((element) => {
+    columnData.forEach((element, columnIndex) => {
       // console.log('ele = ', element);
       let colExpectations = [];
       element.selectedExpectations.forEach((item) => {
@@ -230,10 +229,10 @@ function ColumnExpectation() {
           const selectedArray = expectionsData.filter(
             (val) => val.expectation_type === item
           );
-          if (selectedArray && selectedArray[0] && selectedArray[0].kwargs) {
+          if (selectedArray && selectedArray[columnIndex] && selectedArray[columnIndex].kwargs) {
             kwOj = {
               ...kwOj,
-              kwargs: selectedArray[0].kwargs,
+              kwargs: selectedArray[columnIndex].kwargs,
             };
           }
           colExpectations.push({
@@ -270,13 +269,7 @@ function ColumnExpectation() {
       .then((res) => {
         setScreenLoading(false);
         dispatch(clearTableExpectation);
-        // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-        navigate(
-          "/configuration/datasource/martdetails/columnchecks/datadocs",
-          {
-            state: {...params}
-          }
-        );
+        navigate("/configuration/reportmart");
         message.success("Profiling Done Successfully!");
       })
       .catch((err) => {
@@ -300,7 +293,7 @@ function ColumnExpectation() {
     let colPayload = [];
     columnData.forEach((element) => {
       let colExpectations = [];
-      element.selectedExpectations.forEach((item) => {
+      element.selectedExpectations.forEach((item, colIndex) => {
         if (editKwargsObj[item] !== undefined) {
           const colObj = { column: element.columnName };
           let kwOj = {
@@ -317,11 +310,11 @@ function ColumnExpectation() {
 
           const selectedArray = expectionsData.filter(
             (val) => val.expectation_type === item
-          );
-          if (selectedArray && selectedArray[0] && selectedArray[0].kwargs) {
+          ); 
+          if (selectedArray && selectedArray[colIndex] && selectedArray[colIndex].kwargs) {
             kwOj = {
               ...kwOj,
-              kwargs: selectedArray[0].kwargs,
+              kwargs: selectedArray[colIndex].kwargs,
             };
           }
           colExpectations.push({

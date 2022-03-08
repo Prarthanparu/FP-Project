@@ -15,47 +15,47 @@ import { addTableExpectation } from "../../redux/slices/dataSourceSlice";
 import ExpectationKwargsUpdate from "./ExpectationKwargsUpdate";
 
 const TableExpectation = () => {
+  // {
+  //   title: "expect_table_row_count_to_equal",
+  //   kwargs: {
+  //     value: "",
+  //   },
+  // },
+  // {
+  //   title: "expect_value_at_index",
+  // },
+  // {
+  //   title: "expect_table_row_count_to_equal_other_table",
+  // },
+  // {
+  //   title: "expect_table_columns_to_match_set",
+  //   kwargs: {
+  //     column_set: "",
+  //     exact_match: "",
+  //   },
+  // },
+  // {
+  //   title: "expect_table_columns_to_match_ordered_list",
+  //   kwargs: {
+  //     column_list: "",
+  //   },
+  // },
+  // {
+  //   title: "expect_table_column_count_to_equal",
+  //   kwargs: {
+  //     value: "",
+  //   },
+  // },
+  // {
+  //   title: "expect_table_column_count_to_be_between",
+  //   kwargs: {
+  //     min_value: "",
+  //     max_value: "",
+  //   },
+  // },
   const expectation = [
     {
-      title: "expect_table_row_count_to_equal",
-      kwargs: {
-        value: "",
-      },
-    },
-    {
-      title: "expect_value_at_index",
-    },
-    {
-      title: "expect_table_row_count_to_equal_other_table",
-    },
-    {
-      title: "expect_table_columns_to_match_set",
-      kwargs: {
-        column_set: "",
-        exact_match: "",
-      },
-    },
-    {
-      title: "expect_table_columns_to_match_ordered_list",
-      kwargs: {
-        column_list: "",
-      },
-    },
-    {
       title: "expect_table_row_count_to_be_between",
-      kwargs: {
-        min_value: "",
-        max_value: "",
-      },
-    },
-    {
-      title: "expect_table_column_count_to_equal",
-      kwargs: {
-        value: "",
-      },
-    },
-    {
-      title: "expect_table_column_count_to_be_between",
       kwargs: {
         min_value: "",
         max_value: "",
@@ -103,7 +103,7 @@ const TableExpectation = () => {
     const filterItems = (arr, query) => {
       return arr.filter(function (el) {
         return (
-          el.expectation_type.toLowerCase().indexOf(query.toLowerCase()) !== -1
+          el.expectation_type.toLowerCase().indexOf(query.toLowerCase()) !== -1 && el.expectation_type.toLowerCase() === 'expect_table_row_count_to_be_between'
         );
       });
     };

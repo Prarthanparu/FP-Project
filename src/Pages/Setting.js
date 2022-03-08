@@ -1,51 +1,88 @@
-import React, { useEffect } from "react";
-import { Form, Input, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, message, Select } from "antd";
 import styled from "styled-components";
 import Axios from "axios";
 
-const Setting = () => {
+const { Option } = Select;
+
+const Settings = () => {
   const [form] = Form.useForm();
   const proxy = process.env.REACT_APP_PROXY;
   const url = proxy + "/api/appconfiguration";
+  const [data, setData] = useState({});
 
   useEffect(() => {
     Axios.get(url).then((res) => {
-      console.log(res.data);
+      setData(res.data);
     });
-  });
+  }, [url]);
+
+  const onFinish = () => {
+    Axios.put(url, data.response).then((res) => {
+      message.info("successfully updated");
+    });
+  };
+
+  const onValueChange = (e) => {
+    const newValue = data.response.find((x) => x.id === parseInt(e.target.id));
+    newValue.attribute_value = e.target.value;
+    const newData = data.response.map((x) =>
+      x.id === parseInt(e.target.id) ? newValue : x
+    );
+    setData({ ...data, response: newData });
+  };
+
+  const onSelectValue = (id, value) => {
+    const newValue = data.response.find((x) => x.id === parseInt(id));
+    newValue.attribute_value = value;
+    const newData = data.response.map((x) =>
+      x.id === parseInt(id) ? newValue : x
+    );
+    setData({ ...data, response: newData });
+  };
+
+
   const formItemLayout = {
     labelCol: { span: 3 },
     wrapperCol: { span: 6 },
   };
-  const data = {
-    response: [
-      {
-        id: 1,
-        attribute_name: "period",
-        attribute_value: "12",
-        active: 1,
-      },
-      {
-        id: 2,
-        attribute_name: "standard_deviation",
-        attribute_value: "2",
-        active: 1,
-      },
-    ],
-  };
   return (
     <MainWrapper>
       <Header>
-        <h1>Setting</h1>
+        <h1>Settings</h1>
       </Header>
       <Form {...formItemLayout} form={form} layout="horizontal">
-        {data.response.map((e) => (
-          <Form.Item label={e.attribute_name}>
-            <Input placeholder={e.attribute_name} value={e.attribute_value} />
-          </Form.Item>
-        ))}
+        {data.response?.map((setting) => {
+          return setting.attribute_type === "select" ? (
+            <Form.Item label={setting.display_name}>
+              <Select
+                placeholder="Select periodicity"
+                onChange={(value) => onSelectValue(setting.id, value)}
+                defaultValue={setting.attribute_value}
+              >
+                {JSON.parse(setting.possible_values).map((x) => (
+                  <Option value={x} key={x}>
+                    {x}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          ) : (
+            <Form.Item label={setting.display_name}>
+              <Input
+                placeholder={setting.attribute_name}
+                id={setting.id}
+                value={setting.attribute_value}
+                onChange={onValueChange}
+                type={setting.attribute_type}
+              />
+            </Form.Item>
+          );
+        })}
         <ButtonContent>
-          <Button type="primary" >Submit</Button>
+          <Button type="primary" onClick={onFinish}>
+            Submit
+          </Button>
         </ButtonContent>
       </Form>
     </MainWrapper>
@@ -69,4 +106,4 @@ const ButtonContent = styled.div`
   justify-content: center;
 `;
 
-export default Setting;
+export default Settings;

@@ -1,50 +1,53 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Collapse, Space } from "antd";
-import { CaretRightOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { Collapse, Space, message } from "antd";
+import { PlusCircleOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { EyeOutlined } from "@ant-design/icons";
 import { Pie, Line } from "@ant-design/plots";
 import { useNavigate } from "react-router-dom";
+
 import GraphModal from "../Components/GraphModal";
 import { useLocation } from "react-router-dom";
+import Axios from "axios";
+import moment from "moment";
 
-function DetailedViewGraph() {
+function DetailedViewGraph(props) {
+  console.log(props);
   const { Panel } = Collapse;
   const { state } = useLocation();
-  const navigate = useNavigate();
+  console.log(state);
   const [open, setOpen] = useState(false);
   const [type, setType] = useState("");
-  const text = `
--->  Row Count of 725 is outside of the expected range of 1681 and 2377
-`;
+  const navigate = useNavigate();
 
-  const DemoPie = () => {
-    const data = [
-      {
-        type: "type-A",
-        value: 27,
-      },
-      {
-        type: "type-B",
-        value: 25,
-      },
-      {
-        type: "type-C",
-        value: 18,
-      },
-      {
-        type: "type-D",
-        value: 15,
-      },
-      {
-        type: "type-E",
-        value: 10,
-      },
-      {
-        type: "type-F",
-        value: 5,
-      },
-    ];
+  const PieGraph = () => {
+    const { state } = useLocation();
+
+    const proxy = process.env.REACT_APP_PROXY;
+    const pieGraphUrl = proxy + "/api/pie_graph_data";
+    const [data, setData] = useState([
+      { type: "Passed", value: 1 },
+      { type: "Failed", value: 1 },
+    ]);
+
+    useEffect(() => {
+      Axios.get(pieGraphUrl, {
+        headers: {
+          report_mart_id: state.report_mart_id,
+          execution_id: state.execution_id,
+        },
+      })
+        .then((res) => {
+          const values = [
+            { type: "Passed", value: res.data[0].no_of_passed },
+            { type: "Failed", value: res.data[0].no_of_failed },
+          ];
+          setData(values);
+        })
+        .catch((err) => {
+          message.info("Something went wrong");
+        });
+    }, [pieGraphUrl, state.execution_id, state.report_mart_id]);
     const config = {
       appendPadding: 10,
       data,
@@ -52,6 +55,7 @@ function DetailedViewGraph() {
       height: 300,
       angleField: "value",
       colorField: "type",
+      color: ["green", "red"],
       radius: 0.9,
       label: {
         type: "outer",
@@ -68,7 +72,11 @@ function DetailedViewGraph() {
     };
     return <Pie {...config} />;
   };
-  const DemoLine = () => {
+  const DemoLine = (props) => {
+    const { state } = useLocation();
+
+    const proxy = process.env.REACT_APP_PROXY;
+    const timeSeriesGraphUrl = proxy + "/api/time_series_graph";
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -76,21 +84,30 @@ function DetailedViewGraph() {
     }, []);
 
     const asyncFetch = () => {
-      fetch(
-        "https://gw.alipayobjects.com/os/bmw-prod/1d565782-dde4-4bb6-8946-ea6a38ccf184.json"
-      )
-        .then((response) => response.json())
-        .then((json) => setData(json))
-        .catch((error) => {
-          console.log("fetch data failed", error);
+      Axios.get(timeSeriesGraphUrl, {
+        headers: {
+          report_mart_id: state.report_mart_id,
+        },
+      })
+        .then((res) => {
+          const data_points = res.data.map((item) => {
+            return {
+              date: moment(item.processed_date).local().format("MM-DD-YYYY HH:mm"),
+              value: item.no_of_failed,
+            };
+          });
+          setData(data_points);
+        })
+        .catch((err) => {
+          message.info("Something went wrong");
         });
     };
     const config = {
       data,
       padding: "auto",
       width: 400,
-      xField: "Date",
-      yField: "scales",
+      xField: "date",
+      yField: "value",
       annotations: [
         {
           type: "regionFilter",
@@ -101,7 +118,7 @@ function DetailedViewGraph() {
         {
           type: "text",
           position: ["min", "median"],
-          content: "中位数",
+          content: "Failed",
           offsetY: -4,
           style: {
             textBaseline: "bottom",
@@ -121,116 +138,145 @@ function DetailedViewGraph() {
 
     return <Line {...config} />;
   };
-  const handleRedirect = (type) => {
+  
+  const handleRedirect = (column) => {
     setOpen(true);
-    setType(type);
+    setType(column);
   };
+
   const listData = window && window.history && window.history.state.usr;
+
   const handleBack = () => {
-    navigate(`/configuration/reportmart/detailedview/individualdata`, {
-      state: state.list,
+    navigate(`/configuration/reportmart/detailedview`, {
+      state: {
+        execution_id: state.execution_id,
+        report_mart_id: state.report_mart_id,
+      },
     });
   };
 
   return (
     <MainBody>
-      <ArrowLeftOutlined onClick={handleBack} />
+      <BackButton onClick={handleBack}>
+        <ArrowLeftOutlined />
+        &nbsp;Back
+      </BackButton>
       <DetailedViewGraphBody>
         <DetailedViewGraphHeader>
           <h2>Percent of Test failed</h2>
         </DetailedViewGraphHeader>
         <DetailedViewChart>
-          <DemoPie />
+          <PieGraph />
         </DetailedViewChart>
         <DetailedViewGraphHeaderTwo>
-          <h2>Count of Test Failuers over time</h2>
+          <h2>Count of Test Failures over time</h2>
         </DetailedViewGraphHeaderTwo>
         <DetailedViewChartSecond>
           <DemoLine />
         </DetailedViewChartSecond>
       </DetailedViewGraphBody>
-      <DetailedViewGraphContent>
-        <TableContentHeader>
-          <h1>Table Expectations</h1>
-        </TableContentHeader>
-        <TableContent>
-          <Collapse
-            bordered={false}
-            defaultActiveKey={["1"]}
-            expandIcon={({ isActive }) => (
-              <CaretRightOutlined rotate={isActive ? 90 : 0} />
-            )}
-            className="site-collapse-custom-collapse"
-          >
-            <Panel
-              header={listData.datset_name}
-              key="1"
-              className="site-collapse-custom-panel"
-            >
-              <Flex>
-                <span>
-                  {listData.table_expecatation_list.map((i, index) => (
-                    <span key={`${index}`}>
-                      {i}
-                      <br />
-                    </span>
+      <GraphBody>
+        <DetailedViewGraphContent>
+          <TableContentHeader>
+            <h1>Table Expectations</h1>
+          </TableContentHeader>
+          <TableContent>
+            <Flex>
+              <table cellPadding={10}>
+                <thead>
+                  <tr>
+                    <th>Expecations</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                {listData.table_expecatation_list
+                  .filter((e) => e === "expect_table_row_count_to_be_between")
+                  .map((i, index) => (
+                    <tr>
+                      <td>
+                        <span key={`${index}`}>{i}</span>
+                      </td>
+                      <td>
+                        <Icon
+                          onClick={(e) => {
+                            handleRedirect("table");
+                          }}
+                          title="View Details"
+                          style={{ fontSize: "20px", cursor: "pointer" }}
+                        />
+                      </td>
+                    </tr>
                   ))}
-                </span>
-                <Icon
-                  onClick={(e) => {
-                    handleRedirect("table");
-                  }}
-                  title="View Docs"
-                  style={{ fontSize: "20px", cursor: "pointer" }}
-                />
-              </Flex>
-            </Panel>
-          </Collapse>
-        </TableContent>
-      </DetailedViewGraphContent>
-      <DetailedViewGraphContent>
-        <TableContentHeader>
-          <h1> Column Expectations</h1>
-        </TableContentHeader>
-        <TableContent>
-          <Collapse
-            bordered={false}
-            defaultActiveKey={["1"]}
-            expandIcon={({ isActive }) => (
-              <CaretRightOutlined rotate={isActive ? 90 : 0} />
-            )}
-            className="site-collapse-custom-collapse"
-          >
-            <Panel
-              header={listData.datset_name}
-              key="1"
-              className="site-collapse-custom-panel"
-            >
-              <Flex
-                onClick={(e) => {
-                  handleRedirect("column");
+              </table>
+            </Flex>
+          </TableContent>
+        </DetailedViewGraphContent>
+        <DetailedViewGraphContentOne>
+          <TableContentHeader>
+            <h1> Column Expectations</h1>
+          </TableContentHeader>
+          <TableContent>
+            <Flex>
+              {/* <span
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
                 }}
-              >
-                <span>
-                  {listData.column_expecatation_list.map((i, index) => (
-                    <span key={`${index}`}>
-                      {i}
-                      <br />
-                    </span>
-                  ))}
-                </span>
-                <Icon
-                  onClick={(e) => {
-                    handleRedirect("column");
-                  }}
-                  title="View Docs"
-                  style={{ fontSize: "20px", cursor: "pointer" }}
-                />
-              </Flex>
-            </Panel>
-          </Collapse>
-        </TableContent>
-      </DetailedViewGraphContent>
+              > */}
+              <table cellPadding={10}>
+                <thead>
+                  <tr>
+                    <th>Columns</th>
+                    <th>Expecations</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+
+                {listData.column_expecatation_list.map(
+                  (expectation, expectationIndex) => (
+                    <tr>
+                      {/* <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            marginBottom: "5px",
+                            justifyContent: "space-between",
+                          }}
+                        > */}
+                      <td>
+                        <span
+                          style={{
+                            fontSize: "16px",
+                            fontWeight: "bold",
+                            color: " #EF7434",
+                          }}
+                        >
+                          {Object.keys(expectation)[0]}
+                        </span>
+                      </td>
+                      <td>
+                        <span>{Object.values(expectation)[0]}</span>
+                      </td>
+                      <td>
+                        <Icon
+                          onClick={(e) => {
+                            handleRedirect(Object.keys(expectation)[0]);
+                          }}
+                          title="View Details"
+                          style={{ fontSize: "20px", cursor: "pointer" }}
+                        />
+                      </td>
+                      {/* </div> */}
+                    </tr>
+                  )
+                )}
+              </table>
+              {/* </span> */}
+            </Flex>
+          </TableContent>
+        </DetailedViewGraphContentOne>
+      </GraphBody>
+
       {open && (
         <GraphModal
           isModalVisible={open}
@@ -240,6 +286,7 @@ function DetailedViewGraph() {
           handleOk={() => setOpen(false)}
           datasetId={state.dataset_id}
           reportMartId={state.report_mart_id}
+          execution_id={state.execution_id}
         />
       )}
     </MainBody>
@@ -262,12 +309,29 @@ const DetailedViewGraphBody = styled.div`
   border: 1px solid black;
   background-color: #2d2d2f;
   flex: 1;
+  gap: 80px;
   padding-left: 50px;
 `;
-const DetailedViewGraphContent = styled.div``;
+const DetailedViewGraphContent = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+`;
+const DetailedViewGraphContentOne = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+`;
 
 const TableContentHeader = styled.div``;
 const TableContent = styled.div``;
+const GraphBody = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  flex: 1;
+  gap: 50px;
+`;
 
 const DetailedViewChart = styled.div`
   display: flex;
@@ -291,7 +355,6 @@ const DetailedViewGraphHeaderTwo = styled.div`
 const Flex = styled.p`
   display: flex;
   align-items: end;
-  max-height: 100px;
   overflow-y: auto;
   margin-bottom: 0;
 `;
@@ -301,4 +364,12 @@ const Icon = styled(EyeOutlined)`
   &:hover {
     color: orange;
   }
+`;
+const BackButton = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(239, 116, 52);
 `;

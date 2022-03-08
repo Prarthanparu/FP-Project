@@ -54,10 +54,7 @@ function AppBody() {
         path="/configuration/reportmart/detailedview/individualdata"
         element={<DetailedViewGraph />}
       />
-      <Route
-        path="/configuration/setting"
-        element={<Setting />}
-      />
+      <Route path="/configuration/setting" element={<Setting />} />
     </Routes>
   );
 }

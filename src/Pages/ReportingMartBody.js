@@ -4,6 +4,7 @@ import {
   EditOutlined,
   FundViewOutlined,
   PlayCircleOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import Axios from "axios";
@@ -40,6 +41,7 @@ const ReportingMartBody = ({ suiteData }) => {
   const [date, setDate] = useState("");
   const [period, setPeriod] = useState("6");
   const [martId, setMartId] = useState(moment().format("DD-MM-YYYY"));
+  const [refresh, setRefresh] = useState(false);
 
   const [screenLoading, setScreenLoading] = useState(false);
 
@@ -52,6 +54,7 @@ const ReportingMartBody = ({ suiteData }) => {
           report_mart_id: martId,
           period,
           date: moment(date).format("YYYY-MM-DD"),
+          refresh: refresh
         },
         {
           headers: {
@@ -63,8 +66,10 @@ const ReportingMartBody = ({ suiteData }) => {
           console.log(res);
           setScreenLoading(false);
           setIsModalVisible(false);
-          // TODO fix this hard code res.data.result[response.data.datasets_response_id[0]]
-          message.success("Profiling Done Successfully!");
+          message.success(
+            "Quality checks has been performed successfully on reporting mart"
+          );
+          setIsModalVisible(false);
           navigate("/configuration/reportmart/refresh");
         })
         .catch((err) => {
@@ -116,8 +121,20 @@ const ReportingMartBody = ({ suiteData }) => {
               title="Execute"
               style={{ fontSize: "20px" }}
               onClick={(e) => {
+                setRefresh(false);
                 setIsModalVisible(true);
                 setMartId(reportMartId);
+              }}
+            />
+          </section>
+          <section>
+            <ReloadOutlined
+              title="Refresh Report Mart"
+              style={{ fontSize: "20px" }}
+              onClick={(e) => {
+                setIsModalVisible(true);
+                setMartId(reportMartId);
+                setRefresh(true);
               }}
             />
           </section>
